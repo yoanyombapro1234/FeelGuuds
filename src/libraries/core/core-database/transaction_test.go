@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
-	core_database "github.com/Lens-Platform/Platform/src/libraries/core/core-database"
+	core_database "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-database"
 )
 
 var (

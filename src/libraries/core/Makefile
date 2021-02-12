@@ -18,11 +18,7 @@ contracts:
     			-I=$(GOPATH)/src \
     			--go_out=plugins=grpc:./schema/models/ ./schema/proto/contracts/*.proto
 
-run-tests:
-	@echo "running core-library tests"
-	@echo "----- running core-metrics tests"
-	go test github.com/Lens-Platform/Platform/src/libraries/core/core-metrics
-	go test github.com/Lens-Platform/Platform/src/libraries/core/core-metrics/testutil
+run-tests: run-metrics-tests
 	@echo "----- running core-logging tests"
 	go test github.com/Lens-Platform/Platform/src/libraries/core/core-logging/datapol
 	go test github.com/Lens-Platform/Platform/src/libraries/core/core-logging/json
@@ -30,3 +26,10 @@ run-tests:
 	go test github.com/Lens-Platform/Platform/src/libraries/core/core-logging/sanitization
 	@echo "----- running core-auth-sdk tests"
 	go test github.com/Lens-Platform/Platform/src/libraries/core/core-auth-sdk
+
+
+run-metrics-tests:
+	@echo "running core-library tests"
+	@echo "----- running core-metrics tests"
+	go test github.com/Lens-Platform/Platform/src/libraries/core/core-metrics
+	go test github.com/Lens-Platform/Platform/src/libraries/core/core-metrics/testutil

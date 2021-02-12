@@ -21,7 +21,7 @@ import (
 
 	"github.com/go-logr/logr"
 
-	json "github.com/Lens-Platform/Platform/src/libraries/core/core-logging/json"
+	json "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
 )
 
 const (

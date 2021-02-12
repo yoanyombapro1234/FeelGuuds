@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	core_logging "github.com/Lens-Platform/Platform/src/libraries/core/core-logging/json"
+	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
 )
 
 type LoggingMiddleware struct {

@@ -19,7 +19,7 @@ package sanitization
 import (
 	"fmt"
 
-	"github.com/Lens-Platform/Platform/src/libraries/core/core-logging/datapol"
+	"github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/datapol"
 )
 
 const (
