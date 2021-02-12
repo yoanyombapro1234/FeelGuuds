@@ -18,18 +18,22 @@ contracts:
     			-I=$(GOPATH)/src \
     			--go_out=plugins=grpc:./schema/models/ ./schema/proto/contracts/*.proto
 
-run-tests: run-metrics-tests
-	@echo "----- running core-logging tests"
-	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/datapol
-	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json
-	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/logreduction
-	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/sanitization
-	@echo "----- running core-auth-sdk tests"
-	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk
-
+run-tests: run-metrics-tests run-logging-tests run-core-auth-sdk-tests
 
 run-metrics-tests:
 	@echo "running core-library tests"
 	@echo "----- running core-metrics tests"
 	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics
 	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics/testutil
+
+run-logging-tests:
+	@echo "running core-library tests"
+	@echo "----- running core-logging tests"
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/datapol
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/logreduction
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/sanitization
+
+run-core-auth-sdk-tests:
+	@echo "----- running core-auth-sdk tests"
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk
