@@ -20,16 +20,16 @@ contracts:
 
 run-tests: run-metrics-tests
 	@echo "----- running core-logging tests"
-	go test github.com/Lens-Platform/Platform/src/libraries/core/core-logging/datapol
-	go test github.com/Lens-Platform/Platform/src/libraries/core/core-logging/json
-	go test github.com/Lens-Platform/Platform/src/libraries/core/core-logging/logreduction
-	go test github.com/Lens-Platform/Platform/src/libraries/core/core-logging/sanitization
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/datapol
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/logreduction
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/sanitization
 	@echo "----- running core-auth-sdk tests"
-	go test github.com/Lens-Platform/Platform/src/libraries/core/core-auth-sdk
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk
 
 
 run-metrics-tests:
 	@echo "running core-library tests"
 	@echo "----- running core-metrics tests"
-	go test github.com/Lens-Platform/Platform/src/libraries/core/core-metrics
-	go test github.com/Lens-Platform/Platform/src/libraries/core/core-metrics/testutil
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics
+	go test github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics/testutil
