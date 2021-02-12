@@ -1,0 +1,79 @@
+name: publish-containers
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'release'
+
+jobs:
+  publish-containers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          platforms: all
+      - name: Setup Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          buildkitd-flags: "--debug"
+      #- name: Login to GitHub Container Registry
+      #  uses: docker/login-action@v1
+      #  with:
+      #    registry: ghcr.io
+      #    username: ${{ secrets.DOCKER_USERNAME }}
+      #   password: ${{ secrets.GHCR_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Prepare
+        id: prep
+        run: |
+          VERSION=sha-${GITHUB_SHA::8}
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF/refs\/tags\//}
+          fi
+          echo ::set-output name=BUILD_DATE::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          echo ::set-output name=VERSION::${VERSION}
+      - name: Publish multi-arch image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          builder: ${{ steps.buildx.outputs.name }}
+          context: ./podinfo
+          file: ./podinfo/Dockerfile
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
+          tags: |
+            blackspaceinc/podinfo:${{ steps.prep.outputs.VERSION }}
+            blackspaceinc/podinfo:latest
+            blackspaceinc/podinfo:${{ steps.prep.outputs.VERSION }}
+          labels: |
+            org.opencontainers.image.title=${{ github.event.repository.name }}
+            org.opencontainers.image.description=${{ github.event.repository.description }}
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.url=${{ github.event.repository.html_url }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.prep.outputs.VERSION }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.BUILD_DATE }}
+      - name: Publish base image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          builder: ${{ steps.buildx.outputs.name }}
+          context: ./podinfo
+          platforms: linux/amd64
+          file: ./podinfo/Dockerfile.base
+          tags: docker.io/blackspaceinc/podinfo-base:latest
+      - name: Publish helm chart
+        uses: stefanprodan/helm-gh-pages@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: ./podinfo/charts
+          target_dir: ./podinfo/charts
+          commit_username: LensPlatform
+          commit_email: yoanyombapro@gmail.com
