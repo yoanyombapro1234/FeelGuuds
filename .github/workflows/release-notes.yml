@@ -5,6 +5,7 @@ on:
     branches:
       - 'master'
       - 'release'
+      - 'main'
 
 jobs:
   publish-release-notes:
