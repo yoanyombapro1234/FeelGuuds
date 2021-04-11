@@ -3,7 +3,7 @@ name: Authentication Service Continuos Integration Flow
 on:
   push:
     branches:
-      - 'main'
+      - '*'
 
 jobs:
   trivy_authentication_service:
