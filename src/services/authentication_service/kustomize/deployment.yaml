@@ -15,22 +15,31 @@ spec:
       app: service
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9797"
       labels:
         app: service
     spec:
       containers:
-      - name: backend
+      - name: service
         image: keratin/authn-server:latest
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
           containerPort: 3000
           protocol: TCP
+        - name: http-metrics
+          containerPort: 9797
+          protocol: TCP
+        - name: grpc
+          containerPort: 9999
+          protocol: TCP
         command:
         - sh -c "./authn migrate && ./authn server"
         env:
           - name: AUTHN_URL
-            value: "http://service:3000"
+            value: "http://backend:3000"
           - name: APP_DOMAINS
             value: "localhost"
           - name: SECRET_KEY_BASE
@@ -78,7 +87,7 @@ spec:
             command:
             - curl
             - -f
-            - service:3000/health
+            - backend:3000/health
           initialDelaySeconds: 5
           timeoutSeconds: 5
         resources:
@@ -87,4 +96,4 @@ spec:
             memory: 512Mi
           requests:
             cpu: 100m
-            memory: 32Mi
+            memory: 64Mi
