@@ -23,14 +23,12 @@ spec:
   selfSigned: {}
 EOF
 
-#kubectl create -f kubernetes-db-config/postgres-configmap.yaml
-#kubectl create -f kubernetes-db-config/postgres-storage.yaml
-#kubectl create -f kubernetes-db-config/postgres-deployment.yaml
-#kubectl create -f kubernetes-db-config/postgres-service.yaml
+kubectl create -f kubernetes-db-config/postgres-configmap.yaml
+kubectl create -f kubernetes-db-config/postgres-storage.yaml
+kubectl create -f kubernetes-db-config/postgres-deployment.yaml
+kubectl create -f kubernetes-db-config/postgres-service.yaml
 
-#kubectl get svc postgres
-
-helm install my-release stable/postgresql
+kubectl get svc postgres
 
 # install service with tls enabled
 helm upgrade --install authentication-service ./charts/authentication_service \
