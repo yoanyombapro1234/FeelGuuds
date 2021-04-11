@@ -1,9 +1,8 @@
-name: Podinfo Continuos Integration Flow
+name: Authentication Service Continuos Integration Flow
 
 on:
   push:
     branches:
-      - 'master'
       - 'main'
 
 jobs:
@@ -14,9 +13,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Build image
         id: build
-        working-directory: ./podinfo
+        working-directory: ./src/services/authentication_service
         run: |
-          IMAGE=test/podinfo:${GITHUB_SHA}
+          IMAGE=keratin/authn-server:latest
           docker build -t ${IMAGE} .
           echo "::set-output name=image::$IMAGE"
       - name: Scan image
@@ -31,7 +30,7 @@ jobs:
           - 2.16.12
           - 3.3.4
     env:
-      working-directory: ./podinfo
+      working-directory: ./src/services/authentication_service
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -42,7 +41,7 @@ jobs:
         working-directory: ${{env.working-directory}}
         run: |
           ./hack/build.sh
-          kind load docker-image test/podinfo:latest
+          kind load docker-image keratin/authn-server:latest
       - name: Setup Helm
         uses: ./.github/actions/helm
         with:
@@ -60,12 +59,12 @@ jobs:
       - name: Debug failure
         if: failure()
         run: |
-          kubectl logs -l app=podinfo || true
+          kubectl logs -l app=authentication_service || true
 
   test:
     runs-on: ubuntu-latest
     env:
-      working-directory: ./podinfo
+      working-directory: ./src/services/authentication_service
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -92,7 +91,7 @@ jobs:
         uses: stefanprodan/kube-tools@v1
         with:
           command: |
-            helmv3 template ${{env.working-directory}}/charts/podinfo | kubeval --strict
+            helmv3 template ${{env.working-directory}}/charts/authentication_service | kubeval --strict
       - name: Validate kustomization
         uses: stefanprodan/kube-tools@v1
         with:
