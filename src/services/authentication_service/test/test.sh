@@ -3,7 +3,7 @@
 set -e
 
 # wait for service
-kubectl rollout status deployment/authentication_service --timeout=3m
+kubectl rollout status deployment/authentication-service --timeout=3m
 
 # test service
 helm test service
