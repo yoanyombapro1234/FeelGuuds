@@ -2,12 +2,12 @@
 
 replicaCount: 1
 logLevel: info
-backend: #http://authentication_service:9898/echo
+backend: #http://authentication-service:9898/echo
 backends: []
 
 image:
-    repository: ghcr.io/FeelGuuds/authentication_service
-    tag: 5.2.0
+    repository: keratin/authn-server
+    tag: 1.10.4
     pullPolicy: IfNotPresent
 
 ui:
@@ -33,7 +33,7 @@ service:
     httpPort: 9898
     externalPort: 3000
     grpcPort: 9999
-    grpcService: authentication_service
+    grpcService: authentication-service
     nodePort: 31198
     # the port used to bind the http port to the host
     # NOTE: requires privileged container with NET_BIND_SERVICE capability -- this is useful for testing
@@ -67,7 +67,7 @@ certificate:
         name: self-signed
     # the hostname / subject alternative names for the certificate
     dnsNames:
-        - authentication_service
+        - authentication-service
 
 # metrics-server add-on required
 hpa:

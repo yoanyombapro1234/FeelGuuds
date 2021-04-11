@@ -9,7 +9,7 @@ spec:
   routes:
     - condition:
         method: GET
-        pathRegex: /
+        pathRegex: /health
       name: GET /
     - condition:
         method: POST

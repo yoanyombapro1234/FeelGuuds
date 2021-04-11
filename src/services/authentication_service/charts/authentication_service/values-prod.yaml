@@ -7,8 +7,8 @@ backend: #http://authentication_service:9898/echo
 backends: []
 
 image:
-  repository: ghcr.io/FeelGuuds/authentication_service
-  tag: 5.2.0
+  repository: keratin/authn-server
+  tag: 1.10.4
   pullPolicy: IfNotPresent
 
 ui:
@@ -64,7 +64,7 @@ certificate:
     name: self-signed
   # the hostname / subject alternative names for the certificate
   dnsNames:
-    - authentication_service
+    - authentication-service
 
 # metrics-server add-on required
 hpa:
