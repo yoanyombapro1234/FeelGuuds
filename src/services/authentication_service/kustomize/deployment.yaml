@@ -45,7 +45,7 @@ spec:
         - name: SECRET_KEY_BASE
           value: "secret"
         - name: DATABASE_URL
-          value: "sqlite3://:memory:?mode=memory\\&cache=shared"
+          value: "postgres://postgresadmin1:admin123@localhost:5432/postgresdb"
         - name: REDIS_URL
           value: "cache:6379" # TODO change this to actual redis cluster in the cloud
         - name: HTTP_AUTH_USERNAME
