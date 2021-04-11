@@ -40,22 +40,18 @@ jobs:
       - name: Build container image
         working-directory: ${{env.working-directory}}
         run: |
-          ./hack/build.sh
+          ./test/build.sh
           kind load docker-image keratin/authn-server:latest
       - name: Setup Helm
         uses: ./.github/actions/helm
         with:
           helm-version: ${{ matrix.helm-version }}
-      - name: Install Tiller
-        working-directory: ${{env.working-directory}}
-        if: ${{ startsWith(matrix.helm-version, '2') }}
-        run: ./hack/tiller.sh
       - name: Deploy
         working-directory: ${{env.working-directory}}
-        run: ./hack/deploy.sh
+        run: ./test/deploy.sh
       - name: Run integration tests
         working-directory: ${{env.working-directory}}
-        run: ./hack/test.sh
+        run: ./test/test.sh
       - name: Debug failure
         if: failure()
         run: |
