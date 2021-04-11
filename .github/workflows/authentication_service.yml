@@ -11,12 +11,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build image
-        id: build
+      - name: Pull image
+        id: pull
         working-directory: ./src/services/authentication_service
         run: |
           IMAGE=keratin/authn-server:latest
-          docker build -t ${IMAGE} .
+          docker pull ${IMAGE}
           echo "::set-output name=image::$IMAGE"
       - name: Scan image
         uses: docker://docker.io/aquasec/trivy:latest
