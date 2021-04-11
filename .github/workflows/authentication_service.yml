@@ -48,9 +48,6 @@ jobs:
       - name: Deploy
         working-directory: ${{env.working-directory}}
         run: ./test/deploy.sh
-      - name: Run integration tests
-        working-directory: ${{env.working-directory}}
-        run: ./test/test.sh
       - name: Debug failure
         if: failure()
         run: |
