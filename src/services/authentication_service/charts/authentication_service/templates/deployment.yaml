@@ -47,63 +47,47 @@ spec:
                 - NET_BIND_SERVICE
           {{- end }}
           command:
-            - ./service
-            - --port={{ .Values.service.httpPort | default 9898 }}
-            {{- if .Values.tls.enabled }}
-            - --secure-port={{ .Values.tls.port }}
-            {{- end }}
-            {{- if .Values.tls.certPath }}
-            - --cert-path={{ .Values.tls.certPath }}
-            {{- end }}
-            {{- if .Values.service.metricsPort }}
-            - --port-metrics={{ .Values.service.metricsPort }}
-            {{- end }}
-            {{- if .Values.service.grpcPort }}
-            - --grpc-port={{ .Values.service.grpcPort }}
-            {{- end }}
-            {{- if .Values.service.grpcService }}
-            - --grpc-service-name={{ .Values.service.grpcService }}
-            {{- end }}
-            {{- range .Values.backends }}
-            - --backend-url={{ . }}
-            {{- end }}
-            {{- if .Values.cache }}
-            - --cache-server={{ .Values.cache }}
-            {{- else if .Values.redis.enabled }}
-            - --cache-server={{ template "service.fullname" . }}-redis:6379
-            {{- end }}
-            - --level={{ .Values.logLevel }}
-            - --random-delay={{ .Values.faults.delay }}
-            - --random-error={{ .Values.faults.error }}
-            {{- if .Values.faults.unhealthy }}
-            - --unhealthy
-            {{- end }}
-            {{- if .Values.faults.unready }}
-            - --unready
-            {{- end }}
-            {{- if .Values.h2c.enabled }}
-            - --h2c
-            {{- end }}
+		  	- sh -c "./authn migrate && ./authn server"
           env:
-          {{- if .Values.ui.message }}
-          - name: SERVICE_UI_MESSAGE
-            value: {{ quote .Values.ui.message }}
-          {{- end }}
-          {{- if .Values.ui.logo }}
-          - name: SERVICE_UI_LOGO
-            value: {{ .Values.ui.logo }}
-          {{- end }}
-          {{- if .Values.ui.color }}
-          - name: SERVICE_UI_COLOR
-            value: {{ quote .Values.ui.color }}
-          {{- end }}
-          {{- if .Values.backend }}
-          - name: SERVICE_BACKEND_URL
-            value: {{ .Values.backend }}
-          {{- end }}
+			- name: AUTHN_URL
+			  value: "http://backend:3000"
+			- name: APP_DOMAINS
+			  value: "localhost"
+			- name: SECRET_KEY_BASE
+			  value: "secret"
+			- name: DATABASE_URL
+			  value: "sqlite3://:memory:?mode=memory\\&cache=shared"
+			- name: REDIS_URL
+			  value: "cache:6379" # TODO change this to actual redis cluster in the cloud
+			- name: HTTP_AUTH_USERNAME
+			  value: "test"
+			- name: HTTP_AUTH_PASSWORD
+			  value: "test"
+			- name: ENABLE_SIGNUP
+			  value: "false"
+			- name: ACCESS_TOKEN_TTL
+			  value: "86400"
+			- name: REFRESH_TOKEN_TTL
+			  value: "2592000"
+			- name: SESSION_KEY_SALT
+			  value: "test"
+			- name: DB_ENCRYPTION_KEY_SALT
+			  value: "test"
+			- name: USERNAME_IS_EMAIL
+			  value: "true"
+			- name: PASSWORD_POLICY_SCORE
+			  value: "2"
+			- name: PASSWORD_CHANGE_LOGOUT
+			  value: "true"
+			- name: APP_PASSWORD_RESET_URL
+			  value: ""
+			- name: PASSWORD_RESET_TOKEN_TTL
+			  value: "1800"
+			- name: APP_PASSWORD_CHANGED_URL
+			  value: ""
           ports:
             - name: http
-              containerPort: {{ .Values.service.httpPort | default 9898 }}
+              containerPort: {{ .Values.service.httpPort | default 3000 }}
               protocol: TCP
               {{- if .Values.service.hostPort }}
               hostPort: {{ .Values.service.hostPort }}
@@ -129,19 +113,17 @@ spec:
           livenessProbe:
             exec:
               command:
-              - servicecli
-              - check
-              - http
-              - localhost:{{ .Values.service.httpPort | default 9898 }}/healthz
+              - curl
+              - -f
+              - authentication-service:3000/health
             initialDelaySeconds: 1
             timeoutSeconds: 5
           readinessProbe:
             exec:
               command:
-              - servicecli
-              - check
-              - http
-              - localhost:{{ .Values.service.httpPort | default 9898 }}/readyz
+              - curl
+              - -f
+              - authentication-service:3000/health
             initialDelaySeconds: 1
             timeoutSeconds: 5
           volumeMounts:
