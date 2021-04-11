@@ -24,7 +24,7 @@ spec:
 EOF
 
 # install service with tls enabled
-helm upgrade --install authentication_service ./charts/authentication_service \
+helm upgrade --install authentication-service ./charts/authentication_service \
     --set image.repository=test/authentication_service \
     --set image.tag=latest \
     --set tls.enabled=true \
