@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: service
-        image: keratin/authn-server:latest
+        image: keratin/authn-server:1.10.4
         imagePullPolicy: IfNotPresent
         ports:
         - name: http

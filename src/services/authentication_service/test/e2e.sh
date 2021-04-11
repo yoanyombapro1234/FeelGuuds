@@ -11,7 +11,7 @@ $SCRIPT_DIR/build.sh
 kind create cluster || true
 
 # load the docker image
-kind load docker-image keratin/authn-server:latest
+kind load docker-image keratin/authn-server:1.10.4
 
 # run the deploy
 $SCRIPT_DIR/deploy.sh

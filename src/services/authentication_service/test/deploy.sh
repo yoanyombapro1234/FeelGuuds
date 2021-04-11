@@ -26,7 +26,7 @@ EOF
 # install service with tls enabled
 helm upgrade --install authentication_service ./charts/authentication_service \
     --set image.repository=test/authentication_service \
-    --set image.tag=latest \
+    --set image.tag=1.10.4 \
     --set tls.enabled=true \
     --set certificate.create=true \
     --namespace=default
