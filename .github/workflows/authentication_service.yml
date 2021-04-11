@@ -27,8 +27,7 @@ jobs:
     strategy:
       matrix:
         helm-version:
-          - 2.16.12
-          - 3.3.4
+          - 3.5.3
     env:
       working-directory: ./src/services/authentication_service
     runs-on: ubuntu-latest
