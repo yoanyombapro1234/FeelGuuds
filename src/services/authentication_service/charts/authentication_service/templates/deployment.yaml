@@ -47,7 +47,8 @@ spec:
                 - NET_BIND_SERVICE
           {{- end }}
           command:
-		  	- sh -c "./authn migrate && ./authn server"
+            -
+			- sh -c "./authn migrate && ./authn server"
           env:
 			- name: AUTHN_URL
 			  value: "http://backend:3000"
@@ -115,7 +116,7 @@ spec:
               command:
               - curl
               - -f
-              - authentication-service:3000/health
+              - localhost:{{ .Values.service.httpPort | default 3000 }}/health
             initialDelaySeconds: 1
             timeoutSeconds: 5
           readinessProbe:
@@ -123,7 +124,7 @@ spec:
               command:
               - curl
               - -f
-              - authentication-service:3000/health
+              - localhost:{{ .Values.service.httpPort | default 9898 }}/health
             initialDelaySeconds: 1
             timeoutSeconds: 5
           volumeMounts:
