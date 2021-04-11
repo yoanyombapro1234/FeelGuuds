@@ -41,7 +41,7 @@ jobs:
         working-directory: ${{env.working-directory}}
         run: |
           ./test/build.sh
-          kind load docker-image keratin/authn-server:latest
+          kind load docker-image keratin/authn-server:1.10.4
       - name: Setup Helm
         uses: ./.github/actions/helm
         with:
