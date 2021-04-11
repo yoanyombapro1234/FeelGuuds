@@ -1,9 +1,9 @@
 apiVersion: v1
 version: 5.2.0
 appVersion: 5.2.0
-name: authentication_service
+name: authentication-service
 engine: gotpl
-description: authentication_service Helm chart for Kubernetes
+description: authentication-service Helm chart for Kubernetes
 home: https://github.com/yoanyombapro1234/src/services/authentication_service
 maintainers:
     - email: yoanyombapro@gmail.com
