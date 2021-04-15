@@ -3,5 +3,15 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/services/Microservice-Template-Golang" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/authentication_hdr_service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/cart_service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/email_service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/merchant_service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/notifications_service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/payments_service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/product_catalogue_service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/reviews_service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/shipping_service" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/services/shopper_service" vcs="Git" />
   </component>
 </project>

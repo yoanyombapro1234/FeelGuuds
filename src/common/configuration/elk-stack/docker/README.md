@@ -441,8 +441,8 @@ instead of `elasticsearch`.*
 [connect-kibana]: https://www.elastic.co/guide/en/kibana/current/connect-to-elasticsearch.html
 [index-pattern]: https://www.elastic.co/guide/en/kibana/current/index-patterns.html
 
-[config-es]: ./elasticsearch/config/elasticsearch.yml
-[config-kbn]: ./kibana/config/kibana.yml
+[config-es]: elasticsearch/config/elasticsearch.yml
+[config-kbn]: kibana/config/kibana.yml
 [config-ls]: ./logstash/config/logstash.yml
 
 [es-docker]: https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
