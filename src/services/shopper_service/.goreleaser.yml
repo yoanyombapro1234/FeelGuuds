@@ -1,0 +1,16 @@
+builds:
+  - main: ./cmd/servicecli
+    binary: servicecli
+    ldflags: -s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /pkg/version.REVISION={{.Commit}}
+    goos:
+      - windows
+      - darwin
+      - linux
+    goarch:
+      - amd64
+    env:
+      - CGO_ENABLED=0
+archives:
+  - name_template: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - none*
