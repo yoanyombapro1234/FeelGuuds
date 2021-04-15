@@ -1,12 +1,10 @@
-# FeelGuuds Service Template
+# FeelGuuds Cart Service - (BullFrog)
 
 [![e2e](https://github.com/yoanyombapro1234/FeelGuuds/src/services/cart_service/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/cart_service/blob/master/.github/workflows/e2e.yml)
 [![test](https://github.com/yoanyombapro1234/FeelGuuds/src/services/cart_service/workflows/test/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/cart_service/blob/master/.github/workflows/test.yml)
 [![cve-scan](https://github.com/yoanyombapro1234/FeelGuuds/src/services/cart_service/workflows/cve-scan/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/cart_service/blob/master/.github/workflows/cve-scan.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds/src/services/cart_service)](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds/src/services/cart_service)
 [![Docker Pulls](https://img.shields.io/docker/pulls/yoanyombapro1234/FeelGuuds/src/services/cart_service)](https://hub.docker.com/r/yoanyombapro1234/FeelGuuds/src/services/cart_service)
-
-Service is a tiny web application made with Go that showcases best practices of running microservices in Kubernetes.
 
 Specifications:
 
