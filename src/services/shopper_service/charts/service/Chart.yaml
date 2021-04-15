@@ -4,9 +4,9 @@ appVersion: 5.2.0
 name: service
 engine: gotpl
 description: Service Helm chart for Kubernetes
-home: https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service 
+home: https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service
 maintainers:
     - email: yoanyombapro@gmail.com
       name: yoanyomba
 sources:
-    - https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service 
+    - https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service
