@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/yoanyombapro1234/Microservice-Template-Golang/pkg/version"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/pkg/version"
 )
 
 // Info godoc

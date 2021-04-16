@@ -21,8 +21,8 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	_ "github.com/yoanyombapro1234/Microservice-Template-Golang/pkg/api/docs"
-	"github.com/yoanyombapro1234/Microservice-Template-Golang/pkg/fscache"
+	_ "github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/pkg/api/docs"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/pkg/fscache"
 )
 
 // @title Service API
@@ -30,10 +30,10 @@ import (
 // @description Go microservice template for Kubernetes.
 
 // @contact.name Source Code
-// @contact.url https://github.com/yoanyombapro1234/Microservice-Template-Golang
+// @contact.url https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service
 
 // @license.name MIT License
-// @license.url https://github.com/yoanyombapro1234/Microservice-Template-Golang/blob/master/LICENSE
+// @license.url https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/blob/master/LICENSE
 
 // @host localhost:9898
 // @BasePath /

@@ -14,10 +14,10 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/yoanyombapro1234/Microservice-Template-Golang/pkg/api"
-	"github.com/yoanyombapro1234/Microservice-Template-Golang/pkg/grpc"
-	"github.com/yoanyombapro1234/Microservice-Template-Golang/pkg/signals"
-	"github.com/yoanyombapro1234/Microservice-Template-Golang/pkg/version"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/pkg/api"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/pkg/grpc"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/pkg/signals"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/pkg/version"
 )
 
 func main() {

@@ -20,11 +20,11 @@ var doc = `{
         "title": "{{.Title}}",
         "contact": {
             "name": "Source Code",
-            "url": "https://github.com/yoanyombapro1234/Microservice-Template-Golang"
+            "url": "https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service"
         },
         "license": {
             "name": "MIT License",
-            "url": "https://github.com/yoanyombapro1234/Microservice-Template-Golang/blob/master/LICENSE"
+            "url": "https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/blob/master/LICENSE"
         },
         "version": "{{.Version}}"
     },

@@ -1,12 +1,11 @@
-# FeelGuuds Service Template
+# FeelGuuds Product Catalogue Service - (Hornet)
 
-[![e2e](https://github.com/yoanyombapro1234/Microservice-Template-Golang/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/Microservice-Template-Golang/blob/master/.github/workflows/e2e.yml)
-[![test](https://github.com/yoanyombapro1234/Microservice-Template-Golang/workflows/test/badge.svg)](https://github.com/yoanyombapro1234/Microservice-Template-Golang/blob/master/.github/workflows/test.yml)
-[![cve-scan](https://github.com/yoanyombapro1234/Microservice-Template-Golang/workflows/cve-scan/badge.svg)](https://github.com/yoanyombapro1234/Microservice-Template-Golang/blob/master/.github/workflows/cve-scan.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/Microservice-Template-Golang)](https://goreportcard.com/report/github.com/yoanyombapro1234/Microservice-Template-Golang)
-[![Docker Pulls](https://img.shields.io/docker/pulls/yoanyombapro1234/Microservice-Template-Golang)](https://hub.docker.com/r/yoanyombapro1234/Microservice-Template-Golang)
+[![e2e](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/blob/master/.github/workflows/e2e.yml)
+[![test](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/workflows/test/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/blob/master/.github/workflows/test.yml)
+[![cve-scan](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/workflows/cve-scan/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/blob/master/.github/workflows/cve-scan.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service)](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service)
+[![Docker Pulls](https://img.shields.io/docker/pulls/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service)](https://hub.docker.com/r/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service)
 
-Service is a tiny web application made with Go that showcases best practices of running microservices in Kubernetes.
 
 Specifications:
 
@@ -97,13 +96,13 @@ service/service
 Kustomize:
 
 ```bash
-kubectl apply -k github.com/yoanyombapro1234/Microservice-Template-Golang/kustomize
+kubectl apply -k github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/kustomize
 ```
 
 Docker:
 
 ```bash
-docker run -dp 9898:9898 yoanyombapro1234/Microservice-Template-Golang
+docker run -dp 9898:9898 yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service
 ```
 
 ### Continuous Delivery

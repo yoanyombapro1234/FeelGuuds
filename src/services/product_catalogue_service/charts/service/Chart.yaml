@@ -4,9 +4,9 @@ appVersion: 5.2.0
 name: service
 engine: gotpl
 description: Service Helm chart for Kubernetes
-home: https://github.com/yoanyombapro1234/Microservice-Template-Golang
+home: https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service
 maintainers:
     - email: yoanyombapro@gmail.com
       name: yoanyomba
 sources:
-    - https://github.com/yoanyombapro1234/Microservice-Template-Golang
+    - https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service

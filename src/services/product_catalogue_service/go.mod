@@ -1,4 +1,4 @@
-module github.com/yoanyombapro1234/Microservice-Template-Golang
+module github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service
 
 go 1.15
 
