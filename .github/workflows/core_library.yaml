@@ -1,5 +1,5 @@
 on: push
-name: Blackspace Core
+name: FeelGuuds Core Library
 jobs:
   checks:
     name: run
