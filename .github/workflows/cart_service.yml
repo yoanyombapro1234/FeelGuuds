@@ -39,7 +39,7 @@ jobs:
       - name: Build container image
         working-directory: ${{env.working-directory}}
         run: |
-          ./hack/build.sh
+          ./test/build.sh
           kind load docker-image test/service:latest
       - name: Setup Helm
         uses: ./.github/actions/helm
