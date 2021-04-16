@@ -30,7 +30,7 @@ jobs:
           - 2.16.12
           - 3.3.4
     env:
-      working-directory: ./src/services/authentication_service
+      working-directory: ./src/services/authentication_hdr_service
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -41,7 +41,7 @@ jobs:
         working-directory: ${{env.working-directory}}
         run: |
           ./hack/build.sh
-          kind load docker-image test/podinfo:latest
+          kind load docker-image test/service:latest
       - name: Setup Helm
         uses: ./.github/actions/helm
         with:
@@ -64,7 +64,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      working-directory: ./src/services/authentication_service
+      working-directory: ./src/services/authentication_hdr_service
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -91,7 +91,7 @@ jobs:
         uses: stefanprodan/kube-tools@v1
         with:
           command: |
-            helmv3 template ${{env.working-directory}}/charts/podinfo | kubeval --strict
+            helmv3 template ${{env.working-directory}}/charts/service | kubeval --strict
       - name: Validate kustomization
         uses: stefanprodan/kube-tools@v1
         with:
