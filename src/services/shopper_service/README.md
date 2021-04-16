@@ -1,10 +1,10 @@
 # FeelGuuds Shopper Service - (Trident)
 
-[![e2e](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /blob/master/.github/workflows/e2e.yml)
-[![test](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /workflows/test/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /blob/master/.github/workflows/test.yml)
-[![cve-scan](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /workflows/cve-scan/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /blob/master/.github/workflows/cve-scan.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service )](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service )
-[![Docker Pulls](https://img.shields.io/docker/pulls/yoanyombapro1234/FeelGuuds/src/services/shopper_service )](https://hub.docker.com/r/yoanyombapro1234/FeelGuuds/src/services/shopper_service )
+[![e2e](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/blob/master/.github/workflows/e2e.yml)
+[![test](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/workflows/test/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/blob/master/.github/workflows/test.yml)
+[![cve-scan](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/workflows/cve-scan/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/blob/master/.github/workflows/cve-scan.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service)](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service)
+[![Docker Pulls](https://img.shields.io/docker/pulls/yoanyombapro1234/FeelGuuds/src/services/shopper_service)](https://hub.docker.com/r/yoanyombapro1234/FeelGuuds/src/services/shopper_service)
 
 Specifications:
 
@@ -95,7 +95,7 @@ service/service
 Kustomize:
 
 ```bash
-kubectl apply -k github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /kustomize
+kubectl apply -k github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/kustomize
 ```
 
 Docker:

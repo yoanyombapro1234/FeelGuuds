@@ -20,11 +20,11 @@ var doc = `{
         "title": "{{.Title}}",
         "contact": {
             "name": "Source Code",
-            "url": "https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service "
+            "url": "https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service"
         },
         "license": {
             "name": "MIT License",
-            "url": "https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /blob/master/LICENSE"
+            "url": "https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/blob/master/LICENSE"
         },
         "version": "{{.Version}}"
     },

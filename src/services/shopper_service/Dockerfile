@@ -11,11 +11,11 @@ COPY . .
 RUN go mod download
 
 RUN CGO_ENABLED=0 go build -ldflags "-s -w \
-	-X github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /pkg/version.REVISION=${REVISION}" \
+	-X github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/pkg/version.REVISION=${REVISION}" \
 	-a -o bin/service cmd/service/*
 
 RUN CGO_ENABLED=0 go build -ldflags "-s -w \
-	-X github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /pkg/version.REVISION=${REVISION}" \
+	-X github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/pkg/version.REVISION=${REVISION}" \
 	-a -o bin/servicecli cmd/servicecli/*
 
 FROM alpine:3.13

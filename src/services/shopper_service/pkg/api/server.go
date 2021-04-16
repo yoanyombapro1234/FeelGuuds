@@ -21,8 +21,8 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	_ "github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /pkg/api/docs"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /pkg/fscache"
+	_ "github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/pkg/api/docs"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/pkg/fscache"
 )
 
 // @title Service API
@@ -33,7 +33,7 @@ import (
 // @contact.url https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service
 
 // @license.name MIT License
-// @license.url https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /blob/master/LICENSE
+// @license.url https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/blob/master/LICENSE
 
 // @host localhost:9898
 // @BasePath /

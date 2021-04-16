@@ -10,7 +10,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /pkg/version"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/pkg/version"
 )
 
 // Echo godoc

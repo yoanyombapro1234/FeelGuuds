@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service /pkg/version"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/pkg/version"
 )
 
 // Version godoc
