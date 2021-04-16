@@ -1,8 +1,8 @@
 # FeelGuuds Shopper Service - (Trident)
 
-[![e2e](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/workflows/e2e/badge.svg)](https://https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
-[![test](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/workflows/test/badge.svg)](https://https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
-[![cve-scan](https://github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service/workflows/cve-scan/badge.svg)](https://https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
+[![e2e](https://github.com/stefanprodan/podinfo/workflows/e2e/badge.svg)](https://https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
+[![test](https://github.com/stefanprodan/podinfo/workflows/test/badge.svg)](https://https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
+[![cve-scan](https://github.com/stefanprodan/podinfo/workflows/cve-scan/badge.svg)](https://https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service)](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds/src/services/shopper_service)
 [![Docker Pulls](https://img.shields.io/docker/pulls/yoanyombapro1234/FeelGuuds/src/services/shopper_service)](https://hub.docker.com/r/yoanyombapro1234/FeelGuuds/src/services/shopper_service)
 
