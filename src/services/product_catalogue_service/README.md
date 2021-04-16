@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 # FeelGuuds Product Catalogue Service (Hornet)
+=======
+# FeelGuuds Product Catalogue Service - (Hornet)
 
 [![e2e](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/blob/master/.github/workflows/e2e.yml)
 [![test](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/workflows/test/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/blob/master/.github/workflows/test.yml)
