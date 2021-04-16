@@ -2,7 +2,7 @@
 
 [![e2e](https://github.com/stefanprodan/podinfo/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
 [![test](https://github.com/stefanprodan/podinfo/workflows/test/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
-[![cve-scan](https://github.com/stefanprodan/podinfo/workflows/cve-scan/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
+[![cve-scan](https://github.com/yoanyombapro1234/FeelGuuds/workflows/shopper_service/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/shopper_service.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds)](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds)
 [![Docker Pulls](https://img.shields.io/docker/pulls/yoanyombapro1234/FeelGuuds/src/services/shopper_service)](https://hub.docker.com/r/yoanyombapro1234/FeelGuuds/src/services/shopper_service)
 
