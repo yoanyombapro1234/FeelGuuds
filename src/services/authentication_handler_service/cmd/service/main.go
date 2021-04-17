@@ -353,12 +353,10 @@ func NewAuthServiceClientConnection(err error, logger core_logging.ILog) *core_a
 		if err != nil {
 			if retries != retryLimit {
 				logger.ErrorM(err, fmt.Sprintf("failed to connect to authentication service. Attempt #%d",retries))
-			} else {
-				logger.FatalM(err, "failed to connect to authentication service")
 			}
 			retries += 1
 		} else {
-			retries = retryLimit
+			break
 		}
 
 		time.Sleep(1 * time.Second)
