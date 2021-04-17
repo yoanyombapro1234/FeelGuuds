@@ -1,0 +1,117 @@
+syntax = "proto3";
+option go_package = "feelguuds.grpc.authentication_handler_service.v1";
+
+// authentication handler service API
+service authentication_handler_serviceApi {
+	// create account
+	rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+	// update account
+	rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse);
+	// delete account
+	rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
+	// lock account
+	rpc LockAccount(LockAccountRequest) returns (LockAccountResponse);
+	// unlock account
+	rpc UnLockAccount(UnLockAccountRequest) returns (UnLockAccountResponse);
+	// get account
+	rpc GetAccount(GetAccountRequest) returns (GetAccountResponse);
+	// authenticate account
+	rpc AuthenticateAccount(AuthenticateAccountRequest) returns (AuthenticateAccountResponse);
+	// log out account
+	rpc LogoutAccount(LogoutAccountRequest) returns (LogoutAccountResponse);
+}
+
+// create account api request
+message CreateAccountRequest {
+	string email = 1;
+	string password = 2;
+}
+
+// create account api response
+message CreateAccountResponse {
+	uint32 id = 1;
+	string error = 2;
+}
+
+// update account api request
+message UpdateAccountRequest {
+	uint32 id = 1;
+	string email = 2;
+}
+
+// update account api response
+message UpdateAccountResponse {
+	string error = 1;
+}
+
+// delete account api request
+message DeleteAccountRequest {
+	uint32 id = 1;
+}
+
+// delete account api response
+message DeleteAccountResponse {
+	string error = 1;
+}
+
+// lock account api request
+message LockAccountRequest {
+	uint32 id = 1;
+}
+
+// lock account api response
+message LockAccountResponse {
+	string error = 1;
+}
+
+// unlock account api request
+message UnLockAccountRequest {
+	uint32 id = 1;
+}
+
+// unlock account api response
+message UnLockAccountResponse {
+	string error = 1;
+}
+
+// get account api request
+message GetAccountRequest {
+	uint32 id = 1;
+}
+
+// get account api response
+message GetAccountResponse {
+	Account account = 1;
+	string error = 2;
+}
+
+// authenticate account request
+message AuthenticateAccountRequest {
+	string email = 1;
+	string password = 2;
+}
+
+// authenticate account response
+message AuthenticateAccountResponse {
+	string token = 1;
+	string error = 2;
+}
+
+// logout api request
+message LogoutAccountRequest {
+	uint32 id = 1;
+}
+
+// logout api response
+message LogoutAccountResponse {
+	string error = 1;
+}
+
+// ==== Common ====
+// account representation
+message Account {
+	uint32 id = 1;
+	string username = 2;
+	bool locked = 3;
+	bool deleted = 4;
+}
