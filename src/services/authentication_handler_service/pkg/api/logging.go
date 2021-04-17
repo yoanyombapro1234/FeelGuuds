@@ -3,14 +3,15 @@ package api
 import (
 	"net/http"
 
+	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
 	"go.uber.org/zap"
 )
 
 type LoggingMiddleware struct {
-	logger *zap.Logger
+	logger core_logging.ILog
 }
 
-func NewLoggingMiddleware(logger *zap.Logger) *LoggingMiddleware {
+func NewLoggingMiddleware(logger core_logging.ILog) *LoggingMiddleware {
 	return &LoggingMiddleware{
 		logger: logger,
 	}
@@ -18,7 +19,7 @@ func NewLoggingMiddleware(logger *zap.Logger) *LoggingMiddleware {
 
 func (m *LoggingMiddleware) Handler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		m.logger.Debug(
+		m.logger.InfoM(
 			"request started",
 			zap.String("proto", r.Proto),
 			zap.String("uri", r.RequestURI),

@@ -17,12 +17,17 @@ import (
 	"github.com/spf13/viper"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/swaggo/swag"
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
+	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
+	core_metrics "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics"
+	core_tracing "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing"
 	"go.uber.org/zap"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
 	_ "github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/api/docs"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/fscache"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/metrics"
 )
 
 // @title Service API
@@ -74,17 +79,22 @@ type Config struct {
 }
 
 type Server struct {
-	router  *mux.Router
-	logger  *zap.Logger
-	config  *Config
-	pool    *redis.Pool
-	handler http.Handler
+	router        *mux.Router
+	config        *Config
+	pool          *redis.Pool
+	handler       http.Handler
+	authnClient   *core_auth_sdk.Client
+	logger        core_logging.ILog
+	metrics       *metrics.CoreMetrics
+	metricsEngine *core_metrics.CoreMetricsEngine
+	tracerEngine  *core_tracing.TracingEngine
 }
 
-func NewServer(config *Config, logger *zap.Logger) (*Server, error) {
+func NewServer(config *Config, client *core_auth_sdk.Client, logging core_logging.ILog, serviceMetrics *metrics.CoreMetrics,
+	metricsEngineConf *core_metrics.CoreMetricsEngine, tracer *core_tracing.TracingEngine) (*Server, error) {
 	srv := &Server{
 		router: mux.NewRouter(),
-		logger: logger,
+		logger: logging,
 		config: config,
 	}
 
@@ -129,7 +139,7 @@ func (s *Server) registerHandlers() {
 	s.router.HandleFunc("/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 		doc, err := swag.ReadDoc()
 		if err != nil {
-			s.logger.Error("swagger error", zap.Error(err), zap.String("path", "/swagger.json"))
+			s.logger.Error(err, "swagger error", zap.Error(err), zap.String("path", "/swagger.json"))
 		}
 		w.Write([]byte(doc))
 	})
@@ -162,14 +172,14 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		s.handler = s.router
 	}
 
-	//s.printRoutes()
+	s.printRoutes()
 
 	// load configs in memory and start watching for changes in the config dir
 	if stat, err := os.Stat(s.config.ConfigPath); err == nil && stat.IsDir() {
 		var err error
 		watcher, err = fscache.NewWatch(s.config.ConfigPath)
 		if err != nil {
-			s.logger.Error("config watch error", zap.Error(err), zap.String("path", s.config.ConfigPath))
+			s.logger.Error(err, "config watch error", zap.Error(err), zap.String("path", s.config.ConfigPath))
 		} else {
 			watcher.Watch()
 		}
@@ -218,14 +228,14 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	// determine if the http server was started
 	if srv != nil {
 		if err := srv.Shutdown(ctx); err != nil {
-			s.logger.Warn("HTTP server graceful shutdown failed", zap.Error(err))
+			s.logger.Error(err, "HTTP server graceful shutdown failed", zap.Error(err))
 		}
 	}
 
 	// determine if the secure server was started
 	if secureSrv != nil {
 		if err := secureSrv.Shutdown(ctx); err != nil {
-			s.logger.Warn("HTTPS server graceful shutdown failed", zap.Error(err))
+			s.logger.Error(err,"HTTPS server graceful shutdown failed", zap.Error(err))
 		}
 	}
 }
@@ -250,7 +260,7 @@ func (s *Server) startServer() *http.Server {
 	// start the server in the background
 	go func() {
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-			s.logger.Fatal("HTTP server crashed", zap.Error(err))
+			s.logger.FatalM(err, "HTTP server crashed")
 		}
 	}()
 
@@ -281,7 +291,7 @@ func (s *Server) startSecureServer() *http.Server {
 	// start the server in the background
 	go func() {
 		if err := srv.ListenAndServeTLS(cert, key); err != http.ErrServerClosed {
-			s.logger.Fatal("HTTPS server crashed", zap.Error(err))
+			s.logger.FatalM(err, "HTTPS server crashed")
 		}
 	}()
 

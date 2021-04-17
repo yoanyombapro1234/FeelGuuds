@@ -89,3 +89,10 @@ protogen:
 		-I=$(GOPATH)/src/github.com/infobloxopen/protoc-gen-gorm/options \
 		-I=$(GOPATH)/src/github.com/protobuf/src/google/protobuf/timestamp.proto \
 		--gogoopsee_out=plugins=grpc+graphql,Mopsee/protobuf/opsee.proto=github.com/opsee/protobuf/opseeproto,Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/protoc-gen-gogo/descriptor:./gen/ --proto_path=$(GOPATH)/src:. ./proto/*.proto
+
+down:
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml down
+
+up:
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans

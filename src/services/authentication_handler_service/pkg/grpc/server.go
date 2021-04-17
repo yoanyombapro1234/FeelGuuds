@@ -4,20 +4,28 @@ import (
 	"fmt"
 	"net"
 
-	"go.uber.org/zap"
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
+	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
+	core_metrics "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics"
+	core_tracing "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
 	proto "github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/metrics"
 )
 
 type Server struct {
 	// inherit the behaviors/adhere to the interface the api server adheres to
 	proto.UnimplementedAuthenticationHandlerServiceApiServer
-	logger *zap.Logger
-	config *Config
+	config        *Config
+	authnClient   *core_auth_sdk.Client
+	logger        core_logging.ILog
+	metrics       *metrics.CoreMetrics
+	metricsEngine *core_metrics.CoreMetricsEngine
+	tracerEngine  *core_tracing.TracingEngine
 }
 
 type Config struct {
@@ -25,10 +33,14 @@ type Config struct {
 	ServiceName string `mapstructure:"grpc-service-name"`
 }
 
-func NewServer(config *Config, logger *zap.Logger) (*Server, error) {
+func NewServer(config *Config, client *core_auth_sdk.Client, logging core_logging.ILog, serviceMetrics *metrics.CoreMetrics,
+	metricsEngineConf *core_metrics.CoreMetricsEngine, tracer *core_tracing.TracingEngine) (*Server, error) {
 	srv := &Server{
-		logger: logger,
-		config: config,
+		logger:        logging,
+		metrics:       serviceMetrics,
+		metricsEngine: metricsEngineConf,
+		tracerEngine:  tracer,
+		config:        config,
 	}
 
 	return srv, nil
@@ -37,7 +49,8 @@ func NewServer(config *Config, logger *zap.Logger) (*Server, error) {
 func (s *Server) ListenAndServe() {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", s.config.Port))
 	if err != nil {
-		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
+		var msg = fmt.Sprintf("faled to listen on port %d", s.config.Port)
+		s.logger.FatalM(err, msg)
 	}
 
 	srv := grpc.NewServer()
@@ -50,6 +63,7 @@ func (s *Server) ListenAndServe() {
 	server.SetServingStatus(s.config.ServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
 
 	if err := srv.Serve(listener); err != nil {
-		s.logger.Fatal("failed to serve", zap.Error(err))
+		var msg = fmt.Sprintf("faled to serve on port %d", s.config.Port)
+		s.logger.FatalM(err, msg)
 	}
 }
