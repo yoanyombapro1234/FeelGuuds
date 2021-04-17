@@ -117,7 +117,6 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/denisenkom/go-mssqldb v0.0.0-20191124224453-732737034ffd h1:83Wprp6ROGeiHFAP8WJdI2RoxALQYgdllERc3N5N2DM=
 github.com/denisenkom/go-mssqldb v0.0.0-20191124224453-732737034ffd/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
 github.com/dgrijalva/jwt-go v0.0.0-20180719211823-0b96aaa70776/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
-github.com/dgrijalva/jwt-go v1.0.2 h1:KPldsxuKGsS2FPWsNeg9ZO18aCrGKujPoWXn2yo+KQM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgrijalva/jwt-go v3.2.1-0.20200107013213-dc14462fd587+incompatible h1:CiQ/hJK0Lsc/2Gm9uMSIe7cFE+h0sbTwHuTGQkIZpio=
@@ -231,7 +230,6 @@ github.com/golang/protobuf v1.4.3/go.mod h1:oDoupMAO8OvCJWAcko0GGGIgR6R6ocIYbsSw
 github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/gomodule/redigo v1.8.4 h1:Z5JUg94HMTR1XpwBaSH4vq3+PNSIykBLxMdglbw10gg=
 github.com/gomodule/redigo v1.8.4/go.mod h1:P9dn9mFrCBvWhGE1wpxx6fgq7BAeLBk+UUUzlpkBYO0=
-github.com/gomodule/redigo/redis v0.0.0-do-not-use h1:J7XIp6Kau0WoyT4JtXHT3Ei0gA1KkSc6bc87j9v9WIo=
 github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
 github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
 github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=
@@ -324,6 +322,8 @@ github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/jinzhu/now v1.0.1 h1:HjfetcXq097iXP0uoPCdnM4Efp5/9MsM0/M+XOTeR3M=
 github.com/jinzhu/now v1.0.1/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
+github.com/jinzhu/now v1.1.1 h1:g39TucaRWyV3dwDO++eEc6qf8TVIQ/Da48WmqjZ3i7E=
+github.com/jinzhu/now v1.1.1/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
@@ -554,7 +554,6 @@ github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/uber/jaeger-client-go v2.25.0+incompatible h1:IxcNZ7WRY1Y3G4poYlx24szfsn/3LvK9QHCq9oQw8+U=
 github.com/uber/jaeger-client-go v2.25.0+incompatible/go.mod h1:WVhlPFC8FDjOFMMWRy2pZqQJSXxYSwNYOkTr/Z6d3Kk=
-github.com/uber/jaeger-lib v1.5.0 h1:OHbgr8l656Ub3Fw5k9SWnBfIEwvoHQ+W2y+Aa9D1Uyo=
 github.com/uber/jaeger-lib v2.4.0+incompatible/go.mod h1:ComeNDZlWwrWnDv8aPp0Ba6+uUTzImX/AauajbLI56U=
 github.com/uber/jaeger-lib v2.4.1+incompatible h1:td4jdvLcExb4cBISKIpHuGoVXh+dVKhn2Um6rjCsSsg=
 github.com/uber/jaeger-lib v2.4.1+incompatible/go.mod h1:ComeNDZlWwrWnDv8aPp0Ba6+uUTzImX/AauajbLI56U=
@@ -562,7 +561,6 @@ github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijb
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
-github.com/yoanyombapro1234/FeelGuuds v0.0.0-20210416043814-63b17f0049be h1:NVC78G+eRMk6RbYjR/XpDhb1uJxrKqcCw6OlDCzNz8c=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core v0.0.0-20210416043814-63b17f0049be h1:TMWaf8LSpR5dOaqwHgPJpbTFIK/CDI/tzCa/ONK9yCs=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core v0.0.0-20210416043814-63b17f0049be/go.mod h1:RjGkR6VT17AU5JVV6+TF8JHWUiSyiBOt86Ib+8CK+Uo=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210212043033-02d9b91fb6ac/go.mod h1:EfxNIYWC8OE+GZwzc198RKsuW5zwFkwaAjk5CZg83Fc=
@@ -570,9 +568,6 @@ github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210416043814-63b17f0049be/go.mod h1:EfxNIYWC8OE+GZwzc198RKsuW5zwFkwaAjk5CZg83Fc=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging v0.0.0-20210212043033-02d9b91fb6ac h1:PsbpLGKuCbYdaHGOcFIVGQvM6mB8cDlphTlnOL9tIxs=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging v0.0.0-20210212043033-02d9b91fb6ac/go.mod h1:OHhZAU7HiA11vEhRC+c/OQ4/LQb0MFVaqgxgIcBaTXk=
-github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging v0.0.0-20210416043814-63b17f0049be h1:k4/tChiJRfb+iP26WJe6fGTohqa6c7u+IkWYysT68QQ=
-github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json v0.0.0-20210416043814-63b17f0049be h1:Btdgj//3xi073W+pIGfhdDP9hpsAK/hT82SizJ4mI04=
-github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json v0.0.0-20210416043814-63b17f0049be/go.mod h1:kNY0aLqF8d/kiFsk9JJ4fj9glFNSQtkZ3/MQOa7pTpM=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing v0.0.0-20210416043814-63b17f0049be h1:9NshGv4q4kekmMEQ3N9r2ysuLrTgrZAgcoxF2JMCpIE=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing v0.0.0-20210416043814-63b17f0049be/go.mod h1:eSnxaCX7doNglJJLYkDAf6nojHtzOQInmOhayaia9ZQ=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

@@ -12,6 +12,7 @@ require (
 	github.com/gomodule/redigo v1.8.4
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.4.2
+	github.com/jinzhu/now v1.1.1 // indirect
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/prometheus/client_golang v1.10.0
 	github.com/spf13/cobra v1.1.3
@@ -22,7 +23,7 @@ require (
 	github.com/uber/jaeger-lib v2.4.1+incompatible
 	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core v0.0.0-20210416043814-63b17f0049be
 	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210416043814-63b17f0049be
-	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json v0.0.0-20210416043814-63b17f0049be // indirect
+	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging v0.0.0-20210212043033-02d9b91fb6ac
 	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing v0.0.0-20210416043814-63b17f0049be
 	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20210415231046-e915ea6b2b7d

@@ -27,7 +27,7 @@ type jwtCustomClaims struct {
 func (s *Server) tokenGenerateHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		s.logger.Error("reading the request body failed", zap.Error(err))
+		s.logger.Error(err, "reading the request body failed", zap.Error(err))
 		s.ErrorResponse(w, r, "invalid request body", http.StatusBadRequest)
 		return
 	}

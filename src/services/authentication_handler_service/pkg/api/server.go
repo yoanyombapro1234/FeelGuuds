@@ -172,7 +172,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		s.handler = s.router
 	}
 
-	s.printRoutes()
+	// s.printRoutes()
 
 	// load configs in memory and start watching for changes in the config dir
 	if stat, err := os.Stat(s.config.ConfigPath); err == nil && stat.IsDir() {

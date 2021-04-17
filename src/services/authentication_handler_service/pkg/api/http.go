@@ -59,7 +59,7 @@ func (s *Server) JSONResponse(w http.ResponseWriter, r *http.Request, result int
 	body, err := json.Marshal(result)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		s.logger.Error("JSON marshal failed", zap.Error(err))
+		s.logger.Error(err,"JSON marshal failed", zap.Error(err))
 		return
 	}
 
@@ -73,7 +73,7 @@ func (s *Server) JSONResponseCode(w http.ResponseWriter, r *http.Request, result
 	body, err := json.Marshal(result)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		s.logger.Error("JSON marshal failed", zap.Error(err))
+		s.logger.Error(err,"JSON marshal failed", zap.Error(err))
 		return
 	}
 
@@ -95,7 +95,7 @@ func (s *Server) ErrorResponse(w http.ResponseWriter, r *http.Request, error str
 	body, err := json.Marshal(data)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		s.logger.Error("JSON marshal failed", zap.Error(err))
+		s.logger.Error(err,"JSON marshal failed", zap.Error(err))
 		return
 	}
 

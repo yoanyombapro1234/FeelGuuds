@@ -24,7 +24,7 @@ func (s *Server) echoWsHandler(w http.ResponseWriter, r *http.Request) {
 	c, err := wsCon.Upgrade(w, r, nil)
 	if err != nil {
 		if err != nil {
-			s.logger.Warn("websocket upgrade error", zap.Error(err))
+			s.logger.Info("websocket upgrade error", zap.Error(err))
 			return
 		}
 	}
@@ -39,7 +39,7 @@ func (s *Server) echoWsHandler(w http.ResponseWriter, r *http.Request) {
 		_, message, err := c.ReadMessage()
 		if err != nil {
 			if !strings.Contains(err.Error(), "close") {
-				s.logger.Warn("websocket read error", zap.Error(err))
+				s.logger.Info("websocket read error", zap.Error(err))
 			}
 			break
 		}
@@ -69,7 +69,7 @@ func (s *Server) sendHostWs(ws *websocket.Conn, in chan interface{}, done chan s
 			}
 			in <- status
 		case <-done:
-			s.logger.Debug("websocket exit")
+			s.logger.Info("websocket exit")
 			return
 		}
 	}
@@ -81,7 +81,7 @@ func (s *Server) writeWs(ws *websocket.Conn, in chan interface{}) {
 		case msg := <-in:
 			if err := ws.WriteJSON(msg); err != nil {
 				if !strings.Contains(err.Error(), "close") {
-					s.logger.Warn("websocket write error", zap.Error(err))
+					s.logger.Info("websocket write error", zap.Error(err))
 				}
 				return
 			}

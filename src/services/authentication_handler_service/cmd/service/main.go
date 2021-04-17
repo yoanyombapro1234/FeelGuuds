@@ -146,7 +146,9 @@ func main() {
 	logger := core_logging.NewJSONLogger(nil, rootSpan)
 
 	authnServiceClient := NewAuthServiceClientConnection(err, logger)
-	logger.InfoM("successfully initialized authentication service client")
+	if authnServiceClient != nil {
+		logger.InfoM("successfully initialized authentication service client")
+	}
 
 	// start stress tests if any
 	beginStressTest(viper.GetInt("stress-cpu"), viper.GetInt("stress-memory"), logger)
@@ -329,12 +331,12 @@ func initAuthnClient(username, password, audience, issuer, url, origin string) (
 func NewAuthServiceClientConnection(err error, logger core_logging.ILog) *core_auth_sdk.Client {
 	// initialize authentication client in order to establish communication with the
 	// authentication service. This serves as a singular source of truth for authentication needs
-	authUsername := viper.GetString("AUTHN_USERNAME")
-	authPassword := viper.GetString("AUTHN_PASSWORD")
-	domains := viper.GetString("AUTHN_DOMAINS")
-	privateURL := viper.GetString("AUTHN_PRIVATE_BASE_URL") + ":" + viper.GetString("AUTHN_INTERNAL_PORT")
-	origin := viper.GetString("AUTHN_ORIGIN")
-	issuer := viper.GetString("AUTHN_ISSUER_BASE_URL") + ":" + viper.GetString("AUTHN_PORT")
+	authUsername := viper.GetString("SERVICE_AUTHN_USERNAME")
+	authPassword := viper.GetString("SERVICE_AUTHN_PASSWORD")
+	domains := viper.GetString("SERVICE_AUTHN_DOMAINS")
+	privateURL := viper.GetString("SERVICE_AUTHN_PRIVATE_BASE_URL") + ":" + viper.GetString("SERVICE_AUTHN_INTERNAL_PORT")
+	origin := viper.GetString("SERVICE_AUTHN_ORIGIN")
+	issuer := viper.GetString("SERVICE_AUTHN_ISSUER_BASE_URL") + ":" + viper.GetString("SERVICE_AUTHN_PORT")
 
 	authnClient, err := initAuthnClient(authUsername, authPassword, domains, issuer, privateURL, origin)
 	// crash the process if we cannot connect to the authentication service
@@ -344,21 +346,27 @@ func NewAuthServiceClientConnection(err error, logger core_logging.ILog) *core_a
 
 	// TODO: make this a retryable operation
 	retries := 1
-	for retries < 4 {
+	retryLimit := 8
+	for retries < retryLimit {
 		// perform a test request to the authentication service
 		_, err = authnClient.ServerStats()
 		if err != nil {
-			if retries != 4 {
-				logger.ErrorM(err, "failed to connect to authentication service")
+			if retries != retryLimit {
+				logger.ErrorM(err, fmt.Sprintf("failed to connect to authentication service. Attempt #%d",retries))
 			} else {
 				logger.FatalM(err, "failed to connect to authentication service")
 			}
 			retries += 1
 		} else {
-			retries = 4
+			retries = retryLimit
 		}
 
 		time.Sleep(1 * time.Second)
+	}
+
+	if err != nil {
+		logger.Error(errors.New("failed to initiate connection to downstream service"), "failure")
+		return nil
 	}
 
 	// attempt to connect to the authentication service if not then crash process
