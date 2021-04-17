@@ -3,8 +3,8 @@
 # The release version is controlled from pkg/version
 
 TAG?=latest
-NAME:=service
-DOCKER_REPOSITORY:=stefanprodan
+NAME:=authentication_handler_service
+DOCKER_REPOSITORY:=feelguuds
 DOCKER_IMAGE_NAME:=$(DOCKER_REPOSITORY)/$(NAME)
 GIT_COMMIT:=$(shell git describe --dirty --always)
 VERSION:=$(shell grep 'VERSION' pkg/version/version.go | awk '{ print $$4 }' | tr -d '"')
@@ -16,7 +16,9 @@ run:
 	--ui-logo=https://raw.githubusercontent.com/stefanprodan/service/gh-pages/cuddle_clap.gif $(EXTRA_RUN_ARGS)
 
 test:
-	go test ./... -coverprofile cover.out
+	echo "sleeping for 10s .... then commencing testing"
+	sleep 10s
+	go test -v -race ./... -coverprofile cover.out
 
 build:
 	GIT_COMMIT=$$(git rev-list -1 HEAD) && CGO_ENABLED=0 go build  -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version.REVISION=$(GIT_COMMIT)" -a -o ./bin/service ./cmd/service/*
@@ -34,14 +36,14 @@ build-container:
 	docker build -t $(DOCKER_IMAGE_NAME):$(VERSION) .
 
 build-base:
-	docker build -f Dockerfile.base -t $(DOCKER_REPOSITORY)/service-base:latest .
+	docker build -f Dockerfile.base -t $(DOCKER_REPOSITORY)/$(NAME)-base:latest .
 
 push-base: build-base
-	docker push $(DOCKER_REPOSITORY)/service-base:latest
+	docker push $(DOCKER_REPOSITORY)/$(NAME)-base:latest
 
 test-container:
-	@docker rm -f service || true
-	@docker run -dp 9898:9898 --name=service $(DOCKER_IMAGE_NAME):$(VERSION)
+	@docker rm -f $(NAME) || true
+	@docker run -dp 9898:9898 --name=$(NAME) $(DOCKER_IMAGE_NAME):$(VERSION)
 	@docker ps
 	@TOKEN=$$(curl -sd 'test' localhost:9898/token | jq -r .token) && \
 	curl -sH "Authorization: Bearer $${TOKEN}" localhost:9898/token/validate | grep test
@@ -77,3 +79,13 @@ release:
 swagger:
 	go get github.com/swaggo/swag/cmd/swag
 	cd pkg/api && $$(go env GOPATH)/bin/swag init -g server.go
+
+protogen:
+	protoc -I. \
+		-I$(GOPATH)/src \
+		-I=$(GOPATH)/src/github.com/infobloxopen/protoc-gen-gorm \
+		-I=$(GOPATH)/src/github.com/infobloxopen/atlas-app-toolkit \
+		-I=$(GOPATH)/src/github.com/lyft/protoc-gen-validate/validate/validate.proto \
+		-I=$(GOPATH)/src/github.com/infobloxopen/protoc-gen-gorm/options \
+		-I=$(GOPATH)/src/github.com/protobuf/src/google/protobuf/timestamp.proto \
+		--gogoopsee_out=plugins=grpc+graphql,Mopsee/protobuf/opsee.proto=github.com/opsee/protobuf/opseeproto,Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/protoc-gen-gogo/descriptor:./gen/ --proto_path=$(GOPATH)/src:. ./proto/*.proto
