@@ -9,9 +9,13 @@ import (
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	proto "github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 )
 
 type Server struct {
+	// inherit the behaviors/adhere to the interface the api server adheres to
+	proto.UnimplementedAuthenticationHandlerServiceApiServer
 	logger *zap.Logger
 	config *Config
 }
@@ -39,6 +43,9 @@ func (s *Server) ListenAndServe() {
 	srv := grpc.NewServer()
 	server := health.NewServer()
 	reflection.Register(srv)
+
+	// use the auto generate code to register server
+	proto.RegisterAuthenticationHandlerServiceApiServer(srv, s)
 	grpc_health_v1.RegisterHealthServer(srv, server)
 	server.SetServingStatus(s.config.ServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
 

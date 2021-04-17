@@ -10,7 +10,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.10.0
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gomodule/redigo v1.8.4
 	github.com/gorilla/mux v1.8.0
@@ -22,7 +22,7 @@ require (
 	github.com/stefanprodan/k8s-podinfo v1.8.0 // indirect
 	github.com/swaggo/http-swagger v1.0.0
 	github.com/swaggo/swag v1.7.0
-	github.com/yoanyombapro1234/Microservice-Template-Golang v1.8.0
+	github.com/yoanyombapro1234/Microservice-Template-Golang v1.8.0 // indirect
 	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
 	google.golang.org/grpc v1.37.0
