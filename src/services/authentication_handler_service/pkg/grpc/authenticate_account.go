@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
@@ -27,26 +26,21 @@ func (s *Server) AuthenticateAccount(ctx context.Context, req *proto.Authenticat
 		s.metrics.InvalidRequestParametersCounter.WithLabelValues(constants.LOGIN_ACCOUNT).Inc()
 
 		err := service_errors.ErrInvalidInputArguments
-		var msg = "invalid input parameters. please specify a valid email and password"
-		s.logger.Error(err, msg)
+		s.logger.Error(err, "invalid input parameters. please specify a valid email and password")
 
 		return nil, err
 	}
 
 	var (
-		begin           = time.Now()
-		took            = time.Since(begin)
-		operation       = func() (interface{}, error) {
+		operation = func() (interface{}, error) {
 			return s.authnClient.LoginAccount(req.Email, req.Password)
-		}
-		retryableOperation = func() (interface{}, error) {
-			return s.performRetryableRpcCall(ctx, operation)
 		}
 	)
 
 	ctx = opentracing.ContextWithSpan(ctx, parentSpan)
-	result, err := s.PerformRPCOperationAndInstrument(ctx, retryableOperation, constants.LOGIN_ACCOUNT, &took)
+	result, err := s.PerformRetryableRPCOperation(ctx, parentSpan, operation, constants.LOGIN_ACCOUNT)()
 	if err != nil {
+		s.logger.Error(err, err.Error())
 		return nil, err
 	}
 
@@ -60,8 +54,8 @@ func (s *Server) AuthenticateAccount(ctx context.Context, req *proto.Authenticat
 
 	s.logger.For(ctx).Info("Successfully authenticated user account", zap.String("jwt", token))
 	response := &proto.AuthenticateAccountResponse{
-		Token:                token,
-		Error:                "",
+		Token: token,
+		Error: "",
 	}
 
 	return response, nil

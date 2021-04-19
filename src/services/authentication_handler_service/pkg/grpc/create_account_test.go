@@ -15,6 +15,7 @@ import (
 )
 
 func Test_create_account(t *testing.T) {
+	// TODO : ensure proper metrics are being emitted in each unit test
 	expectedErrMsg := "retry limit reached"
 	ThirdPartyMockService.ImportAccountFunc = func(username, password string, locked bool) (int, error) {
 		return 0, errors.New(expectedErrMsg)
@@ -24,12 +25,12 @@ func Test_create_account(t *testing.T) {
 	password := fmt.Sprintf("test_password_%s", GenerateRandomString(17))
 
 	tests := []struct {
-		scenario string
-		email    string
-		password string
-		res      *proto.CreateAccountResponse
-		errCode  codes.Code
-		errMsg   string
+		scenario          string
+		email             string
+		password          string
+		res               *proto.CreateAccountResponse
+		errCode           codes.Code
+		errMsg            string
 		ImportAccountFunc func(username, password string, locked bool) (int, error)
 	}{
 		// scenario: duplicate account
@@ -40,7 +41,7 @@ func Test_create_account(t *testing.T) {
 			nil,
 			codes.Unknown,
 			expectedErrMsg,
-			 func(username, password string, locked bool) (int, error) {
+			func(username, password string, locked bool) (int, error) {
 				return 0, errors.New(expectedErrMsg)
 			},
 		},

@@ -13,7 +13,7 @@ import (
 )
 
 // PerformRPCOperationAndInstrument performs a rpc call to an external service and instruments the resulting response accordingly
-func (s *Server) PerformRPCOperationAndInstrument(
+func (s *Server) performRPCOperationAndInstrument(
 	ctx context.Context,
 	f func() (interface{}, error),
 	operationType string,

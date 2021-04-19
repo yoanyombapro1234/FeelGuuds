@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"strconv"
-	"time"
 
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
@@ -26,28 +25,22 @@ func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (
 	if req.Id == 0 {
 		s.metrics.InvalidRequestParametersCounter.WithLabelValues(constants.GET_ACCOUNT).Inc()
 		err := service_errors.ErrInvalidInputArguments
-		var msg = "invalid input parameters. please specify a valid user id"
-		s.logger.Error(err, msg)
+		s.logger.Error(err, "invalid input parameters. please specify a valid user id")
 		return nil, err
 	}
 
 	var (
-		begin           = time.Now()
-		took            = time.Since(begin)
-		operation       = func() (interface{}, error) {
+		operation = func() (interface{}, error) {
 			account, err := s.authnClient.GetAccount(strconv.Itoa(int(req.GetId())))
 			if err != nil {
 				return nil, err
 			}
 			return account, nil
 		}
-		retryableOperation = func() (interface{}, error) {
-			return s.performRetryableRpcCall(ctx, operation)
-		}
 	)
 
 	ctx = opentracing.ContextWithSpan(ctx, parentSpan)
-	result, err := s.PerformRPCOperationAndInstrument(ctx, retryableOperation, constants.DELETE_ACCOUNT, &took)
+	result, err := s.PerformRetryableRPCOperation(ctx, parentSpan, operation, constants.GET_ACCOUNT)()
 	if err != nil {
 		s.logger.Error(err, err.Error())
 		return nil, err
@@ -64,7 +57,7 @@ func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (
 
 	s.logger.For(ctx).Info("Successfully obtained user account", zap.Int("Id", int(req.GetId())))
 	return &proto.GetAccountResponse{
-		Account:              account,
-		Error:                "",
+		Account: account,
+		Error:   "",
 	}, nil
 }

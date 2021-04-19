@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"time"
 
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
@@ -26,32 +25,27 @@ func (s *Server) LogoutAccount(ctx context.Context, req *proto.LogoutAccountRequ
 		s.metrics.InvalidRequestParametersCounter.WithLabelValues(constants.LOGOUT_ACCOUNT).Inc()
 
 		err := service_errors.ErrInvalidInputArguments
-		var msg = "invalid input parameters. please specify a valid user id"
-		s.logger.Error(err, msg)
+		s.logger.Error(err, "invalid input parameters. please specify a valid user id")
 
 		return nil, err
 	}
 
 	var (
-		begin           = time.Now()
-		took            = time.Since(begin)
-		operation       = func() (interface{}, error) {
+		operation = func() (interface{}, error) {
 			return nil, s.authnClient.LogOutAccount()
-		}
-		retryableOperation = func() (interface{}, error) {
-			return s.performRetryableRpcCall(ctx, operation)
 		}
 	)
 
 	ctx = opentracing.ContextWithSpan(ctx, parentSpan)
-	_, err := s.PerformRPCOperationAndInstrument(ctx, retryableOperation, constants.LOGOUT_ACCOUNT, &took)
+	_, err := s.PerformRetryableRPCOperation(ctx, parentSpan, operation, constants.LOGOUT_ACCOUNT)()
 	if err != nil {
+		s.logger.Error(err, err.Error())
 		return nil, err
 	}
 
 	s.logger.For(ctx).Info("Successfully logged out user account", zap.Int("id", int(req.GetId())))
 	response := &proto.LogoutAccountResponse{
-		Error:                "",
+		Error: "",
 	}
 	return response, nil
 }

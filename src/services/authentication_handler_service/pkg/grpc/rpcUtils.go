@@ -5,9 +5,12 @@ import (
 	"time"
 
 	"github.com/giantswarm/retry-go"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
 )
+
+type RpcOperationFunc func() (interface{}, error)
 
 // setCtxRequestTimeout sets the request deadline in the context. This function should be invoked prior to any rpc calls
 func (s *Server) setCtxRequestTimeout(ctx context.Context) context.Context {
@@ -45,4 +48,21 @@ func (s *Server) performRetryableRpcCall(ctx context.Context, f func() (interfac
 	}
 
 	return <-response, nil
+}
+
+// PerformRetryableRPCOperation performs a retryable operation
+func (s *Server) PerformRetryableRPCOperation(ctx context.Context, span opentracing.Span, op RpcOperationFunc, opType string) RpcOperationFunc {
+	return func() (interface{}, error) {
+		var (
+			begin = time.Now()
+			took  = time.Since(begin)
+		)
+
+		retryableOp := func() (interface{}, error) {
+			return s.performRetryableRpcCall(ctx, op)
+		}
+
+		ctx = opentracing.ContextWithSpan(ctx, span)
+		return s.performRPCOperationAndInstrument(ctx, retryableOp, opType, &took)
+	}
 }

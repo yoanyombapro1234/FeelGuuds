@@ -15,11 +15,10 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/uber/jaeger-lib/metrics/prometheus"
+	"go.uber.org/zap"
+
 	core_metrics "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics"
 	core_tracing "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/api"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/grpc"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/metrics"
@@ -38,9 +37,9 @@ func main() {
 	fs.Int("port-metrics", 0, "metrics port")
 	fs.Int("grpc-port", 0, "gRPC port")
 	fs.String("grpc-service-name", "service", "gPRC service name")
-	fs.Int("grpc-rpc-deadline", 100, "gRPC deadline in milliseconds")
+	fs.Int("grpc-rpc-deadline", 200, "gRPC deadline in milliseconds")
 	fs.Int("grpc-rpc-retries", 5, "gRPC max operation retries in the face of errors")
-	fs.Int("grpc-rpc-retry-timeout", 100, "gRPC max timeout of retry operation in milliseconds")
+	fs.Int("grpc-rpc-retry-timeout", 50, "gRPC max timeout of retry operation in milliseconds")
 	fs.Int("grpc-rpc-retry-backoff", 5, "gRPC backoff in between failed retry operations in milliseconds")
 
 	fs.String("level", "info", "log level debug, info, warn, error, flat or panic")
@@ -216,53 +215,6 @@ func main() {
 	srv, _ := api.NewServer(&srvCfg, authnServiceClient, logger, serviceMetrics.MicroServiceMetrics, serviceMetrics.Engine, tracerEngine)
 	stopCh := signals.SetupSignalHandler()
 	srv.ListenAndServe(stopCh)
-}
-
-func initZap(logLevel string) (*zap.Logger, error) {
-	level := zap.NewAtomicLevelAt(zapcore.InfoLevel)
-	switch logLevel {
-	case "debug":
-		level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
-	case "info":
-		level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
-	case "warn":
-		level = zap.NewAtomicLevelAt(zapcore.WarnLevel)
-	case "error":
-		level = zap.NewAtomicLevelAt(zapcore.ErrorLevel)
-	case "fatal":
-		level = zap.NewAtomicLevelAt(zapcore.FatalLevel)
-	case "panic":
-		level = zap.NewAtomicLevelAt(zapcore.PanicLevel)
-	}
-
-	zapEncoderConfig := zapcore.EncoderConfig{
-		TimeKey:        "ts",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "caller",
-		MessageKey:     "msg",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-	}
-
-	zapConfig := zap.Config{
-		Level:       level,
-		Development: false,
-		Sampling: &zap.SamplingConfig{
-			Initial:    100,
-			Thereafter: 100,
-		},
-		Encoding:         "json",
-		EncoderConfig:    zapEncoderConfig,
-		OutputPaths:      []string{"stderr"},
-		ErrorOutputPaths: []string{"stderr"},
-	}
-
-	return zapConfig.Build()
 }
 
 var stressMemoryPayload []byte

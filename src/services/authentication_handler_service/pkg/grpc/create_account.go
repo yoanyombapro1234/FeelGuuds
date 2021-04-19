@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
@@ -27,26 +26,20 @@ func (s *Server) CreateAccount(ctx context.Context, req *proto.CreateAccountRequ
 		s.metrics.InvalidRequestParametersCounter.WithLabelValues(constants.CREATE_ACCOUNT).Inc()
 
 		err := service_errors.ErrInvalidInputArguments
-		var msg = "invalid input parameters. please specify a username and password"
-		s.logger.Error(err, msg)
+		s.logger.Error(err, "invalid input parameters. please specify a valid username and password")
 
 		return nil, err
 	}
 
 	var (
-		begin           = time.Now()
-		took            = time.Since(begin)
 		isAccountLocked = false
 		operation       = func() (interface{}, error) {
 			return s.authnClient.ImportAccount(req.Email, req.Password, isAccountLocked)
 		}
-		retryableOperation = func() (interface{}, error) {
-			return s.performRetryableRpcCall(ctx, operation)
-		}
 	)
 
 	ctx = opentracing.ContextWithSpan(ctx, parentSpan)
-	result, err := s.PerformRPCOperationAndInstrument(ctx, retryableOperation, constants.CREATE_ACCOUNT, &took)
+	result, err := s.PerformRetryableRPCOperation(ctx, parentSpan, operation, constants.CREATE_ACCOUNT)()
 	if err != nil {
 		return nil, err
 	}
