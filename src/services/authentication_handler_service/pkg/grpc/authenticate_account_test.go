@@ -23,7 +23,7 @@ func Test_authenticate_account(t *testing.T) {
 		scenario string
 		email    string
 		password string
-		res      *proto.CreateAccountResponse
+		res      *proto.AuthenticateAccountResponse
 		errCode  codes.Code
 		errMsg   string
 		LoginAccount func(username, password string) (string, error)
@@ -57,7 +57,10 @@ func Test_authenticate_account(t *testing.T) {
 			"valid request",
 			email,
 			password,
-			nil,
+			&proto.AuthenticateAccountResponse{
+				Token:                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+				Error:                "",
+			},
 			codes.Unknown,
 			"",
 			func(username, password string) (string, error) {
@@ -97,6 +100,10 @@ func Test_authenticate_account(t *testing.T) {
 			if response != nil {
 				if response.GetError() != tt.res.GetError() {
 					t.Error("response: expected", tt.res.GetError(), "received", response.GetError())
+				}
+
+				if response.Token != tt.res.Token {
+					t.Error("response: expected", tt.res.Token, "received", response.Token)
 				}
 			}
 

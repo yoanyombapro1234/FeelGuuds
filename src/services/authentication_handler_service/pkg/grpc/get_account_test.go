@@ -10,77 +10,77 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
 )
 
-func Test_create_account(t *testing.T) {
+func Test_get_account(t *testing.T) {
 	// TODO : ensure proper metrics are being emitted in each unit test
 	expectedErrMsg := "retry limit reached"
-	ThirdPartyMockService.ImportAccountFunc = func(username, password string, locked bool) (int, error) {
-		return 0, errors.New(expectedErrMsg)
-	}
 
 	email := fmt.Sprintf("test_%s@gmail.com", GenerateRandomString(17))
 	password := fmt.Sprintf("test_password_%s", GenerateRandomString(17))
+	testAccount := &proto.Account{
+		Id:                   1,
+		Username:             email,
+		Locked:               true,
+		Deleted:              true,
+	}
 
 	tests := []struct {
 		scenario          string
-		email             string
-		password          string
-		res               *proto.CreateAccountResponse
+		id uint32
+		email          string
+		password string
+		res               *proto.GetAccountResponse
 		errCode           codes.Code
 		errMsg            string
-		ImportAccountFunc func(username, password string, locked bool) (int, error)
+		GetAccountFunc func(id string) (*core_auth_sdk.Account, error)
 	}{
-		// scenario: duplicate account
-		{
-			"account already exists",
-			email,
-			password,
-			nil,
-			codes.Unknown,
-			expectedErrMsg,
-			func(username, password string, locked bool) (int, error) {
-				return 0, errors.New(expectedErrMsg)
-			},
-		},
-		// scenario: invalid email params
-		{
-			"invalid email params",
-			"",
-			password,
-			nil,
-			codes.InvalidArgument,
-			"invalid input arguments",
-			func(username, password string, locked bool) (int, error) {
-				return 0, nil
-			},
-		},
-		// scenario: invalid password params
-		{
-			"invalid password params",
-			email,
-			"",
-			nil,
-			codes.InvalidArgument,
-			"invalid input arguments",
-			func(username, password string, locked bool) (int, error) {
-				return 0, nil
-			},
-		},
 		// scenario: valid request
 		{
-			"valid request",
+			"account successfully retrieved",
+			1,
 			email,
 			password,
-			&proto.CreateAccountResponse{
-				Id:                   1,
+			&proto.GetAccountResponse{
+				Account:              testAccount,
 				Error:                "",
 			},
 			codes.Unknown,
+			expectedErrMsg,
+			func(id string) (*core_auth_sdk.Account, error) {
+					return &core_auth_sdk.Account{
+						ID: int(testAccount.Id),
+						Username: testAccount.Username,
+					}, nil
+			},
+		},
+		// scenario: invalid request
+		{
+			"invalid request - invalid input arguments",
+			0,
+			email,
 			"",
-			func(username, password string, locked bool) (int, error) {
-				return 1, nil
+			nil,
+			codes.InvalidArgument,
+			"invalid input arguments",
+			func(id string) (*core_auth_sdk.Account, error) {
+				return nil, service_errors.ErrInvalidInputArguments
+			},
+		},
+		// scenario: invalid request
+		{
+			"invalid request - account does not exist",
+			1,
+			email,
+			"",
+			nil,
+			codes.Unknown,
+			"account does not exist",
+			func(id string) (*core_auth_sdk.Account, error) {
+				return nil, errors.New("account does not exist")
 			},
 		},
 	}
@@ -88,26 +88,21 @@ func Test_create_account(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.scenario, func(t *testing.T) {
 			ctx := context.Background()
-			ThirdPartyMockService.ImportAccountFunc = tt.ImportAccountFunc
+			ThirdPartyMockService.GetAccountFunc = tt.GetAccountFunc
 			conn := MockGRPCService(ctx, &ThirdPartyMockService)
 			defer conn.Close()
 
 			client := proto.NewAuthenticationHandlerServiceApiClient(conn)
 
-			request := &proto.CreateAccountRequest{
-				Email:    tt.email,
-				Password: tt.password,
+			request := &proto.GetAccountRequest{
+				Id: tt.id,
 			}
 
-			response, err := client.CreateAccount(ctx, request)
+			response, err := client.GetAccount(ctx, request)
 
 			if response != nil {
 				if response.GetError() != tt.res.GetError() {
 					t.Error("response: expected", tt.res.GetError(), "received", response.GetError())
-				}
-
-				if response.Id != tt.res.Id {
-					t.Error("response: expected", tt.res.Id, "received", response.Id)
 				}
 			}
 

@@ -13,74 +13,55 @@ import (
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 )
 
-func Test_create_account(t *testing.T) {
+func Test_update_account(t *testing.T) {
 	// TODO : ensure proper metrics are being emitted in each unit test
 	expectedErrMsg := "retry limit reached"
-	ThirdPartyMockService.ImportAccountFunc = func(username, password string, locked bool) (int, error) {
-		return 0, errors.New(expectedErrMsg)
-	}
 
 	email := fmt.Sprintf("test_%s@gmail.com", GenerateRandomString(17))
-	password := fmt.Sprintf("test_password_%s", GenerateRandomString(17))
 
 	tests := []struct {
 		scenario          string
 		email             string
-		password          string
-		res               *proto.CreateAccountResponse
+		id          int
+		res               *proto.UpdateAccountResponse
 		errCode           codes.Code
 		errMsg            string
-		ImportAccountFunc func(username, password string, locked bool) (int, error)
+		UpdateAccoutnFunc func(id, email string) error
 	}{
-		// scenario: duplicate account
+		// scenario: successful update of account
 		{
-			"account already exists",
+			"account exists based on credentials",
 			email,
-			password,
+			1,
 			nil,
 			codes.Unknown,
-			expectedErrMsg,
-			func(username, password string, locked bool) (int, error) {
-				return 0, errors.New(expectedErrMsg)
+			"",
+			func(id, username string) error {
+				return nil
 			},
 		},
 		// scenario: invalid email params
 		{
 			"invalid email params",
 			"",
-			password,
+			0,
 			nil,
 			codes.InvalidArgument,
 			"invalid input arguments",
-			func(username, password string, locked bool) (int, error) {
-				return 0, nil
+			func(id, username string) error {
+				return nil
 			},
 		},
-		// scenario: invalid password params
+		// scenario: account does not exist
 		{
-			"invalid password params",
+			"account does not exist",
 			email,
-			"",
+			1,
 			nil,
-			codes.InvalidArgument,
-			"invalid input arguments",
-			func(username, password string, locked bool) (int, error) {
-				return 0, nil
-			},
-		},
-		// scenario: valid request
-		{
-			"valid request",
-			email,
-			password,
-			&proto.CreateAccountResponse{
-				Id:                   1,
-				Error:                "",
-			},
 			codes.Unknown,
-			"",
-			func(username, password string, locked bool) (int, error) {
-				return 1, nil
+			expectedErrMsg,
+			func(id, username string) error {
+				return errors.New("account does not exit")
 			},
 		},
 	}
@@ -88,26 +69,22 @@ func Test_create_account(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.scenario, func(t *testing.T) {
 			ctx := context.Background()
-			ThirdPartyMockService.ImportAccountFunc = tt.ImportAccountFunc
+			ThirdPartyMockService.UpdateAccountFunc = tt.UpdateAccoutnFunc
 			conn := MockGRPCService(ctx, &ThirdPartyMockService)
 			defer conn.Close()
 
 			client := proto.NewAuthenticationHandlerServiceApiClient(conn)
 
-			request := &proto.CreateAccountRequest{
+			request := &proto.UpdateAccountRequest{
 				Email:    tt.email,
-				Password: tt.password,
+				Id: uint32(tt.id),
 			}
 
-			response, err := client.CreateAccount(ctx, request)
+			response, err := client.UpdateAccount(ctx, request)
 
 			if response != nil {
 				if response.GetError() != tt.res.GetError() {
 					t.Error("response: expected", tt.res.GetError(), "received", response.GetError())
-				}
-
-				if response.Id != tt.res.Id {
-					t.Error("response: expected", tt.res.Id, "received", response.Id)
 				}
 			}
 

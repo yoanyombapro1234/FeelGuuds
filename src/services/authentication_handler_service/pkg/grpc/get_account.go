@@ -7,6 +7,7 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/constants"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
@@ -46,7 +47,7 @@ func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (
 		return nil, err
 	}
 
-	account, ok := result.(*proto.Account)
+	account, ok := result.(*core_auth_sdk.Account)
 	if !ok {
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(constants.GET_ACCOUNT)
 
@@ -57,7 +58,13 @@ func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (
 
 	s.logger.For(ctx).Info("Successfully obtained user account", zap.Int("Id", int(req.GetId())))
 	return &proto.GetAccountResponse{
-		Account: account,
+		Account: &proto.Account{
+			Id:                   uint32(account.ID),
+			Username:             account.Username,
+			Locked:               account.Locked,
+			Deleted:              account.Deleted,
+			XXX_sizecache:        0,
+		},
 		Error:   "",
 	}, nil
 }
