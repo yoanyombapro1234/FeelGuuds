@@ -31,7 +31,7 @@ func Test_authenticate_account(t *testing.T) {
 		{
 			"invalid input arguments - password",
 			email,
-			" ",
+			"",
 			nil,
 			codes.InvalidArgument,
 			service_errors.ErrInvalidInputArguments.Error(),
