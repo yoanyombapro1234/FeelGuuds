@@ -23,7 +23,6 @@ func (s *Server) UpdateAccount(ctx context.Context, req *proto.UpdateAccountRequ
 		return nil, service_errors.ErrInvalidInputArguments
 	}
 
-	// TODO: change this to username instead of email
 	if req.Email == "" || req.Id == 0 {
 		s.metrics.InvalidRequestParametersCounter.WithLabelValues(constants.UPDATE_ACCOUNT).Inc()
 
