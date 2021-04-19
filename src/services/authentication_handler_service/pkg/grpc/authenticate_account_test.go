@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -11,61 +10,45 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
 )
 
-func Test_create_account(t *testing.T) {
+func Test_authenticate_account(t *testing.T) {
 	// TODO : ensure proper metrics are being emitted in each unit test
-	expectedErrMsg := "retry limit reached"
-	ThirdPartyMockService.ImportAccountFunc = func(username, password string, locked bool) (int, error) {
-		return 0, errors.New(expectedErrMsg)
-	}
-
 	email := fmt.Sprintf("test_%s@gmail.com", GenerateRandomString(17))
 	password := fmt.Sprintf("test_password_%s", GenerateRandomString(17))
 
 	tests := []struct {
-		scenario          string
-		email             string
-		password          string
-		res               *proto.CreateAccountResponse
-		errCode           codes.Code
-		errMsg            string
-		ImportAccountFunc func(username, password string, locked bool) (int, error)
+		scenario string
+		email    string
+		password string
+		res      *proto.CreateAccountResponse
+		errCode  codes.Code
+		errMsg   string
+		LoginAccount func(username, password string) (string, error)
 	}{
-		// scenario: duplicate account
+		// scenario: invalid input arguments - password
 		{
-			"account already exists",
+			"invalid input arguments - password",
 			email,
-			password,
+			" ",
 			nil,
-			codes.Unknown,
-			expectedErrMsg,
-			func(username, password string, locked bool) (int, error) {
-				return 0, errors.New(expectedErrMsg)
+			codes.InvalidArgument,
+			service_errors.ErrInvalidInputArguments.Error(),
+			func(username, password string) (string, error) {
+				return "", service_errors.ErrInvalidInputArguments
 			},
 		},
-		// scenario: invalid email params
+		// scenario: invalid input params - email
 		{
 			"invalid email params",
 			"",
 			password,
 			nil,
 			codes.InvalidArgument,
-			"invalid input arguments",
-			func(username, password string, locked bool) (int, error) {
-				return 0, nil
-			},
-		},
-		// scenario: invalid password params
-		{
-			"invalid password params",
-			email,
-			"",
-			nil,
-			codes.InvalidArgument,
-			"invalid input arguments",
-			func(username, password string, locked bool) (int, error) {
-				return 0, nil
+			service_errors.ErrInvalidInputArguments.Error(),
+			func(username, password string) (string, error) {
+				return "", service_errors.ErrInvalidInputArguments
 			},
 		},
 		// scenario: valid request
@@ -76,8 +59,8 @@ func Test_create_account(t *testing.T) {
 			nil,
 			codes.Unknown,
 			"",
-			func(username, password string, locked bool) (int, error) {
-				return 1, nil
+			func(username, password string) (string, error) {
+				return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c", nil
 			},
 		},
 	}
@@ -85,18 +68,18 @@ func Test_create_account(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.scenario, func(t *testing.T) {
 			ctx := context.Background()
-			ThirdPartyMockService.ImportAccountFunc = tt.ImportAccountFunc
+			ThirdPartyMockService.LoginAccountFunc = tt.LoginAccount
 			conn := MockGRPCService(ctx, &ThirdPartyMockService)
 			defer conn.Close()
 
 			client := proto.NewAuthenticationHandlerServiceApiClient(conn)
 
-			request := &proto.CreateAccountRequest{
+			request := &proto.AuthenticateAccountRequest{
 				Email:    tt.email,
 				Password: tt.password,
 			}
 
-			response, err := client.CreateAccount(ctx, request)
+			response, err := client.AuthenticateAccount(ctx, request)
 
 			if response != nil {
 				if response.GetError() != tt.res.GetError() {
@@ -109,7 +92,7 @@ func Test_create_account(t *testing.T) {
 					if er.Code() != tt.errCode {
 						t.Error("error code: expected", tt.errCode, "received", er.Code())
 					}
-					if !strings.Contains(er.Message(), tt.errMsg) {
+					if !strings.Contains(tt.errMsg, er.Message()) {
 						t.Error("error message: expected", tt.errMsg, "received", er.Message())
 					}
 				}

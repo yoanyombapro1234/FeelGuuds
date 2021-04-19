@@ -63,7 +63,7 @@ func NewMockServer(authClientMockStub core_auth_sdk.AuthService) *Server {
 	config := &Config{
 		Port:            9897,
 		ServiceName:     "AuthenticationHandlerService",
-		RpcDeadline:     60 * 10000,
+		RpcDeadline:     60*1000000,
 		RpcRetries:      1,
 		RpcRetryTimeout: 10,
 		RpcRetryBackoff: 1,
