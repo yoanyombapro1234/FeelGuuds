@@ -8,11 +8,14 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.1-0.20200107013213-dc14462fd587+incompatible
 	github.com/fatih/color v1.10.0
 	github.com/fsnotify/fsnotify v1.4.9
+	github.com/giantswarm/retry-go v0.0.0-20151203102909-d78cea247d5e
 	github.com/gogo/protobuf v1.3.2
 	github.com/gomodule/redigo v1.8.4
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.4.2
-	github.com/jinzhu/now v1.1.1 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
+	github.com/juju/errgo v0.0.0-20140925100237-08cceb5d0b53 // indirect
+	github.com/opentracing-contrib/go-grpc v0.0.0-20210225150812-73cb765af46e
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/prometheus/client_golang v1.10.0
 	github.com/spf13/cobra v1.1.3

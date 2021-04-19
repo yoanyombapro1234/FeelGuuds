@@ -5,6 +5,8 @@ import (
 )
 
 var (
+	ErrRequestTimeout                           = errors.New("request timeout")
+	ErrRetriesExceeded                          = errors.New("retries exceeded")
 	ErrInvalidRequest                           = errors.New("invalid grpc request")
 	ErrFailedToConnectToDatabase                = errors.New("failed to connect to database")
 	ErrFailedToPerformDatabaseMigrations        = errors.New("failed to perform database migrations")

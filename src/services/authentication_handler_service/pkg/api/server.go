@@ -235,7 +235,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	// determine if the secure server was started
 	if secureSrv != nil {
 		if err := secureSrv.Shutdown(ctx); err != nil {
-			s.logger.Error(err,"HTTPS server graceful shutdown failed", zap.Error(err))
+			s.logger.Error(err, "HTTPS server graceful shutdown failed", zap.Error(err))
 		}
 	}
 }

@@ -38,6 +38,11 @@ func main() {
 	fs.Int("port-metrics", 0, "metrics port")
 	fs.Int("grpc-port", 0, "gRPC port")
 	fs.String("grpc-service-name", "service", "gPRC service name")
+	fs.Int("grpc-rpc-deadline", 100, "gRPC deadline in milliseconds")
+	fs.Int("grpc-rpc-retries", 5, "gRPC max operation retries in the face of errors")
+	fs.Int("grpc-rpc-retry-timeout", 100, "gRPC max timeout of retry operation in milliseconds")
+	fs.Int("grpc-rpc-retry-backoff", 5, "gRPC backoff in between failed retry operations in milliseconds")
+
 	fs.String("level", "info", "log level debug, info, warn, error, flat or panic")
 	fs.StringSlice("backend-url", []string{}, "backend service URL")
 	fs.Duration("http-client-timeout", 2*time.Minute, "client timeout duration")
@@ -352,7 +357,7 @@ func NewAuthServiceClientConnection(err error, logger core_logging.ILog) *core_a
 		_, err = authnClient.ServerStats()
 		if err != nil {
 			if retries != retryLimit {
-				logger.ErrorM(err, fmt.Sprintf("failed to connect to authentication service. Attempt #%d",retries))
+				logger.ErrorM(err, fmt.Sprintf("failed to connect to authentication service. Attempt #%d", retries))
 			}
 			retries += 1
 		} else {

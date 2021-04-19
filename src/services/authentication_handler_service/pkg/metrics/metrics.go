@@ -21,12 +21,12 @@ func NewMetricsEngine(engine *core_metrics.CoreMetricsEngine, serviceName string
 
 type CoreMetrics struct {
 	ServiceName string
-	// tracks the number of http requests partitioned by name and status code
+	// tracks the number of grpc requests partitioned by name and status code
 	// used for monitoring and alerting (RED method)
-	HttpRequestCounter *core_metrics.CounterVec
-	// tracks the latencies associated with a http requests by operation name
+	GRPCRequestCounter *core_metrics.CounterVec
+	// tracks the latencies associated with a GRPC requests by operation name
 	// used for horizontal pod auto-scaling (Kubernetes HPA v2)
-	HttpRequestLatencyCounter *core_metrics.HistogramVec
+	GRPCRequestLatencyCounter *core_metrics.HistogramVec
 	// tracks the number of times there was a failure or success when trying to extract id from the request url
 	ExtractIdOperationCounter *core_metrics.CounterVec
 	// tracks the number of times there was a failure or success when trying to extract id from the request url
@@ -40,8 +40,8 @@ type CoreMetrics struct {
 func NewCoreMetrics(engine *core_metrics.CoreMetricsEngine, serviceName string) *CoreMetrics {
 	return &CoreMetrics{
 		ServiceName:                     serviceName,
-		HttpRequestCounter:              NewHttpRequestCounter(engine, serviceName),
-		HttpRequestLatencyCounter:       NewHttpRequestLatencyCounter(engine, serviceName),
+		GRPCRequestCounter:              NewGRPCRequestCounter(engine, serviceName),
+		GRPCRequestLatencyCounter:       NewGRPCRequestLatencyCounter(engine, serviceName),
 		ExtractIdOperationCounter:       NewExtractIdOperationCounter(engine, serviceName),
 		RemoteOperationStatusCounter:    NewRemoteOperationStatusCounter(engine, serviceName),
 		RemoteOperationsLatencyCounter:  NewRemoteOperationLatencyCounter(engine, serviceName),
@@ -51,24 +51,24 @@ func NewCoreMetrics(engine *core_metrics.CoreMetricsEngine, serviceName string) 
 	}
 }
 
-func NewHttpRequestCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.CounterVec {
+func NewGRPCRequestCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.CounterVec {
 	newCounter := core_metrics.NewCounterVec(&core_metrics.CounterOpts{
 		Namespace: serviceName,
-		Subsystem: "HTTP",
+		Subsystem: "GRPC",
 		Name:      fmt.Sprintf("%s_http_requests_total", serviceName),
-		Help:      "How many HTTP requests processed partitioned by name and status code",
+		Help:      "How many GRPC requests processed partitioned by name and status code",
 	}, []string{"name", "code"})
 
 	engine.RegisterMetric(newCounter)
 	return newCounter
 }
 
-func NewHttpRequestLatencyCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.HistogramVec {
+func NewGRPCRequestLatencyCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.HistogramVec {
 	newCounter := core_metrics.NewHistogramVec(&core_metrics.HistogramOpts{
 		Namespace:         serviceName,
-		Subsystem:         "HTTP",
+		Subsystem:         "GRPC",
 		Name:              fmt.Sprintf("%s_http_requests_latencies", serviceName),
-		Help:              "Seconds spent serving HTTP requests.",
+		Help:              "Seconds spent serving GRPC requests.",
 		ConstLabels:       nil,
 		Buckets:           prometheus.DefBuckets,
 		DeprecatedVersion: "",
