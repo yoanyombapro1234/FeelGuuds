@@ -11,6 +11,7 @@ import (
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
+	"errors"
 )
 
 func Test_authenticate_account(t *testing.T) {
@@ -61,6 +62,18 @@ func Test_authenticate_account(t *testing.T) {
 			"",
 			func(username, password string) (string, error) {
 				return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c", nil
+			},
+		},
+		// scenario: invalid input params - email
+		{
+			"bad credentials",
+			email,
+			password,
+			nil,
+			codes.Unknown,
+			"retry limit reached (1/1): field: credentials, message: failed",
+			func(username, password string) (string, error) {
+				return "", errors.New("field: credentials, message: failed")
 			},
 		},
 	}
