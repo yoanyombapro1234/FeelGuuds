@@ -11,11 +11,9 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
 )
 
-// TODO: ensure the authentication client adheres to an interface which we can directly mock and pass in
-// a version so we can better test various use cases without having to spin up the service dependencies - https://dev.to/jonfriesen/mocking-dependencies-in-go-1h4d
-// also add unit and integration testing scenarios at the function level
 func Test_create_account(t *testing.T) {
 	expectedErrMsg := "retry limit reached"
 	ThirdPartyMockService.ImportAccountFunc = func(username, password string, locked bool) (int, error) {
@@ -32,8 +30,9 @@ func Test_create_account(t *testing.T) {
 		res      *proto.CreateAccountResponse
 		errCode  codes.Code
 		errMsg   string
+		ImportAccountFunc func(username, password string, locked bool) (int, error)
 	}{
-		// scenario: valid fields
+		// scenario: duplicate account
 		{
 			"account already exists",
 			email,
@@ -41,17 +40,57 @@ func Test_create_account(t *testing.T) {
 			nil,
 			codes.Unknown,
 			expectedErrMsg,
+			 func(username, password string, locked bool) (int, error) {
+				return 0, errors.New(expectedErrMsg)
+			},
+		},
+		// scenario: invalid email params
+		{
+			"invalid email params",
+			"",
+			password,
+			nil,
+			codes.Unknown,
+			service_errors.ErrInvalidInputArguments.Error(),
+			func(username, password string, locked bool) (int, error) {
+				return 0, nil
+			},
+		},
+		// scenario: invalid password params
+		{
+			"invalid password params",
+			email,
+			"",
+			nil,
+			codes.Unknown,
+			service_errors.ErrInvalidInputArguments.Error(),
+			func(username, password string, locked bool) (int, error) {
+				return 0, nil
+			},
+		},
+		// scenario: valid request
+		{
+			"valid request",
+			email,
+			password,
+			nil,
+			codes.Unknown,
+			"",
+			func(username, password string, locked bool) (int, error) {
+				return 1, nil
+			},
 		},
 	}
 
-	ctx := context.Background()
-	conn := MockGRPCService(ctx, &ThirdPartyMockService)
-	defer conn.Close()
-
-	client := proto.NewAuthenticationHandlerServiceApiClient(conn)
-
 	for _, tt := range tests {
 		t.Run(tt.scenario, func(t *testing.T) {
+			ctx := context.Background()
+			ThirdPartyMockService.ImportAccountFunc = tt.ImportAccountFunc
+			conn := MockGRPCService(ctx, &ThirdPartyMockService)
+			defer conn.Close()
+
+			client := proto.NewAuthenticationHandlerServiceApiClient(conn)
+
 			request := &proto.CreateAccountRequest{
 				Email:    tt.email,
 				Password: tt.password,

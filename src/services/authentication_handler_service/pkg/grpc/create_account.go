@@ -51,7 +51,7 @@ func (s *Server) CreateAccount(ctx context.Context, req *proto.CreateAccountRequ
 		return nil, err
 	}
 
-	authnID, ok := result.(int)
+	id, ok := result.(int)
 	if !ok {
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(constants.CREATE_ACCOUNT)
 		err := errors.New("failed to convert result to uint32 id value")
@@ -59,8 +59,8 @@ func (s *Server) CreateAccount(ctx context.Context, req *proto.CreateAccountRequ
 		return nil, err
 	}
 
-	s.logger.For(ctx).Info("Successfully created user account", zap.Int("Id", int(authnID)))
-	response := &proto.CreateAccountResponse{Id: uint32(authnID), Error: ""}
+	s.logger.For(ctx).Info("Successfully created user account", zap.Int("Id", int(id)))
+	response := &proto.CreateAccountResponse{Id: uint32(id), Error: ""}
 
 	return response, nil
 }
