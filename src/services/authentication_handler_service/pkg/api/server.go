@@ -83,14 +83,14 @@ type Server struct {
 	config        *Config
 	pool          *redis.Pool
 	handler       http.Handler
-	authnClient   *core_auth_sdk.Client
+	authnClient   core_auth_sdk.AuthService
 	logger        core_logging.ILog
 	metrics       *metrics.CoreMetrics
 	metricsEngine *core_metrics.CoreMetricsEngine
 	tracerEngine  *core_tracing.TracingEngine
 }
 
-func NewServer(config *Config, client *core_auth_sdk.Client, logging core_logging.ILog, serviceMetrics *metrics.CoreMetrics,
+func NewServer(config *Config, client core_auth_sdk.AuthService, logging core_logging.ILog, serviceMetrics *metrics.CoreMetrics,
 	metricsEngineConf *core_metrics.CoreMetricsEngine, tracer *core_tracing.TracingEngine) (*Server, error) {
 	srv := &Server{
 		router: mux.NewRouter(),

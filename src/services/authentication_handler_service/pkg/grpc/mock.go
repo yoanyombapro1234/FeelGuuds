@@ -26,28 +26,32 @@ type MockAuthGRPCServer struct {
 	proto.UnimplementedAuthenticationHandlerServiceApiServer
 }
 
+type MockDialOption func(context.Context, string) (net.Conn, error)
+
 // dialer creates an in memory full duplex connection
-func dialer() func(context.Context, string) (net.Conn, error) {
-	listener := bufconn.Listen(1024 * 1024)
+func dialer(authClientMock core_auth_sdk.AuthService) func() MockDialOption {
+	return func() MockDialOption {
+		listener := bufconn.Listen(1024 * 1024)
 
-	server := grpc.NewServer()
-	s := NewMockServer()
-	proto.RegisterAuthenticationHandlerServiceApiServer(server, s)
+		server := grpc.NewServer()
+		s := NewMockServer(authClientMock)
+		proto.RegisterAuthenticationHandlerServiceApiServer(server, s)
 
-	go func() {
-		if err := server.Serve(listener); err != nil {
-			log.Fatal(err)
+		go func() {
+			if err := server.Serve(listener); err != nil {
+				log.Fatal(err)
+			}
+		}()
+
+		return func(context.Context, string) (net.Conn, error) {
+			return listener.Dial()
 		}
-	}()
-
-	return func(context.Context, string) (net.Conn, error) {
-		return listener.Dial()
 	}
 }
 
 // MockGRPCService creates and returns a mock grpc service connection
-func MockGRPCService(ctx context.Context) *grpc.ClientConn {
-	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer()))
+func MockGRPCService(ctx context.Context, authClientMock core_auth_sdk.AuthService) *grpc.ClientConn {
+	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(authClientMock)()))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,34 +59,26 @@ func MockGRPCService(ctx context.Context) *grpc.ClientConn {
 }
 
 // NewMockServer creates a new mock server instance
-func NewMockServer() *Server {
+func NewMockServer(authClientMockStub core_auth_sdk.AuthService) *Server {
 	config := &Config{
 		Port:            9897,
 		ServiceName:     "AuthenticationHandlerService",
-		RpcDeadline:     100,
-		RpcRetries:      5,
-		RpcRetryTimeout: 100,
-		RpcRetryBackoff: 10,
+		RpcDeadline:     60*10000,
+		RpcRetries:      1,
+		RpcRetryTimeout: 10,
+		RpcRetryBackoff: 1,
 	}
 
-	const serviceName string = "test"
-
 	// initiate tracing engine
-	tracerEngine, closer := InitializeTracingEngine(serviceName)
+	tracerEngine, closer := InitializeTracingEngine(config.ServiceName)
 	defer closer.Close()
 	ctx := context.Background()
 
 	// initiate metrics engine
-	serviceMetrics := InitializeMetricsEngine(serviceName)
+	serviceMetrics := InitializeMetricsEngine(config.ServiceName)
 
 	// initiate logging client
 	logger := InitializeLoggingEngine(ctx)
-
-	// authn client
-	authnClient, err := InitializeAuthnClient(logger)
-	if err != nil {
-		logger.For(ctx).FatalM(err, "unable to setup mock server")
-	}
 
 	srv := &Server{
 		config:        config,
@@ -90,14 +86,14 @@ func NewMockServer() *Server {
 		metricsEngine: serviceMetrics.Engine,
 		metrics:       serviceMetrics.MicroServiceMetrics,
 		logger:        logger,
-		authnClient:   authnClient,
+		authnClient:   authClientMockStub,
 	}
 
 	return srv
 }
 
 // InitializeAuthnClient creates a connection to the authn service
-func InitializeAuthnClient(logger core_logging.ILog) (*core_auth_sdk.Client, error) {
+func InitializeAuthnClient(logger core_logging.ILog) (core_auth_sdk.AuthService, error) {
 	client, err := core_auth_sdk.NewClient(core_auth_sdk.Config{
 		// The AUTHN_URL of your Keratin AuthN server. This will be used to verify tokens created by
 		// AuthN, and will also be used for API calls unless PrivateBaseURL is also set.

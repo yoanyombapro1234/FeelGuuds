@@ -2,7 +2,9 @@ package grpc
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"google.golang.org/grpc/codes"
@@ -15,6 +17,11 @@ import (
 // a version so we can better test various use cases without having to spin up the service dependencies - https://dev.to/jonfriesen/mocking-dependencies-in-go-1h4d
 // also add unit and integration testing scenarios at the function level
 func Test_create_account(t *testing.T) {
+	expectedErrMsg := "retry limit reached"
+	ThirdPartyMockService.ImportAccountFunc = func(username, password string, locked bool) (int, error) {
+		return 0, errors.New(expectedErrMsg)
+	}
+
 	email := fmt.Sprintf("test_%s@gmail.com", GenerateRandomString(17))
 	password := fmt.Sprintf("test_password_%s", GenerateRandomString(17))
 
@@ -28,20 +35,17 @@ func Test_create_account(t *testing.T) {
 	}{
 		// scenario: valid fields
 		{
-			"successfull account created",
+			"account already exists",
 			email,
 			password,
-			&proto.CreateAccountResponse{
-				Id:    0,
-				Error: "",
-			},
-			codes.OK,
-			"",
+			nil,
+			codes.Unknown,
+			expectedErrMsg,
 		},
 	}
 
 	ctx := context.Background()
-	conn := MockGRPCService(ctx)
+	conn := MockGRPCService(ctx, &ThirdPartyMockService)
 	defer conn.Close()
 
 	client := proto.NewAuthenticationHandlerServiceApiClient(conn)
@@ -64,9 +68,9 @@ func Test_create_account(t *testing.T) {
 			if err != nil {
 				if er, ok := status.FromError(err); ok {
 					if er.Code() != tt.errCode {
-						t.Error("error code: expected", codes.InvalidArgument, "received", er.Code())
+						t.Error("error code: expected", tt.errCode, "received", er.Code())
 					}
-					if er.Message() != tt.errMsg {
+					if !strings.Contains(er.Message(), tt.errMsg) {
 						t.Error("error message: expected", tt.errMsg, "received", er.Message())
 					}
 				}

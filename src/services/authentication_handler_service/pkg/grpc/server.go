@@ -28,7 +28,7 @@ type Server struct {
 	// inherit the behaviors/adhere to the interface the api server adheres to
 	proto.UnimplementedAuthenticationHandlerServiceApiServer
 	config        *Config
-	authnClient   *core_auth_sdk.Client
+	authnClient   core_auth_sdk.AuthService
 	logger        core_logging.ILog
 	metrics       *metrics.CoreMetrics
 	metricsEngine *core_metrics.CoreMetricsEngine
@@ -45,7 +45,7 @@ type Config struct {
 }
 
 // NewServer defines a new instance of the grpc service
-func NewServer(config *Config, client *core_auth_sdk.Client, logging core_logging.ILog, serviceMetrics *metrics.CoreMetrics,
+func NewServer(config *Config, client core_auth_sdk.AuthService, logging core_logging.ILog, serviceMetrics *metrics.CoreMetrics,
 	metricsEngineConf *core_metrics.CoreMetricsEngine, tracer *core_tracing.TracingEngine) (*Server, error) {
 	srv := &Server{
 		logger:        logging,

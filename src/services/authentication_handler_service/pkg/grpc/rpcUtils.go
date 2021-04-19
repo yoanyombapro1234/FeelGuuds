@@ -18,14 +18,17 @@ func (s *Server) setCtxRequestTimeout(ctx context.Context) context.Context {
 
 // performRetryableRpcCall performs an rpc call using retries in the face of errors
 func (s *Server) performRetryableRpcCall(ctx context.Context, f func() (interface{}, error)) (interface{}, error) {
-	var response = make(chan interface{}, 1)
+	var response = make(chan *interface{}, 1)
 
 	err := retry.Do(
-		func(conn chan<- interface{}) func() error {
+		func(conn chan<- *interface{}) func() error {
 			return func() error {
 				opResponse, err := f()
-				response <- opResponse
-				return err
+				if err != nil {
+					return err
+				}
+				response <- &opResponse
+				return nil
 			}
 		}(response),
 		retry.MaxTries(s.config.RpcRetries),
@@ -34,7 +37,7 @@ func (s *Server) performRetryableRpcCall(ctx context.Context, f func() (interfac
 	)
 
 	if err != nil {
-		return nil, service_errors.ErrRetriesExceeded
+		return nil, err
 	}
 
 	if ctx.Err() == context.Canceled {

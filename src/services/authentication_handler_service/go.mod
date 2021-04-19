@@ -25,7 +25,7 @@ require (
 	github.com/swaggo/swag v1.7.0
 	github.com/uber/jaeger-lib v2.4.1+incompatible
 	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core v0.0.0-20210416043814-63b17f0049be
-	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210416043814-63b17f0049be
+	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210419120811-ccda648fd4a2
 	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging v0.0.0-20210212043033-02d9b91fb6ac
 	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing v0.0.0-20210416043814-63b17f0049be
 	go.uber.org/zap v1.16.0

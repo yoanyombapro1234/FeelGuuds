@@ -333,7 +333,7 @@ func initAuthnClient(username, password, audience, issuer, url, origin string) (
 	}, origin)
 }
 
-func NewAuthServiceClientConnection(err error, logger core_logging.ILog) *core_auth_sdk.Client {
+func NewAuthServiceClientConnection(err error, logger core_logging.ILog) core_auth_sdk.AuthService {
 	// initialize authentication client in order to establish communication with the
 	// authentication service. This serves as a singular source of truth for authentication needs
 	authUsername := viper.GetString("SERVICE_AUTHN_USERNAME")

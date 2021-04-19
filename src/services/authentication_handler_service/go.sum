@@ -572,6 +572,8 @@ github.com/yoanyombapro1234/FeelGuuds/src/libraries/core v0.0.0-20210416043814-6
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210212043033-02d9b91fb6ac/go.mod h1:EfxNIYWC8OE+GZwzc198RKsuW5zwFkwaAjk5CZg83Fc=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210416043814-63b17f0049be h1:p43QTntbNLevGGqDGyCjAohGKJ28yH9QtFw5MRR+O7M=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210416043814-63b17f0049be/go.mod h1:EfxNIYWC8OE+GZwzc198RKsuW5zwFkwaAjk5CZg83Fc=
+github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210419120811-ccda648fd4a2 h1:/1YZPNyAG7Uqy2LMU3Slj6uwT3UYDjmUNt3ZhZLlbVc=
+github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk v0.0.0-20210419120811-ccda648fd4a2/go.mod h1:EfxNIYWC8OE+GZwzc198RKsuW5zwFkwaAjk5CZg83Fc=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging v0.0.0-20210212043033-02d9b91fb6ac h1:PsbpLGKuCbYdaHGOcFIVGQvM6mB8cDlphTlnOL9tIxs=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging v0.0.0-20210212043033-02d9b91fb6ac/go.mod h1:OHhZAU7HiA11vEhRC+c/OQ4/LQb0MFVaqgxgIcBaTXk=
 github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing v0.0.0-20210416043814-63b17f0049be h1:9NshGv4q4kekmMEQ3N9r2ysuLrTgrZAgcoxF2JMCpIE=
