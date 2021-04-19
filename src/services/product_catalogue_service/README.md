@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+# FeelGuuds Product Catalogue Service (Hornet)
+=======
 # FeelGuuds Product Catalogue Service - (Hornet)
 
 [![e2e](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/product_catalogue_service/blob/master/.github/workflows/e2e.yml)
@@ -8,7 +11,6 @@
 
 
 Specifications:
-
 * Health checks (readiness and liveness)
 * Graceful shutdown on interrupt signals
 * File watcher for secrets and configmaps
