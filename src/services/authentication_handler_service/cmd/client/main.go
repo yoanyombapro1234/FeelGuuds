@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	client2 "github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/internal/client"
+	client2 "github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/client"
 )
 
 func main() {

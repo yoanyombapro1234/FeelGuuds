@@ -32,10 +32,6 @@ run:
 	--level=debug --grpc-port=9999 --backend-url=https://httpbin.org/status/401 --backend-url=https://httpbin.org/status/500 \
 	--ui-logo=https://raw.githubusercontent.com/stefanprodan/service/gh-pages/cuddle_clap.gif $(EXTRA_RUN_ARGS)
 
-test:
-	go get github.com/mfridman/tparse
-	go test -v -race ./... -json -cover | tparse -all -top
-
 build:
 	GIT_COMMIT=$$(git rev-list -1 HEAD) && CGO_ENABLED=0 go build  -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version.REVISION=$(GIT_COMMIT)" -a -o ./bin/service ./cmd/service/*
 	GIT_COMMIT=$$(git rev-list -1 HEAD) && CGO_ENABLED=0 go build  -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version.REVISION=$(GIT_COMMIT)" -a -o ./bin/servicecli ./cmd/servicecli/*
@@ -106,10 +102,10 @@ protogen:
 		-I=$(GOPATH)/src/github.com/protobuf/src/google/protobuf/timestamp.proto \
 		--gogoopsee_out=plugins=grpc+graphql,Mopsee/protobuf/opsee.proto=github.com/opsee/protobuf/opseeproto,Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/protoc-gen-gogo/descriptor:./gen/ --proto_path=$(GOPATH)/src:. ./proto/*.proto
 
-down:
+kill-containers:
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml down
 
-up:
+start-containers:
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans
 
@@ -130,3 +126,7 @@ cover:
 	$(AT) echo Open the coverage report:
 	$(AT) echo open $(TMP_COVERAGE)/coverage.html
 	$(AT) if [ "$(OPEN_COVERAGE_HTML)" == "1" ]; then open $(TMP_COVERAGE)/coverage.html; fi
+
+test: start-containers
+	go get github.com/mfridman/tparse
+	go test -v -race ./... -json -cover | tparse -all -top

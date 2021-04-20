@@ -61,7 +61,7 @@ func TestAuthenticationHandlerServiceClient_CreateAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c :=  NewClient(conn, 5*time.Second)
 			_, err := createAccountTestHelper(c, ctx, tt.email, tt.password)
-			if err != nil {
+			if err != nil &&  errors.Is(err, tt.err) {
 				t.Error("error: expected", tt.err, "received", err)
 			}
 		})
