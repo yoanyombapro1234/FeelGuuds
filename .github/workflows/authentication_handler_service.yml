@@ -39,7 +39,7 @@ jobs:
       - name: Build container image
         working-directory: ${{env.working-directory}}
         run: |
-          ./test/build.sh
+          ./e2e_test/build.sh
           kind load docker-image test/service:latest
       - name: Setup Helm
         uses: ./.github/actions/helm
@@ -47,10 +47,10 @@ jobs:
           helm-version: ${{ matrix.helm-version }}
       - name: Deploy
         working-directory: ${{env.working-directory}}
-        run: ./test/deploy.sh
+        run: ./e2e_test/deploy.sh
       - name: Run integration tests
         working-directory: ${{env.working-directory}}
-        run: ./test/test.sh
+        run: ./e2e_test/test.sh
       - name: Debug failure
         if: failure()
         run: |
