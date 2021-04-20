@@ -45,7 +45,7 @@ type Config struct {
 }
 
 // NewServer defines a new instance of the grpc service
-func NewServer(config *Config, client core_auth_sdk.AuthService, logging core_logging.ILog, serviceMetrics *metrics.CoreMetrics,
+func NewGRPCServer(config *Config, client core_auth_sdk.AuthService, logging core_logging.ILog, serviceMetrics *metrics.CoreMetrics,
 	metricsEngineConf *core_metrics.CoreMetricsEngine, tracer *core_tracing.TracingEngine) (*Server, error) {
 	srv := &Server{
 		logger:        logging,

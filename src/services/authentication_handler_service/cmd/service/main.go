@@ -194,7 +194,7 @@ func main() {
 
 	// start gRPC server
 	if grpcCfg.Port > 0 {
-		grpcSrv, _ := grpc.NewServer(&grpcCfg, authnServiceClient, logger, serviceMetrics.MicroServiceMetrics, serviceMetrics.Engine, tracerEngine)
+		grpcSrv, _ := grpc.NewGRPCServer(&grpcCfg, authnServiceClient, logger, serviceMetrics.MicroServiceMetrics, serviceMetrics.Engine, tracerEngine)
 		go grpcSrv.ListenAndServe()
 	}
 

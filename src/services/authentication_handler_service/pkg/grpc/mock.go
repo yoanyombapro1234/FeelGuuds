@@ -60,6 +60,8 @@ func MockGRPCService(ctx context.Context, authClientMock core_auth_sdk.AuthServi
 
 // NewMockServer creates a new mock server instance
 func NewMockServer(authClientMockStub core_auth_sdk.AuthService) *Server {
+	var err error
+
 	config := &Config{
 		Port:            9897,
 		ServiceName:     "AuthenticationHandlerService",
@@ -79,6 +81,13 @@ func NewMockServer(authClientMockStub core_auth_sdk.AuthService) *Server {
 
 	// initiate logging client
 	logger := InitializeLoggingEngine(ctx)
+
+	if authClientMockStub == nil {
+		authClientMockStub, err = InitializeAuthnClient(logger)
+		if err != nil {
+			logger.FatalM(err, err.Error())
+		}
+	}
 
 	srv := &Server{
 		config:        config,

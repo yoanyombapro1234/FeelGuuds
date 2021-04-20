@@ -11,13 +11,14 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/util"
 )
 
 func Test_update_account(t *testing.T) {
 	// TODO : ensure proper metrics are being emitted in each unit test
 	expectedErrMsg := "retry limit reached"
 
-	email := fmt.Sprintf("test_%s@gmail.com", GenerateRandomString(17))
+	email := fmt.Sprintf("test_%s@gmail.com", util.GenerateRandomString(17))
 
 	tests := []struct {
 		scenario          string

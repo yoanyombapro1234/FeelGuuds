@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/util"
 )
 
 func Test_create_account(t *testing.T) {
@@ -20,8 +21,8 @@ func Test_create_account(t *testing.T) {
 		return 0, errors.New(expectedErrMsg)
 	}
 
-	email := fmt.Sprintf("test_%s@gmail.com", GenerateRandomString(17))
-	password := fmt.Sprintf("test_password_%s", GenerateRandomString(17))
+	email := fmt.Sprintf("test_%s@gmail.com", util.GenerateRandomString(17))
+	password := fmt.Sprintf("test_password_%s", util.GenerateRandomString(17))
 
 	tests := []struct {
 		scenario          string
