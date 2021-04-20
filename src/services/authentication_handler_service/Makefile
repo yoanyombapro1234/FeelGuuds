@@ -33,6 +33,7 @@ run:
 	--ui-logo=https://raw.githubusercontent.com/stefanprodan/service/gh-pages/cuddle_clap.gif $(EXTRA_RUN_ARGS)
 
 test:
+	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover | tparse -all -top
 
 build:

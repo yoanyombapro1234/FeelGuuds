@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto/authentication_handler_service.pb.go (68.1%)</option>
+				<option value="file0">github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto/authentication_handler_service.pb.go (66.5%)</option>
 				
 				<option value="file1">github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/api/cache.go (0.0%)</option>
 				
@@ -1583,7 +1583,7 @@ func (this *Account) Equal(that interface{}) bool <span class="cov8" title="1">{
                         return false
                 }</span>
         }
-        <span class="cov8" title="1">if that1 == nil </span><span class="cov8" title="1">{
+        <span class="cov8" title="1">if that1 == nil </span><span class="cov0" title="0">{
                 return this == nil
         }</span> else<span class="cov8" title="1"> if this == nil </span><span class="cov0" title="0">{
                 return false
@@ -2015,7 +2015,7 @@ func (m *CreateAccountResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) <
         _ = i
         var l int
         _ = l
-        if m.XXX_unrecognized != nil </span><span class="cov8" title="1">{
+        if m.XXX_unrecognized != nil </span><span class="cov0" title="0">{
                 i -= len(m.XXX_unrecognized)
                 copy(dAtA[i:], m.XXX_unrecognized)
         }</span>
@@ -2291,7 +2291,7 @@ func (m *UnLockAccountResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) <
         _ = i
         var l int
         _ = l
-        if m.XXX_unrecognized != nil </span><span class="cov8" title="1">{
+        if m.XXX_unrecognized != nil </span><span class="cov0" title="0">{
                 i -= len(m.XXX_unrecognized)
                 copy(dAtA[i:], m.XXX_unrecognized)
         }</span>
@@ -2325,7 +2325,7 @@ func (m *GetAccountRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) <span
         _ = i
         var l int
         _ = l
-        if m.XXX_unrecognized != nil </span><span class="cov8" title="1">{
+        if m.XXX_unrecognized != nil </span><span class="cov0" title="0">{
                 i -= len(m.XXX_unrecognized)
                 copy(dAtA[i:], m.XXX_unrecognized)
         }</span>
@@ -2485,7 +2485,7 @@ func (m *LogoutAccountRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) <s
         _ = i
         var l int
         _ = l
-        if m.XXX_unrecognized != nil </span><span class="cov8" title="1">{
+        if m.XXX_unrecognized != nil </span><span class="cov0" title="0">{
                 i -= len(m.XXX_unrecognized)
                 copy(dAtA[i:], m.XXX_unrecognized)
         }</span>
@@ -2688,7 +2688,7 @@ func NewPopulatedUnLockAccountRequest(r randyAuthenticationHandlerService, easy 
 func NewPopulatedUnLockAccountResponse(r randyAuthenticationHandlerService, easy bool) *UnLockAccountResponse <span class="cov8" title="1">{
         this := &amp;UnLockAccountResponse{}
         this.Error = string(randStringAuthenticationHandlerService(r))
-        if !easy &amp;&amp; r.Intn(10) != 0 </span><span class="cov8" title="1">{
+        if !easy &amp;&amp; r.Intn(10) != 0 </span><span class="cov0" title="0">{
                 this.XXX_unrecognized = randUnrecognizedAuthenticationHandlerService(r, 2)
         }</span>
         <span class="cov8" title="1">return this</span>
@@ -2870,7 +2870,7 @@ func (m *CreateAccountResponse) Size() (n int) <span class="cov8" title="1">{
         if l &gt; 0 </span><span class="cov8" title="1">{
                 n += 1 + l + sovAuthenticationHandlerService(uint64(l))
         }</span>
-        <span class="cov8" title="1">if m.XXX_unrecognized != nil </span><span class="cov8" title="1">{
+        <span class="cov8" title="1">if m.XXX_unrecognized != nil </span><span class="cov0" title="0">{
                 n += len(m.XXX_unrecognized)
         }</span>
         <span class="cov8" title="1">return n</span>
@@ -2998,7 +2998,7 @@ func (m *UnLockAccountResponse) Size() (n int) <span class="cov8" title="1">{
         if l &gt; 0 </span><span class="cov8" title="1">{
                 n += 1 + l + sovAuthenticationHandlerService(uint64(l))
         }</span>
-        <span class="cov8" title="1">if m.XXX_unrecognized != nil </span><span class="cov8" title="1">{
+        <span class="cov8" title="1">if m.XXX_unrecognized != nil </span><span class="cov0" title="0">{
                 n += len(m.XXX_unrecognized)
         }</span>
         <span class="cov8" title="1">return n</span>
@@ -3013,7 +3013,7 @@ func (m *GetAccountRequest) Size() (n int) <span class="cov8" title="1">{
         if m.Id != 0 </span><span class="cov8" title="1">{
                 n += 1 + sovAuthenticationHandlerService(uint64(m.Id))
         }</span>
-        <span class="cov8" title="1">if m.XXX_unrecognized != nil </span><span class="cov8" title="1">{
+        <span class="cov8" title="1">if m.XXX_unrecognized != nil </span><span class="cov0" title="0">{
                 n += len(m.XXX_unrecognized)
         }</span>
         <span class="cov8" title="1">return n</span>
@@ -3088,7 +3088,7 @@ func (m *LogoutAccountRequest) Size() (n int) <span class="cov8" title="1">{
         if m.Id != 0 </span><span class="cov8" title="1">{
                 n += 1 + sovAuthenticationHandlerService(uint64(m.Id))
         }</span>
-        <span class="cov8" title="1">if m.XXX_unrecognized != nil </span><span class="cov8" title="1">{
+        <span class="cov8" title="1">if m.XXX_unrecognized != nil </span><span class="cov0" title="0">{
                 n += len(m.XXX_unrecognized)
         }</span>
         <span class="cov8" title="1">return n</span>
@@ -3339,22 +3339,22 @@ func (m *CreateAccountResponse) Unmarshal(dAtA []byte) error <span class="cov8" 
                         }</span>
                         <span class="cov8" title="1">m.Error = string(dAtA[iNdEx:postIndex])
                         iNdEx = postIndex</span>
-                default:<span class="cov8" title="1">
+                default:<span class="cov0" title="0">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
                         if err != nil </span><span class="cov0" title="0">{
                                 return err
                         }</span>
-                        <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if skippy &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
                                 return io.ErrUnexpectedEOF
                         }</span>
-                        <span class="cov8" title="1">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+                        <span class="cov0" title="0">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
                         iNdEx += skippy</span>
                 }
         }
@@ -3386,7 +3386,7 @@ func (m *UpdateAccountRequest) Unmarshal(dAtA []byte) error <span class="cov8" t
                 }
                 <span class="cov8" title="1">fieldNum := int32(wire &gt;&gt; 3)
                 wireType := int(wire &amp; 0x7)
-                if wireType == 4 </span><span class="cov0" title="0">{
+                if wireType == 4 </span><span class="cov8" title="1">{
                         return fmt.Errorf("proto: UpdateAccountRequest: wiretype end group for non-group")
                 }</span>
                 <span class="cov8" title="1">if fieldNum &lt;= 0 </span><span class="cov0" title="0">{
@@ -3439,7 +3439,7 @@ func (m *UpdateAccountRequest) Unmarshal(dAtA []byte) error <span class="cov8" t
                         if postIndex &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if postIndex &gt; l </span><span class="cov8" title="1">{
+                        <span class="cov8" title="1">if postIndex &gt; l </span><span class="cov0" title="0">{
                                 return io.ErrUnexpectedEOF
                         }</span>
                         <span class="cov8" title="1">m.Email = string(dAtA[iNdEx:postIndex])
@@ -3739,7 +3739,7 @@ func (m *LockAccountRequest) Unmarshal(dAtA []byte) error <span class="cov8" tit
                 if wireType == 4 </span><span class="cov0" title="0">{
                         return fmt.Errorf("proto: LockAccountRequest: wiretype end group for non-group")
                 }</span>
-                <span class="cov8" title="1">if fieldNum &lt;= 0 </span><span class="cov8" title="1">{
+                <span class="cov8" title="1">if fieldNum &lt;= 0 </span><span class="cov0" title="0">{
                         return fmt.Errorf("proto: LockAccountRequest: illegal tag %d (wire type %d)", fieldNum, wire)
                 }</span>
                 <span class="cov8" title="1">switch fieldNum </span>{
@@ -3765,7 +3765,7 @@ func (m *LockAccountRequest) Unmarshal(dAtA []byte) error <span class="cov8" tit
                 default:<span class="cov8" title="1">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
-                        if err != nil </span><span class="cov0" title="0">{
+                        if err != nil </span><span class="cov8" title="1">{
                                 return err
                         }</span>
                         <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
@@ -3809,7 +3809,7 @@ func (m *LockAccountResponse) Unmarshal(dAtA []byte) error <span class="cov8" ti
                 }
                 <span class="cov8" title="1">fieldNum := int32(wire &gt;&gt; 3)
                 wireType := int(wire &amp; 0x7)
-                if wireType == 4 </span><span class="cov0" title="0">{
+                if wireType == 4 </span><span class="cov8" title="1">{
                         return fmt.Errorf("proto: LockAccountResponse: wiretype end group for non-group")
                 }</span>
                 <span class="cov8" title="1">if fieldNum &lt;= 0 </span><span class="cov0" title="0">{
@@ -3851,7 +3851,7 @@ func (m *LockAccountResponse) Unmarshal(dAtA []byte) error <span class="cov8" ti
                 default:<span class="cov8" title="1">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
-                        if err != nil </span><span class="cov8" title="1">{
+                        if err != nil </span><span class="cov0" title="0">{
                                 return err
                         }</span>
                         <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
@@ -3924,7 +3924,7 @@ func (m *UnLockAccountRequest) Unmarshal(dAtA []byte) error <span class="cov8" t
                 default:<span class="cov8" title="1">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
-                        if err != nil </span><span class="cov0" title="0">{
+                        if err != nil </span><span class="cov8" title="1">{
                                 return err
                         }</span>
                         <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
@@ -3933,7 +3933,7 @@ func (m *UnLockAccountRequest) Unmarshal(dAtA []byte) error <span class="cov8" t
                         <span class="cov8" title="1">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov8" title="1">{
+                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
                                 return io.ErrUnexpectedEOF
                         }</span>
                         <span class="cov8" title="1">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
@@ -3968,7 +3968,7 @@ func (m *UnLockAccountResponse) Unmarshal(dAtA []byte) error <span class="cov8" 
                 }
                 <span class="cov8" title="1">fieldNum := int32(wire &gt;&gt; 3)
                 wireType := int(wire &amp; 0x7)
-                if wireType == 4 </span><span class="cov0" title="0">{
+                if wireType == 4 </span><span class="cov8" title="1">{
                         return fmt.Errorf("proto: UnLockAccountResponse: wiretype end group for non-group")
                 }</span>
                 <span class="cov8" title="1">if fieldNum &lt;= 0 </span><span class="cov0" title="0">{
@@ -4002,27 +4002,27 @@ func (m *UnLockAccountResponse) Unmarshal(dAtA []byte) error <span class="cov8" 
                         if postIndex &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if postIndex &gt; l </span><span class="cov8" title="1">{
+                        <span class="cov8" title="1">if postIndex &gt; l </span><span class="cov0" title="0">{
                                 return io.ErrUnexpectedEOF
                         }</span>
                         <span class="cov8" title="1">m.Error = string(dAtA[iNdEx:postIndex])
                         iNdEx = postIndex</span>
-                default:<span class="cov8" title="1">
+                default:<span class="cov0" title="0">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
                         if err != nil </span><span class="cov0" title="0">{
                                 return err
                         }</span>
-                        <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if skippy &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
                                 return io.ErrUnexpectedEOF
                         }</span>
-                        <span class="cov8" title="1">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+                        <span class="cov0" title="0">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
                         iNdEx += skippy</span>
                 }
         }
@@ -4054,7 +4054,7 @@ func (m *GetAccountRequest) Unmarshal(dAtA []byte) error <span class="cov8" titl
                 }
                 <span class="cov8" title="1">fieldNum := int32(wire &gt;&gt; 3)
                 wireType := int(wire &amp; 0x7)
-                if wireType == 4 </span><span class="cov0" title="0">{
+                if wireType == 4 </span><span class="cov8" title="1">{
                         return fmt.Errorf("proto: GetAccountRequest: wiretype end group for non-group")
                 }</span>
                 <span class="cov8" title="1">if fieldNum &lt;= 0 </span><span class="cov0" title="0">{
@@ -4080,22 +4080,22 @@ func (m *GetAccountRequest) Unmarshal(dAtA []byte) error <span class="cov8" titl
                                         break</span>
                                 }
                         }
-                default:<span class="cov8" title="1">
+                default:<span class="cov0" title="0">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
-                        if err != nil </span><span class="cov8" title="1">{
+                        if err != nil </span><span class="cov0" title="0">{
                                 return err
                         }</span>
-                        <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if skippy &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
                                 return io.ErrUnexpectedEOF
                         }</span>
-                        <span class="cov8" title="1">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+                        <span class="cov0" title="0">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
                         iNdEx += skippy</span>
                 }
         }
@@ -4135,7 +4135,7 @@ func (m *GetAccountResponse) Unmarshal(dAtA []byte) error <span class="cov8" tit
                 }</span>
                 <span class="cov8" title="1">switch fieldNum </span>{
                 case 1:<span class="cov8" title="1">
-                        if wireType != 2 </span><span class="cov0" title="0">{
+                        if wireType != 2 </span><span class="cov8" title="1">{
                                 return fmt.Errorf("proto: wrong wireType = %d for field Account", wireType)
                         }</span>
                         <span class="cov8" title="1">var msglen int
@@ -4205,7 +4205,7 @@ func (m *GetAccountResponse) Unmarshal(dAtA []byte) error <span class="cov8" tit
                 default:<span class="cov8" title="1">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
-                        if err != nil </span><span class="cov8" title="1">{
+                        if err != nil </span><span class="cov0" title="0">{
                                 return err
                         }</span>
                         <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
@@ -4283,7 +4283,7 @@ func (m *AuthenticateAccountRequest) Unmarshal(dAtA []byte) error <span class="c
                         if postIndex &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if postIndex &gt; l </span><span class="cov0" title="0">{
+                        <span class="cov8" title="1">if postIndex &gt; l </span><span class="cov8" title="1">{
                                 return io.ErrUnexpectedEOF
                         }</span>
                         <span class="cov8" title="1">m.Email = string(dAtA[iNdEx:postIndex])
@@ -4323,7 +4323,7 @@ func (m *AuthenticateAccountRequest) Unmarshal(dAtA []byte) error <span class="c
                 default:<span class="cov8" title="1">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
-                        if err != nil </span><span class="cov8" title="1">{
+                        if err != nil </span><span class="cov0" title="0">{
                                 return err
                         }</span>
                         <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
@@ -4401,7 +4401,7 @@ func (m *AuthenticateAccountResponse) Unmarshal(dAtA []byte) error <span class="
                         if postIndex &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if postIndex &gt; l </span><span class="cov8" title="1">{
+                        <span class="cov8" title="1">if postIndex &gt; l </span><span class="cov0" title="0">{
                                 return io.ErrUnexpectedEOF
                         }</span>
                         <span class="cov8" title="1">m.Token = string(dAtA[iNdEx:postIndex])
@@ -4450,7 +4450,7 @@ func (m *AuthenticateAccountResponse) Unmarshal(dAtA []byte) error <span class="
                         <span class="cov8" title="1">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
+                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov8" title="1">{
                                 return io.ErrUnexpectedEOF
                         }</span>
                         <span class="cov8" title="1">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
@@ -4514,19 +4514,19 @@ func (m *LogoutAccountRequest) Unmarshal(dAtA []byte) error <span class="cov8" t
                 default:<span class="cov8" title="1">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
-                        if err != nil </span><span class="cov0" title="0">{
+                        if err != nil </span><span class="cov8" title="1">{
                                 return err
                         }</span>
-                        <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if skippy &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
+                        <span class="cov0" title="0">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov8" title="1">{
+                        <span class="cov0" title="0">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
                                 return io.ErrUnexpectedEOF
                         }</span>
-                        <span class="cov8" title="1">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+                        <span class="cov0" title="0">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
                         iNdEx += skippy</span>
                 }
         }
@@ -4558,7 +4558,7 @@ func (m *LogoutAccountResponse) Unmarshal(dAtA []byte) error <span class="cov8" 
                 }
                 <span class="cov8" title="1">fieldNum := int32(wire &gt;&gt; 3)
                 wireType := int(wire &amp; 0x7)
-                if wireType == 4 </span><span class="cov8" title="1">{
+                if wireType == 4 </span><span class="cov0" title="0">{
                         return fmt.Errorf("proto: LogoutAccountResponse: wiretype end group for non-group")
                 }</span>
                 <span class="cov8" title="1">if fieldNum &lt;= 0 </span><span class="cov0" title="0">{
@@ -4609,7 +4609,7 @@ func (m *LogoutAccountResponse) Unmarshal(dAtA []byte) error <span class="cov8" 
                         <span class="cov8" title="1">if (iNdEx + skippy) &lt; 0 </span><span class="cov0" title="0">{
                                 return ErrInvalidLengthAuthenticationHandlerService
                         }</span>
-                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov0" title="0">{
+                        <span class="cov8" title="1">if (iNdEx + skippy) &gt; l </span><span class="cov8" title="1">{
                                 return io.ErrUnexpectedEOF
                         }</span>
                         <span class="cov8" title="1">m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
@@ -4647,7 +4647,7 @@ func (m *Account) Unmarshal(dAtA []byte) error <span class="cov8" title="1">{
                 if wireType == 4 </span><span class="cov0" title="0">{
                         return fmt.Errorf("proto: Account: wiretype end group for non-group")
                 }</span>
-                <span class="cov8" title="1">if fieldNum &lt;= 0 </span><span class="cov0" title="0">{
+                <span class="cov8" title="1">if fieldNum &lt;= 0 </span><span class="cov8" title="1">{
                         return fmt.Errorf("proto: Account: illegal tag %d (wire type %d)", fieldNum, wire)
                 }</span>
                 <span class="cov8" title="1">switch fieldNum </span>{
@@ -4745,7 +4745,7 @@ func (m *Account) Unmarshal(dAtA []byte) error <span class="cov8" title="1">{
                 default:<span class="cov8" title="1">
                         iNdEx = preIndex
                         skippy, err := skipAuthenticationHandlerService(dAtA[iNdEx:])
-                        if err != nil </span><span class="cov8" title="1">{
+                        if err != nil </span><span class="cov0" title="0">{
                                 return err
                         }</span>
                         <span class="cov8" title="1">if skippy &lt; 0 </span><span class="cov0" title="0">{
@@ -4826,11 +4826,11 @@ func skipAuthenticationHandlerService(dAtA []byte) (n int, err error) <span clas
                         <span class="cov8" title="1">iNdEx += length</span>
                 case 3:<span class="cov8" title="1">
                         depth++</span>
-                case 4:<span class="cov0" title="0">
+                case 4:<span class="cov8" title="1">
                         if depth == 0 </span><span class="cov0" title="0">{
                                 return 0, ErrUnexpectedEndOfGroupAuthenticationHandlerService
                         }</span>
-                        <span class="cov0" title="0">depth--</span>
+                        <span class="cov8" title="1">depth--</span>
                 case 5:<span class="cov8" title="1">
                         iNdEx += 4</span>
                 default:<span class="cov8" title="1">
@@ -4843,7 +4843,7 @@ func skipAuthenticationHandlerService(dAtA []byte) (n int, err error) <span clas
                         return iNdEx, nil
                 }</span>
         }
-        <span class="cov8" title="1">return 0, io.ErrUnexpectedEOF</span>
+        <span class="cov0" title="0">return 0, io.ErrUnexpectedEOF</span>
 }
 
 var (
