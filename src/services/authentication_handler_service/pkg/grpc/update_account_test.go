@@ -22,11 +22,11 @@ func Test_update_account(t *testing.T) {
 	tests := []struct {
 		scenario          string
 		email             string
-		id          int
+		id                int
 		res               *proto.UpdateAccountResponse
 		errCode           codes.Code
 		errMsg            string
-		UpdateAccoutnFunc func(id, email string) error
+		UpdateAccountFunc func(id, email string) error
 	}{
 		// scenario: successful update of account
 		{
@@ -69,15 +69,15 @@ func Test_update_account(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.scenario, func(t *testing.T) {
 			ctx := context.Background()
-			ThirdPartyMockService.UpdateAccountFunc = tt.UpdateAccoutnFunc
+			ThirdPartyMockService.UpdateAccountFunc = tt.UpdateAccountFunc
 			conn := MockGRPCService(ctx, &ThirdPartyMockService)
 			defer conn.Close()
 
 			client := proto.NewAuthenticationHandlerServiceApiClient(conn)
 
 			request := &proto.UpdateAccountRequest{
-				Email:    tt.email,
-				Id: uint32(tt.id),
+				Email: tt.email,
+				Id:    uint32(tt.id),
 			}
 
 			response, err := client.UpdateAccount(ctx, request)

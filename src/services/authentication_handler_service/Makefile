@@ -9,6 +9,23 @@ DOCKER_IMAGE_NAME:=$(DOCKER_REPOSITORY)/$(NAME)
 GIT_COMMIT:=$(shell git describe --dirty --always)
 VERSION:=$(shell grep 'VERSION' pkg/version/version.go | awk '{ print $$4 }' | tr -d '"')
 EXTRA_RUN_ARGS?=
+# TMP_BASE is the base directory used for TMP.
+# Use TMP and not TMP_BASE as the temporary directory.
+TMP_BASE := .tmp
+# TMP_COVERAGE is where we store code coverage files.
+TMP_COVERAGE := $(TMP_BASE)/coverage
+
+# GO_PKGS is the list of packages to run our linting and testing commands against.
+# This can be set when invoking a target.
+GO_PKGS ?= $(shell go list ./...)
+
+OPEN_COVERAGE_HTML="1"
+# Set OPEN_COVERAGE=1 to open the coverage.html file after running make cover.
+ifeq ($(OPEN_COVERAGE),1)
+	OPEN_COVERAGE_HTML := 1
+else
+	OPEN_COVERAGE_HTML :=
+endif
 
 run:
 	go run -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version.REVISION=$(GIT_COMMIT)" cmd/service/* \
@@ -17,8 +34,7 @@ run:
 
 test:
 	echo "sleeping for 10s .... then commencing testing"
-	sleep 10s
-	go test -v -race ./... -coverprofile cover.out
+	go test -v -race ./... -json -cover | tparse -all -top
 
 build:
 	GIT_COMMIT=$$(git rev-list -1 HEAD) && CGO_ENABLED=0 go build  -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version.REVISION=$(GIT_COMMIT)" -a -o ./bin/service ./cmd/service/*
@@ -96,3 +112,21 @@ down:
 up:
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans
+
+# Cover runs go_test on GO_PKGS and produces code coverage in multiple formats.
+# A coverage.html file for human viewing will be at $(TMP_COVERAGE)/coverage.html
+# This target will echo "open $(TMP_COVERAGE)/coverage.html" with TMP_COVERAGE
+# expanded so that you can easily copy "open $(TMP_COVERAGE)/coverage.html" into
+# your terminal as a command to run, and then see the code coverage output locally.
+.PHONY: cover
+cover:
+	$(AT) rm -rf $(TMP_COVERAGE)
+	$(AT) mkdir -p $(TMP_COVERAGE)
+	go test $(GO_TEST_FLAGS) -json -cover -coverprofile=$(TMP_COVERAGE)/coverage.txt $(GO_PKGS) | tparse
+	$(AT) go tool cover -html=$(TMP_COVERAGE)/coverage.txt -o $(TMP_COVERAGE)/coverage.html
+	$(AT) echo
+	$(AT) go tool cover -func=$(TMP_COVERAGE)/coverage.txt | grep total
+	$(AT) echo
+	$(AT) echo Open the coverage report:
+	$(AT) echo open $(TMP_COVERAGE)/coverage.html
+	$(AT) if [ "$(OPEN_COVERAGE_HTML)" == "1" ]; then open $(TMP_COVERAGE)/coverage.html; fi

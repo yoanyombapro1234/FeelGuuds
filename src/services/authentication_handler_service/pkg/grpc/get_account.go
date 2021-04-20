@@ -59,12 +59,12 @@ func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (
 	s.logger.For(ctx).Info("Successfully obtained user account", zap.Int("Id", int(req.GetId())))
 	return &proto.GetAccountResponse{
 		Account: &proto.Account{
-			Id:                   uint32(account.ID),
-			Username:             account.Username,
-			Locked:               account.Locked,
-			Deleted:              account.Deleted,
-			XXX_sizecache:        0,
+			Id:            uint32(account.ID),
+			Username:      account.Username,
+			Locked:        account.Locked,
+			Deleted:       account.Deleted,
+			XXX_sizecache: 0,
 		},
-		Error:   "",
+		Error: "",
 	}, nil
 }

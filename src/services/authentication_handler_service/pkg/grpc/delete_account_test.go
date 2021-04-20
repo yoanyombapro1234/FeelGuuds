@@ -20,12 +20,12 @@ func Test_delete_account(t *testing.T) {
 	id := "1"
 
 	tests := []struct {
-		scenario          string
-		id          string
-		res               *proto.DeleteAccountResponse
-		errCode           codes.Code
-		errMsg            string
-		ArchiveAccountFunc func(id string) (error)
+		scenario           string
+		id                 string
+		res                *proto.DeleteAccountResponse
+		errCode            codes.Code
+		errMsg             string
+		ArchiveAccountFunc func(id string) error
 	}{
 		// scenario: duplicate account
 		{
@@ -45,7 +45,7 @@ func Test_delete_account(t *testing.T) {
 			nil,
 			codes.Unknown,
 			"",
-			func(id string) (error) {
+			func(id string) error {
 				return nil
 			},
 		},
@@ -71,9 +71,9 @@ func Test_delete_account(t *testing.T) {
 
 			client := proto.NewAuthenticationHandlerServiceApiClient(conn)
 
-			accountId , _ := strconv.Atoi(tt.id)
+			accountId, _ := strconv.Atoi(tt.id)
 			request := &proto.DeleteAccountRequest{
-				Id:    uint32(accountId),
+				Id: uint32(accountId),
 			}
 
 			response, err := client.DeleteAccount(ctx, request)

@@ -21,3 +21,4 @@ gcloud/
 dist/
 bin/
 data/
+.temp/

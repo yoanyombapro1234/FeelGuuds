@@ -74,8 +74,8 @@ func Test_create_account(t *testing.T) {
 			email,
 			password,
 			&proto.CreateAccountResponse{
-				Id:                   1,
-				Error:                "",
+				Id:    1,
+				Error: "",
 			},
 			codes.Unknown,
 			"",

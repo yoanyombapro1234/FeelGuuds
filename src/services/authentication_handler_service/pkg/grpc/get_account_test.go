@@ -22,20 +22,20 @@ func Test_get_account(t *testing.T) {
 	email := fmt.Sprintf("test_%s@gmail.com", GenerateRandomString(17))
 	password := fmt.Sprintf("test_password_%s", GenerateRandomString(17))
 	testAccount := &proto.Account{
-		Id:                   1,
-		Username:             email,
-		Locked:               true,
-		Deleted:              true,
+		Id:       1,
+		Username: email,
+		Locked:   true,
+		Deleted:  true,
 	}
 
 	tests := []struct {
-		scenario          string
-		id uint32
+		scenario       string
+		id             uint32
 		email          string
-		password string
-		res               *proto.GetAccountResponse
-		errCode           codes.Code
-		errMsg            string
+		password       string
+		res            *proto.GetAccountResponse
+		errCode        codes.Code
+		errMsg         string
 		GetAccountFunc func(id string) (*core_auth_sdk.Account, error)
 	}{
 		// scenario: valid request
@@ -45,16 +45,16 @@ func Test_get_account(t *testing.T) {
 			email,
 			password,
 			&proto.GetAccountResponse{
-				Account:              testAccount,
-				Error:                "",
+				Account: testAccount,
+				Error:   "",
 			},
 			codes.Unknown,
 			expectedErrMsg,
 			func(id string) (*core_auth_sdk.Account, error) {
-					return &core_auth_sdk.Account{
-						ID: int(testAccount.Id),
-						Username: testAccount.Username,
-					}, nil
+				return &core_auth_sdk.Account{
+					ID:       int(testAccount.Id),
+					Username: testAccount.Username,
+				}, nil
 			},
 		},
 		// scenario: invalid request

@@ -21,12 +21,12 @@ func Test_lock_account(t *testing.T) {
 	id := "1"
 
 	tests := []struct {
-		scenario          string
-		id          string
-		res               *proto.LockAccountResponse
-		errCode           codes.Code
-		errMsg            string
-		LockAccountFunc func(id string) (error)
+		scenario        string
+		id              string
+		res             *proto.LockAccountResponse
+		errCode         codes.Code
+		errMsg          string
+		LockAccountFunc func(id string) error
 	}{
 		// scenario: lock account that exists
 		{
@@ -83,9 +83,9 @@ func Test_lock_account(t *testing.T) {
 
 			client := proto.NewAuthenticationHandlerServiceApiClient(conn)
 
-			accountId , _ := strconv.Atoi(tt.id)
+			accountId, _ := strconv.Atoi(tt.id)
 			request := &proto.LockAccountRequest{
-				Id:    uint32(accountId),
+				Id: uint32(accountId),
 			}
 
 			response, err := client.LockAccount(ctx, request)

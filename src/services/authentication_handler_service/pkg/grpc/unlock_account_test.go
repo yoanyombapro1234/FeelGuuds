@@ -22,11 +22,11 @@ func Test_unlock_account(t *testing.T) {
 
 	tests := []struct {
 		scenario          string
-		id          string
+		id                string
 		res               *proto.UnLockAccountResponse
 		errCode           codes.Code
 		errMsg            string
-		UnLockAccountFunc func(id string) (error)
+		UnLockAccountFunc func(id string) error
 	}{
 		// scenario: unlock account that exists
 		{
@@ -83,9 +83,9 @@ func Test_unlock_account(t *testing.T) {
 
 			client := proto.NewAuthenticationHandlerServiceApiClient(conn)
 
-			accountId , _ := strconv.Atoi(tt.id)
+			accountId, _ := strconv.Atoi(tt.id)
 			request := &proto.UnLockAccountRequest{
-				Id:    uint32(accountId),
+				Id: uint32(accountId),
 			}
 
 			response, err := client.UnLockAccount(ctx, request)
