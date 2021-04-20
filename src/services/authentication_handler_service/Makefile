@@ -33,7 +33,6 @@ run:
 	--ui-logo=https://raw.githubusercontent.com/stefanprodan/service/gh-pages/cuddle_clap.gif $(EXTRA_RUN_ARGS)
 
 test:
-	echo "sleeping for 10s .... then commencing testing"
 	go test -v -race ./... -json -cover | tparse -all -top
 
 build:
