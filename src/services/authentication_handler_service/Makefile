@@ -107,7 +107,7 @@ kill-containers:
 
 start-containers:
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
-	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans --detach
 
 # Cover runs go_test on GO_PKGS and produces code coverage in multiple formats.
 # A coverage.html file for human viewing will be at $(TMP_COVERAGE)/coverage.html
@@ -128,5 +128,7 @@ cover:
 	$(AT) if [ "$(OPEN_COVERAGE_HTML)" == "1" ]; then open $(TMP_COVERAGE)/coverage.html; fi
 
 test: start-containers
+	echo "sleepig for 10 seconds before running unit tests"
+	sleep 10s
 	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover | tparse -all -top
