@@ -71,7 +71,8 @@ services:
       dockerfile: Dockerfile.dev
     container_name: authentication_handler_service
     ports:
-      - "9898:9898"
+      - "9898:9898" # http port
+      - "9897:9897" # grpc port
     restart: unless-stopped
     environment:
       - AUTHN_INTERNAL_PORT=3000

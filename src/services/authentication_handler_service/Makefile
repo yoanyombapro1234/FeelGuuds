@@ -109,6 +109,10 @@ start-containers:
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans --detach
 
+start-containers-live:
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans
+
 # Cover runs go_test on GO_PKGS and produces code coverage in multiple formats.
 # A coverage.html file for human viewing will be at $(TMP_COVERAGE)/coverage.html
 # This target will echo "open $(TMP_COVERAGE)/coverage.html" with TMP_COVERAGE
