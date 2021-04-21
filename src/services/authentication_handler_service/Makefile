@@ -128,7 +128,7 @@ cover:
 	$(AT) if [ "$(OPEN_COVERAGE_HTML)" == "1" ]; then open $(TMP_COVERAGE)/coverage.html; fi
 
 test: start-containers
-	echo "sleepig for 10 seconds before running unit tests"
-	sleep 10s
+	echo "sleeping for 60 seconds before running unit tests"
+	sleep 60s
 	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover | tparse -all -top
