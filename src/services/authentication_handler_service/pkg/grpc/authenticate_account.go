@@ -2,11 +2,12 @@ package grpc
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/constants"
@@ -48,7 +49,7 @@ func (s *Server) AuthenticateAccount(ctx context.Context, req *proto.Authenticat
 	token := fmt.Sprintf("%v", result)
 	if token == "" {
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(constants.LOGIN_ACCOUNT)
-		err := errors.New("issue casting to jwt token")
+		err := status.Errorf(codes.Internal, "issue casting to jwt token")
 		s.logger.For(ctx).ErrorM(err, "casting error")
 		return nil, err
 	}

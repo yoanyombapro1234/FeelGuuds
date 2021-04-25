@@ -2,10 +2,11 @@ package grpc
 
 import (
 	"context"
-	"errors"
 
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/constants"
@@ -47,7 +48,7 @@ func (s *Server) CreateAccount(ctx context.Context, req *proto.CreateAccountRequ
 	id, ok := result.(int)
 	if !ok {
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(constants.CREATE_ACCOUNT)
-		err := errors.New("failed to convert result to uint32 id value")
+		err := status.Errorf(codes.Internal, "failed to convert result to uint32 id value")
 		s.logger.For(ctx).ErrorM(err, "casting error")
 		return nil, err
 	}

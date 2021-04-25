@@ -6,6 +6,8 @@ import (
 
 	"github.com/giantswarm/retry-go"
 	"github.com/opentracing/opentracing-go"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
 )
@@ -40,7 +42,7 @@ func (s *Server) performRetryableRpcCall(ctx context.Context, f func() (interfac
 	)
 
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Unknown, err.Error())
 	}
 
 	if ctx.Err() == context.Canceled {

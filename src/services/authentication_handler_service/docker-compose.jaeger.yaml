@@ -67,7 +67,7 @@ services:
       - no_proxy=localhost
       - JAEGER_ENDPOINT=http://jaeger-collector:14268/api/traces
     ports:
-      - "16686:16686"
+      - "16686:16686" # http://localhost:16686/search
       - "16687:16687"
     networks:
       - web

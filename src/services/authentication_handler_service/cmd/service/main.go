@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -27,6 +28,7 @@ import (
 
 	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
 	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
+	_ "net/http/pprof"
 )
 
 func main() {
@@ -85,6 +87,9 @@ func main() {
 	fs.String("SERVICE_NAME", "authentication_handler_service", "service name")
 	// TODO: reconfigure this to leverage datadog instead
 	fs.String("JAEGER_ENDPOINT", "http://jaeger-collector:14268/api/traces", "jaeger collector endpoint")
+
+	// capture goroutines waiting on synchronization primitives
+	runtime.SetBlockProfileRate(1)
 
 	versionFlag := fs.BoolP("version", "v", false, "get version number")
 

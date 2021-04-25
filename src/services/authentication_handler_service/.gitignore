@@ -23,3 +23,5 @@ bin/
 data/
 .temp/*
 *.temp
+*.result
+*.result/

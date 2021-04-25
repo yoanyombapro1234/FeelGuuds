@@ -19,7 +19,6 @@ TMP_COVERAGE := $(TMP_BASE)/coverage
 # This can be set when invoking a target.
 GO_PKGS ?= $(shell go list ./...)
 
-OPEN_COVERAGE_HTML="1"
 # Set OPEN_COVERAGE=1 to open the coverage.html file after running make cover.
 ifeq ($(OPEN_COVERAGE),1)
 	OPEN_COVERAGE_HTML := 1
@@ -131,8 +130,49 @@ cover:
 	$(AT) echo open $(TMP_COVERAGE)/coverage.html
 	$(AT) if [ "$(OPEN_COVERAGE_HTML)" == "1" ]; then open $(TMP_COVERAGE)/coverage.html; fi
 
+.PHONY: test
 test: start-containers
 	echo "sleeping for 60 seconds before running unit tests"
 	sleep 60s
 	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover | tparse -all -top
+
+# star
+.PHONY: prereq
+prereq: start-containers
+	go install github.com/fullstorydev/grpcurl/cmd/grpcurl
+
+# lists the defined grpc interface
+.PHONY: list-services
+list-services: prereq
+	grpcurl --plaintext localhost:9897 list
+
+# Details the service level grpc methods
+.PHONY: list-methods
+list-methods: prereq
+	grpcurl --plaintext localhost:9897 list authentication_handler_serviceApi
+
+# runs service load tests
+.PHONY: load-test
+load-test: start-containers
+	cd ./load_test && ./load.sh
+	cd ../
+
+## Profiling (https://blog.golang.org/pprof)
+# profiles cpu usage
+.PHONY: profile-cpu
+profile-cpu: start-containers
+	go get -u github.com/google/pprof
+	go tool pprof http://localhost:9898/debug/pprof/profile\?seconds\=20
+
+# profile heap allocations
+.PHONY: profile-heap
+profile-heap: start-containers
+	go get -u github.com/google/pprof
+	go tool pprof http://localhost:9898/debug/pprof/heap
+
+# profile block go routines
+.PHONY: profile-goroutines
+profile-goroutines: start-containers
+	go get -u github.com/google/pprof
+	go tool pprof http://localhost:9898/debug/pprof/block
