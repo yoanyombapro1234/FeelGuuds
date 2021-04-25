@@ -17,20 +17,6 @@ function RunAllLoadTests(){
 	RunLoadTest DeleteAccount '{"id":1}' html
 }
 
-function RunLinearLoadScenario(){
-	echo "running linear load scenario"
-}
-
-# https://linuxize.com/post/bash-functions/
-function RunConcurrentLoadScenario(){
-	echo "running concurrent load scenario"
-}
-
-
-function CreateAccountLoadTest(){
-	echo "running create account api load test"
-}
-
 function RunLoadTest(){
 	echo "running create account api load test"
 	operation=${1:-GetAccount}
@@ -128,22 +114,6 @@ function RunLoadTest(){
 			--concurrency-start=200 --concurrency-step=-2 --concurrency-end=20 \
 			-d "${request}" 0.0.0.0:9897 $flags
 	open "$outputPath"
-}
-
-function UpdateAccountLoadTest(){
-	echo "running create account api load test"
-}
-
-function LockAndUnlockAccountLoadTest(){
-	echo "running create account api load test"
-}
-
-function ArchiveAccountLoadTest(){
-	echo "running create account api load test"
-}
-
-function AuthenticateAccountLoadTest(){
-	echo "running create account api load test"
 }
 
 RunAllLoadTests
