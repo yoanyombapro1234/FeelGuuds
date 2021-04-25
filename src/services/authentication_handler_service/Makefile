@@ -137,7 +137,6 @@ test: start-containers
 	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover | tparse -all -top
 
-# star
 .PHONY: prereq
 prereq: start-containers
 	go install github.com/fullstorydev/grpcurl/cmd/grpcurl
@@ -158,21 +157,22 @@ load-test: start-containers
 	cd ./load_test && ./load.sh
 	cd ../
 
+.PHONY: install-pprof
+install-pprof:
+	go get -u github.com/google/pprof
+
 ## Profiling (https://blog.golang.org/pprof)
 # profiles cpu usage
 .PHONY: profile-cpu
-profile-cpu: start-containers
-	go get -u github.com/google/pprof
+profile-cpu: install-pprof start-containers
 	go tool pprof http://localhost:9898/debug/pprof/profile\?seconds\=20
 
 # profile heap allocations
 .PHONY: profile-heap
-profile-heap: start-containers
-	go get -u github.com/google/pprof
+profile-heap: install-pprof start-containers
 	go tool pprof http://localhost:9898/debug/pprof/heap
 
 # profile block go routines
-.PHONY: profile-goroutines
+.PHONY: install-pprof profile-goroutines
 profile-goroutines: start-containers
-	go get -u github.com/google/pprof
 	go tool pprof http://localhost:9898/debug/pprof/block
