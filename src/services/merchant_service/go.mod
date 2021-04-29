@@ -13,6 +13,8 @@ require (
 	github.com/gomodule/redigo v1.8.4
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.4.2
+	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645 // indirect
+	github.com/opentracing-contrib/go-grpc v0.0.0-20210225150812-73cb765af46e // indirect
 	github.com/prometheus/client_golang v1.10.0
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5

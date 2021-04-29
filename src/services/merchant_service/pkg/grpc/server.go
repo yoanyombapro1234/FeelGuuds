@@ -4,6 +4,11 @@ import (
 	"fmt"
 	"net"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	otgrpc "github.com/opentracing-contrib/go-grpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -36,7 +41,21 @@ func (s *Server) ListenAndServe() {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
 
-	srv := grpc.NewServer()
+	// configure tracing so all future rpc activity will be traced by use of s
+	srv := grpc.NewServer(
+		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
+			grpc_ctxtags.StreamServerInterceptor(),
+			grpc_opentracing.StreamServerInterceptor(),
+			grpc_recovery.StreamServerInterceptor(),
+			otgrpc.OpenTracingStreamServerInterceptor(s.tracerEngine.Tracer),
+		)),
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+			grpc_ctxtags.UnaryServerInterceptor(),
+			grpc_opentracing.UnaryServerInterceptor(),
+			grpc_recovery.UnaryServerInterceptor(),
+			otgrpc.OpenTracingServerInterceptor(s.tracerEngine.Tracer)),
+		))
+
 	server := health.NewServer()
 	reflection.Register(srv)
 	grpc_health_v1.RegisterHealthServer(srv, server)

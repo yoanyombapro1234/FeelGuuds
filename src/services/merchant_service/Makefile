@@ -77,3 +77,98 @@ release:
 swagger:
 	go get github.com/swaggo/swag/cmd/swag
 	cd pkg/api && $$(go env GOPATH)/bin/swag init -g server.go
+
+# generate service objects based on proto def
+.PHONY: protogen
+protogen:
+	protoc -I. \
+		-I$(GOPATH)/src \
+		-I=$(GOPATH)/src/github.com/infobloxopen/protoc-gen-gorm \
+		-I=$(GOPATH)/src/github.com/infobloxopen/atlas-app-toolkit \
+		-I=$(GOPATH)/src/github.com/lyft/protoc-gen-validate/validate/validate.proto \
+		-I=$(GOPATH)/src/github.com/infobloxopen/protoc-gen-gorm/options \
+		-I=$(GOPATH)/src/github.com/protobuf/src/google/protobuf/timestamp.proto \
+		--gogoopsee_out=plugins=grpc+graphql,Mopsee/protobuf/opsee.proto=github.com/opsee/protobuf/opseeproto,Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/protoc-gen-gogo/descriptor:./gen/ --proto_path=$(GOPATH)/src:. ./proto/*.proto
+
+# brings down any running containers
+.PHONY: kill-containers
+kill-containers:
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml down
+
+# starts containers with logging in the background
+.PHONY: start-containers
+start-containers:
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans --detach
+
+# start containers with visible logging in the foreground
+.PHONY: start-containers-live
+start-containers-live:
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans
+
+# Cover runs go_test on GO_PKGS and produces code coverage in multiple formats.
+# A coverage.html file for human viewing will be at $(TMP_COVERAGE)/coverage.html
+# This target will echo "open $(TMP_COVERAGE)/coverage.html" with TMP_COVERAGE
+# expanded so that you can easily copy "open $(TMP_COVERAGE)/coverage.html" into
+# your terminal as a command to run, and then see the code coverage output locally.
+.PHONY: cover
+cover:
+	$(AT) rm -rf $(TMP_COVERAGE)
+	$(AT) mkdir -p $(TMP_COVERAGE)
+	go test $(GO_TEST_FLAGS) -json -cover -coverprofile=$(TMP_COVERAGE)/coverage.txt $(GO_PKGS) | tparse
+	$(AT) go tool cover -html=$(TMP_COVERAGE)/coverage.txt -o $(TMP_COVERAGE)/coverage.html
+	$(AT) echo
+	$(AT) go tool cover -func=$(TMP_COVERAGE)/coverage.txt | grep total
+	$(AT) echo
+	$(AT) echo Open the coverage report:
+	$(AT) echo open $(TMP_COVERAGE)/coverage.html
+	$(AT) if [ "$(OPEN_COVERAGE_HTML)" == "1" ]; then open $(TMP_COVERAGE)/coverage.html; fi
+
+# runs tests against the running containers (unit and e2e testing)
+.PHONY: test
+test: start-containers
+	echo "sleeping for 60 seconds before running unit tests"
+	sleep 60s
+	go get github.com/mfridman/tparse
+	go test -v -race ./... -json -cover | tparse -all -top
+
+# download grpcurl utility
+.PHONY: prereq
+prereq: start-containers
+	go install github.com/fullstorydev/grpcurl/cmd/grpcurl
+
+# lists the defined grpc interface
+.PHONY: list-services
+list-services: prereq
+	grpcurl --plaintext localhost:9897 list
+
+# Details the service level grpc methods
+.PHONY: list-methods
+list-methods: prereq
+	grpcurl --plaintext localhost:9897 list MerchantService
+
+# runs service load tests
+.PHONY: load-test
+load-test: start-containers
+	cd ./load_test && ./load.sh
+	cd ../
+
+## Profiling (https://blog.golang.org/pprof)
+# profiles cpu usage
+.PHONY: profile-cpu
+profile-cpu: start-containers
+	go get -u github.com/google/pprof
+	go tool pprof http://localhost:9898/debug/pprof/profile\?seconds\=20
+
+# profile heap allocations
+.PHONY: profile-heap
+profile-heap: start-containers
+	go get -u github.com/google/pprof
+	go tool pprof http://localhost:9898/debug/pprof/heap
+
+# profile block go routines
+.PHONY: profile-goroutines
+profile-goroutines: start-containers
+	go get -u github.com/google/pprof
+	go tool pprof http://localhost:9898/debug/pprof/block

@@ -1,10 +1,7 @@
 # FeelGuuds Merchant Service - (Alpha)
+[![Continuous Integration Pipeline](https://github.com/stefanprodan/podinfo/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/merchant_service.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds)](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds)
 
-[![e2e](https://github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/blob/master/.github/workflows/e2e.yml)
-[![test](https://github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/workflows/test/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/blob/master/.github/workflows/test.yml)
-[![cve-scan](https://github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/workflows/cve-scan/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/blob/master/.github/workflows/cve-scan.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service )](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service )
-[![Docker Pulls](https://img.shields.io/docker/pulls/yoanyombapro1234/FeelGuuds/src/services/merchant_service )](https://hub.docker.com/r/yoanyombapro1234/FeelGuuds/src/services/merchant_service )
 
 Specifications:
 
