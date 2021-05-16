@@ -18,18 +18,25 @@ import (
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/grpc"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/signals"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/version"
+
+	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
+	"github.com/uber/jaeger-lib/metrics/prometheus"
+	core_metrics "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics"
+	core_tracing "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing"
+	"github.com/opentracing/opentracing-go"
+
 )
 
 func main() {
 	// flags definition
 	fs := pflag.NewFlagSet("default", pflag.ContinueOnError)
-	fs.Int("port", 9898, "HTTP port")
+	fs.Int("HTTP_PORT", 9898, "HTTP PORT")
 	fs.Int("secure-port", 0, "HTTPS port")
 	fs.Int("port-metrics", 0, "metrics port")
 	fs.Int("grpc-port", 0, "gRPC port")
 	fs.String("grpc-service-name", "service", "gPRC service name")
 	fs.String("level", "info", "log level debug, info, warn, error, flat or panic")
-	fs.StringSlice("backend-url", []string{}, "backend service URL")
+	fs.StringSlice("BACKEND_URL", []string{}, "backend service URL")
 	fs.Duration("http-client-timeout", 2*time.Minute, "client timeout duration")
 	fs.Duration("http-server-timeout", 30*time.Second, "server read and write timeout duration")
 	fs.Duration("http-server-shutdown-timeout", 5*time.Second, "server graceful shutdown timeout duration")
@@ -52,8 +59,10 @@ func main() {
 	fs.Int("stress-cpu", 0, "number of CPU cores with 100 load")
 	fs.Int("stress-memory", 0, "MB of data to load into memory")
 	fs.String("cache-server", "", "Redis address in the format <host>:<port>")
+	// TODO: reconfigure this to leverage datadog instead
+	fs.String("JAEGER_ENDPOINT", "http://jaeger-collector:14268/api/traces", "jaeger collector endpoint")
 
-	versionFlag := fs.BoolP("version", "v", false, "get version number")
+	versionFlag := fs.BoolP("VERSION", "v", false, "get version number")
 
 	// parse flags
 	err := fs.Parse(os.Args[1:])
@@ -71,21 +80,21 @@ func main() {
 
 	// bind flags and environment variables
 	viper.BindPFlags(fs)
-	viper.RegisterAlias("backendUrl", "backend-url")
+	viper.RegisterAlias("backendUrl", "BACKEND_URL")
 	hostname, _ := os.Hostname()
-	viper.SetDefault("jwt-secret", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")
-	viper.SetDefault("ui-logo", "https://raw.githubusercontent.com/stefanprodan/podinfo/gh-pages/cuddle_clap.gif")
-	viper.Set("hostname", hostname)
-	viper.Set("version", version.VERSION)
-	viper.Set("revision", version.REVISION)
+	viper.SetDefault("JWT_SECRET", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")
+	viper.SetDefault("UI_LOGO", "https://raw.githubusercontent.com/stefanprodan/podinfo/gh-pages/cuddle_clap.gif")
+	viper.Set("HOSTNAME", hostname)
+	viper.Set("VERSION", version.VERSION)
+	viper.Set("REVISION", version.REVISION)
 	viper.SetEnvPrefix("SERVICE")
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
 
 	// load config from file
-	if _, fileErr := os.Stat(filepath.Join(viper.GetString("config-path"), viper.GetString("config"))); fileErr == nil {
-		viper.SetConfigName(strings.Split(viper.GetString("config"), ".")[0])
-		viper.AddConfigPath(viper.GetString("config-path"))
+	if _, fileErr := os.Stat(filepath.Join(viper.GetString("CONFIG_PATH"), viper.GetString("CONFIG"))); fileErr == nil {
+		viper.SetConfigName(strings.Split(viper.GetString("CONFIG"), ".")[0])
+		viper.AddConfigPath(viper.GetString("CONFIG_PATH"))
 		if readErr := viper.ReadInConfig(); readErr != nil {
 			fmt.Printf("Error reading config file, %v\n", readErr)
 		}
@@ -93,33 +102,55 @@ func main() {
 		fmt.Printf("Error to open config file, %v\n", fileErr)
 	}
 
+	// configure distributed tracing
+	svcName := viper.GetString("GRPC_SERVICE_NAME")
+	collectorEndpoint := viper.GetString("JAEGER_ENDPOINT")
+	tracerEngine, closer := core_tracing.NewTracer(svcName, collectorEndpoint, prometheus.New())
+	defer closer.Close()
+
+	if tracerEngine == nil {
+		panic("cannot initialize tracer engine")
+	}
+	opentracing.SetGlobalTracer(tracerEngine.Tracer)
+
+	// configure metrics
+	coreMetrics := core_metrics.NewCoreMetricsEngineInstance(svcName, nil)
+	serviceMetrics := metrics.NewMetricsEngine(coreMetrics, svcName)
+
+	// start root span
+	ctx := context.Background()
+	rootSpan := opentracing.SpanFromContext(ctx)
 	// configure logging
-	logger, _ := initZap(viper.GetString("level"))
+	logger := core_logging.NewJSONLogger(nil, rootSpan)
+
+
+	// configure logging
+	logger, _ := initZap(viper.GetString("LEVEL"))
 	defer logger.Sync()
 	stdLog := zap.RedirectStdLog(logger)
 	defer stdLog()
 
-	// start stress tests if any
-	beginStressTest(viper.GetInt("stress-cpu"), viper.GetInt("stress-memory"), logger)
+	// start stress tests if any 
+	beginStressTest(viper.GetInt("STRESS_CPU"), viper.GetInt("STRESS_MEMORY"), logger)
 
 	// validate port
-	if _, err := strconv.Atoi(viper.GetString("port")); err != nil {
-		port, _ := fs.GetInt("port")
-		viper.Set("port", strconv.Itoa(port))
+	if _, err := strconv.Atoi(viper.GetString("HTTP_PORT")); err != nil {
+		port, _ := fs.GetInt("HTTP_PORT")
+		viper.Set("HTTP_PORT", strconv.Itoa(port))
 	}
 
 	// validate secure port
-	if _, err := strconv.Atoi(viper.GetString("secure-port")); err != nil {
-		securePort, _ := fs.GetInt("secure-port")
-		viper.Set("secure-port", strconv.Itoa(securePort))
+	if _, err := strconv.Atoi(viper.GetString("HTTPS_PORT")); err != nil {
+		securePort, _ := fs.GetInt("HTTPS_PORT")
+		viper.Set("HTTPS_PORT", strconv.Itoa(securePort))
 	}
 
 	// validate random delay options
-	if viper.GetInt("random-delay-max") < viper.GetInt("random-delay-min") {
-		logger.Panic("`--random-delay-max` should be greater than `--random-delay-min`")
+	if viper.GetInt("RANDOM_DELAY_MAX") < viper.GetInt("RANDOM_DELAY_MIN") {
+		logger.Panic("`--RANDOM_DELAY_MAX` should be greater than `--RANDOM_DELAY_MIN`")
 	}
 
-	switch delayUnit := viper.GetString("random-delay-unit"); delayUnit {
+	switch delayUnit := viper.GetString("RANDOM_DELAY_UNIT"); delayUnit {
 	case
 		"s",
 		"ms":
@@ -148,62 +179,15 @@ func main() {
 
 	// log version and port
 	logger.Info("Starting service",
-		zap.String("version", viper.GetString("version")),
-		zap.String("revision", viper.GetString("revision")),
-		zap.String("port", srvCfg.Port),
+		zap.String("VERSION", viper.GetString("VERSION")),
+		zap.String("REVISION", viper.GetString("REVISION")),
+		zap.String("HTTP_PORT", srvCfg.Port),
 	)
 
 	// start HTTP server
 	srv, _ := api.NewServer(&srvCfg, logger)
 	stopCh := signals.SetupSignalHandler()
 	srv.ListenAndServe(stopCh)
-}
-
-func initZap(logLevel string) (*zap.Logger, error) {
-	level := zap.NewAtomicLevelAt(zapcore.InfoLevel)
-	switch logLevel {
-	case "debug":
-		level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
-	case "info":
-		level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
-	case "warn":
-		level = zap.NewAtomicLevelAt(zapcore.WarnLevel)
-	case "error":
-		level = zap.NewAtomicLevelAt(zapcore.ErrorLevel)
-	case "fatal":
-		level = zap.NewAtomicLevelAt(zapcore.FatalLevel)
-	case "panic":
-		level = zap.NewAtomicLevelAt(zapcore.PanicLevel)
-	}
-
-	zapEncoderConfig := zapcore.EncoderConfig{
-		TimeKey:        "ts",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "caller",
-		MessageKey:     "msg",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-	}
-
-	zapConfig := zap.Config{
-		Level:       level,
-		Development: false,
-		Sampling: &zap.SamplingConfig{
-			Initial:    100,
-			Thereafter: 100,
-		},
-		Encoding:         "json",
-		EncoderConfig:    zapEncoderConfig,
-		OutputPaths:      []string{"stderr"},
-		ErrorOutputPaths: []string{"stderr"},
-	}
-
-	return zapConfig.Build()
 }
 
 var stressMemoryPayload []byte

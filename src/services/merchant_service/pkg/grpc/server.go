@@ -22,8 +22,8 @@ type Server struct {
 }
 
 type Config struct {
-	Port        int    `mapstructure:"grpc-port"`
-	ServiceName string `mapstructure:"grpc-service-name"`
+	Port        int    `mapstructure:"GRPC_PORT"`
+	ServiceName string `mapstructure:"GRPC_SERVICE_NAME"`
 }
 
 func NewServer(config *Config, logger *zap.Logger) (*Server, error) {

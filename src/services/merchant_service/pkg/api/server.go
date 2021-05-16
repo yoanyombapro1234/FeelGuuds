@@ -46,31 +46,31 @@ var (
 )
 
 type Config struct {
-	HttpClientTimeout         time.Duration `mapstructure:"http-client-timeout"`
-	HttpServerTimeout         time.Duration `mapstructure:"http-server-timeout"`
-	HttpServerShutdownTimeout time.Duration `mapstructure:"http-server-shutdown-timeout"`
-	BackendURL                []string      `mapstructure:"backend-url"`
-	UILogo                    string        `mapstructure:"ui-logo"`
-	UIMessage                 string        `mapstructure:"ui-message"`
-	UIColor                   string        `mapstructure:"ui-color"`
-	UIPath                    string        `mapstructure:"ui-path"`
-	DataPath                  string        `mapstructure:"data-path"`
-	ConfigPath                string        `mapstructure:"config-path"`
-	CertPath                  string        `mapstructure:"cert-path"`
-	Port                      string        `mapstructure:"port"`
-	SecurePort                string        `mapstructure:"secure-port"`
-	PortMetrics               int           `mapstructure:"port-metrics"`
-	Hostname                  string        `mapstructure:"hostname"`
-	H2C                       bool          `mapstructure:"h2c"`
-	RandomDelay               bool          `mapstructure:"random-delay"`
-	RandomDelayUnit           string        `mapstructure:"random-delay-unit"`
-	RandomDelayMin            int           `mapstructure:"random-delay-min"`
-	RandomDelayMax            int           `mapstructure:"random-delay-max"`
-	RandomError               bool          `mapstructure:"random-error"`
-	Unhealthy                 bool          `mapstructure:"unhealthy"`
-	Unready                   bool          `mapstructure:"unready"`
-	JWTSecret                 string        `mapstructure:"jwt-secret"`
-	CacheServer               string        `mapstructure:"cache-server"`
+	HttpClientTimeout         time.Duration `mapstructure:"HTTP_CLIENT_TIMEOUT_IN_MINUTES"`
+	HttpServerTimeout         time.Duration `mapstructure:"HTTP_SERVER_TIMEOUT_IN_SECONDS"`
+	HttpServerShutdownTimeout time.Duration `mapstructure:"HTTP_SERVER_SHUTDOWN_IN_SECONDS"`
+	BackendURL                []string      `mapstructure:"BACKEND_URL"`
+	UILogo                    string        `mapstructure:"UI_LOGO"`
+	UIMessage                 string        `mapstructure:"UI_MESSAGE"`
+	UIColor                   string        `mapstructure:"UI_COLOR"`
+	UIPath                    string        `mapstructure:"UI_PATH"`
+	DataPath                  string        `mapstructure:"DATA_PATH"`
+	ConfigPath                string        `mapstructure:"CONFIG_PATH"`
+	CertPath                  string        `mapstructure:"CERT_PATH"`
+	Port                      string        `mapstructure:"HTTP_PORT"`
+	SecurePort                string        `mapstructure:"HTTPS_PORT"`
+	PortMetrics               int           `mapstructure:"METRICS_PORT"`
+	Hostname                  string        `mapstructure:"HOSTNAME"`
+	H2C                       bool          `mapstructure:"H2C"`
+	RandomDelay               bool          `mapstructure:"RANDOM_DELAY"`
+	RandomDelayUnit           string        `mapstructure:"RANDOM_DELAY_UNIT"`
+	RandomDelayMin            int           `mapstructure:"RANDOM_DELAY_MIN"`
+	RandomDelayMax            int           `mapstructure:"RANDOM_DELAY_MAX"`
+	RandomError               bool          `mapstructure:"RANDOM_ERROR"`
+	Unhealthy                 bool          `mapstructure:"UNHEALTHY"`
+	Unready                   bool          `mapstructure:"UNREADY"`
+	JWTSecret                 string        `mapstructure:"JWT_SECRET"`
+	CacheServer               string        `mapstructure:"REDIS_SERVER_ADDRESS"`
 }
 
 type Server struct {
