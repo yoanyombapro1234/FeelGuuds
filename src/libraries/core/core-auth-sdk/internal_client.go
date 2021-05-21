@@ -11,11 +11,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	jose "gopkg.in/square/go-jose.v2"
 )
 
 type internalClient struct {
-	client   *http.Client
+	client   *retryablehttp.Client
 	baseURL  *url.URL
 	username string
 	password string
@@ -28,6 +29,10 @@ const (
 	patch  = "PATCH"
 	post   = "POST"
 	put    = "PUT"
+	defaultRetryWaitMin = 5 * time.Millisecond
+	defaultRetryWaitMax = 10 * time.Millisecond
+	defaultRetryMax = 5
+	defaultRequestTimeout = 1 * time.Second
 )
 
 func newInternalClient(base, username, password, origin string) (*internalClient, error) {
@@ -40,10 +45,14 @@ func newInternalClient(base, username, password, origin string) (*internalClient
 		return nil, err
 	}
 
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = defaultRetryMax
+	retryClient.RetryWaitMin = defaultRetryWaitMin
+	retryClient.RetryWaitMax = defaultRetryWaitMax
+	retryClient.HTTPClient.Timeout = defaultRequestTimeout
+
 	return &internalClient{
-		client: &http.Client{
-			Timeout: 5 * time.Second,
-		},
+		client: retryClient,
 		baseURL:  baseURL,
 		username: username,
 		password: password,
@@ -106,7 +115,7 @@ func (ic *internalClient) Update(id, username string) error {
 	return err
 }
 
-//Signup signs up a user account and returns the jwt token associated with the record
+// Signup signs up a user account and returns the jwt token associated with the record
 // TODO: unit test
 func (ic *internalClient) Signup(username, password string) (string, error){
 	form := url.Values{}
@@ -138,14 +147,14 @@ func (ic *internalClient) Signup(username, password string) (string, error){
 	return data.Result.Token, nil
 }
 
-//Logout revokes the established session and refresh token by the application with the authentication service
+// Logout revokes the established session and refresh token by the application with the authentication service
 // TODO: unit test
 func (ic *internalClient) Logout() error{
 	_, err := ic.doWithAuth(delete, "session", nil)
 	return err
 }
 
-//Login logs a user into the backend system
+// Login logs a user into the backend system
 // TODO: unit test
 func (ic *internalClient) Login(username, password string) (string, error){
 	form := url.Values{}
@@ -177,25 +186,25 @@ func (ic *internalClient) Login(username, password string) (string, error){
 	return data.Result.Token, nil
 }
 
-//LockAccount locks the account with the specified id
+// LockAccount locks the account with the specified id
 func (ic *internalClient) LockAccount(id string) error {
 	_, err := ic.doWithAuth(patch, "accounts/"+id+"/lock", nil)
 	return err
 }
 
-//UnlockAccount unlocks the account with the specified id
+// UnlockAccount unlocks the account with the specified id
 func (ic *internalClient) UnlockAccount(id string) error {
 	_, err := ic.doWithAuth(patch, "accounts/"+id+"/unlock", nil)
 	return err
 }
 
-//ArchiveAccount archives the account with the specified id
+// ArchiveAccount archives the account with the specified id
 func (ic *internalClient) ArchiveAccount(id string) error {
 	_, err := ic.doWithAuth(delete, "accounts/"+id, nil)
 	return err
 }
 
-//ImportAccount imports an existing account
+// ImportAccount imports an existing account
 func (ic *internalClient) ImportAccount(username, password string, locked bool) (int, error) {
 	form := url.Values{}
 	form.Add("username", username)
@@ -222,18 +231,18 @@ func (ic *internalClient) ImportAccount(username, password string, locked bool) 
 	return data.Result.ID, err
 }
 
-//ExpirePassword expires the users current sessions and flags the account for a required password change on next login
+// ExpirePassword expires the users current sessions and flags the account for a required password change on next login
 func (ic *internalClient) ExpirePassword(id string) error {
 	_, err := ic.doWithAuth(patch, "accounts/"+id+"/expire_password", nil)
 	return err
 }
 
-//ServiceStats returns the raw request from the /stats endpoint
+// ServiceStats returns the raw request from the /stats endpoint
 func (ic *internalClient) ServiceStats() (*http.Response, error) {
 	return ic.doWithAuth(get, "stats", nil)
 }
 
-//ServerStats returns the raw request from the /metrics endpoint
+// ServerStats returns the raw request from the /metrics endpoint
 func (ic *internalClient) ServerStats() (*http.Response, error) {
 	return ic.doWithAuth(get, "metrics", nil)
 }
@@ -263,7 +272,7 @@ func (ic *internalClient) get(path string, dest interface{}) (int, error) {
 }
 
 func (ic *internalClient) doWithAuth(verb string, path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(verb, ic.absoluteURL(path), body)
+	req, err := retryablehttp.NewRequest(verb, ic.absoluteURL(path), body)
 	if err != nil {
 		return nil, err
 	}
