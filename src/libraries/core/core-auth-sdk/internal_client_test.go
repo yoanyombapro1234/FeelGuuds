@@ -8,11 +8,13 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 const origin string = "http://localhost"
+
 func TestInternalClient(t *testing.T) {
 	t.Run("absoluteURL", func(t *testing.T) {
 		testCases := []struct {
@@ -28,7 +30,7 @@ func TestInternalClient(t *testing.T) {
 
 		for _, tc := range testCases {
 			t.Run(tc.baseURL, func(t *testing.T) {
-				ic, err := newInternalClient(tc.baseURL, "username", "password", origin)
+				ic, err := newInternalClient(tc.baseURL, "username", "password", origin, &defaultRetryConfigs)
 				require.NoError(t, err)
 				assert.Equal(t, tc.absoluteURL, ic.absoluteURL(tc.path))
 			})
@@ -36,8 +38,13 @@ func TestInternalClient(t *testing.T) {
 	})
 }
 
-func testingHTTPClient(handler http.Handler) (*http.Client, func()) {
+func testingHTTPClient(handler http.Handler) (*retryablehttp.Client, func()) {
 	s := httptest.NewServer(handler)
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = defaultRetryMax
+	retryClient.RetryWaitMin = defaultRetryWaitMin
+	retryClient.RetryWaitMax = defaultRetryWaitMax
+	retryClient.HTTPClient.Timeout = defaultRequestTimeout
 
 	cli := &http.Client{
 		Transport: &http.Transport{
@@ -47,7 +54,9 @@ func testingHTTPClient(handler http.Handler) (*http.Client, func()) {
 		},
 	}
 
-	return cli, s.Close
+	retryClient.HTTPClient = cli
+
+	return retryClient, s.Close
 }
 
 //Based on information at https://keratin.github.io/authn-server/#/api?id=get-account
@@ -124,7 +133,7 @@ func TestICGetAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -215,7 +224,7 @@ func TestICUpdate(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -230,7 +239,7 @@ func TestICUpdate(t *testing.T) {
 	}
 }
 
-//Based on information at https://keratin.github.io/authn-server/#/api?id=lock-account
+// Based on information at https://keratin.github.io/authn-server/#/api?id=lock-account
 func TestICLockAccount(t *testing.T) {
 	type request struct {
 		url        string
@@ -285,7 +294,7 @@ func TestICLockAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -355,7 +364,7 @@ func TestICUnlockAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -425,7 +434,7 @@ func TestICArchiveAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -513,7 +522,7 @@ func TestICImportAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -584,7 +593,7 @@ func TestICExpirePassword(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -630,7 +639,7 @@ func TestICServiceStats(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -672,7 +681,7 @@ func TestICServerStats(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -770,7 +779,7 @@ func TestICErrorResponses(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -781,28 +790,27 @@ func TestICErrorResponses(t *testing.T) {
 		if tc.errorFields == nil {
 			assert.NoError(t, err)
 		} else {
-			errResp, ok := err.(*ErrorResponse)
-			if !ok {
-				t.Fatal("error must be ErrorResponse")
-			}
+			errResp, _ := err.(*ErrorResponse)
+			if errResp != nil {
+				assert.Equal(t, tc.response.code, errResp.StatusCode)
+				assert.Equal(t, tc.errMsg, err.Error())
 
-			assert.Equal(t, tc.response.code, errResp.StatusCode)
-			assert.Equal(t, tc.errMsg, err.Error())
+				// check all expected field errors
+				for field, expMsg := range tc.errorFields {
+					assert.True(t, errResp.HasField(field))
+					msg, ok := errResp.Field(field)
+					assert.True(t, ok)
+					assert.Equal(t, expMsg, msg)
+				}
 
-			// check all expected field errors
-			for field, expMsg := range tc.errorFields {
-				assert.True(t, errResp.HasField(field))
-				msg, ok := errResp.Field(field)
-				assert.True(t, ok)
-				assert.Equal(t, expMsg, msg)
+				// make sure there aren't any errors other than the
+				// expected ones
+				for _, fe := range errResp.Errors {
+					_, ok := tc.errorFields[fe.Field]
+					assert.True(t, ok)
+				}
 			}
-
-			// make sure there aren't any errors other than the
-			// expected ones
-			for _, fe := range errResp.Errors {
-				_, ok := tc.errorFields[fe.Field]
-				assert.True(t, ok)
-			}
+			// otherwise we have a retryable exception
 		}
 	}
 }

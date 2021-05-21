@@ -22,8 +22,25 @@ type Client struct {
 	verifier JWTClaimsExtractor
 }
 
+// RetryConfig provides a mechanism by which clients can configure http retries parameters
+type RetryConfig struct {
+	MaxRetries       int
+	MinRetryWaitTime time.Duration
+	MaxRetryWaitTime time.Duration
+	RequestTimeout   time.Duration
+}
+
+var (
+	defaultRetryConfigs = RetryConfig{
+		MaxRetries:       defaultRetryMax,
+		MinRetryWaitTime: defaultRetryWaitMin,
+		MaxRetryWaitTime: defaultRetryWaitMax,
+		RequestTimeout:   defaultRequestTimeout,
+	}
+)
+
 // NewClient returns an initialized and configured Client.
-func NewClient(config Config, origin string) (*Client, error) {
+func NewClient(config Config, origin string, retryConfig *RetryConfig) (*Client, error) {
 	var err error
 	config.setDefaults()
 
@@ -31,7 +48,7 @@ func NewClient(config Config, origin string) (*Client, error) {
 
 	ac.config = config
 
-	ac.iclient, err = newInternalClient(config.PrivateBaseURL, config.Username, config.Password, origin)
+	ac.iclient, err = newInternalClient(config.PrivateBaseURL, config.Username, config.Password, origin, retryConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -109,17 +126,17 @@ func (ac *Client) ExpirePassword(id string) error {
 }
 
 // LoginAccount attempts to log in the account with the input credentials and returns a jwt token
-func (ac *Client) LoginAccount(username, password string) (string, error){
+func (ac *Client) LoginAccount(username, password string) (string, error) {
 	return ac.iclient.Login(username, password)
 }
 
 // SignupAccount attempts to sign up the account with the input credentials and returns a jwt token
-func (ac *Client) SignupAccount(username, password string) (string, error){
+func (ac *Client) SignupAccount(username, password string) (string, error) {
 	return ac.iclient.Signup(username, password)
 }
 
 // LogOutAccount logs a user out of the systems by revoking all associated tokens to the account
-func (ac *Client) LogOutAccount() error{
+func (ac *Client) LogOutAccount() error {
 	return ac.iclient.Logout()
 }
 
@@ -146,7 +163,7 @@ func defaultClient() *Client {
 // Configure initializes the default AuthN client with the given config. This is necessary to
 // use lib.SubjectFrom without keeping a reference to your own AuthN client.
 func Configure(config Config, origin string) error {
-	client, err := NewClient(config, origin)
+	client, err := NewClient(config, origin, &defaultRetryConfigs)
 	if err != nil {
 		return err
 	}
