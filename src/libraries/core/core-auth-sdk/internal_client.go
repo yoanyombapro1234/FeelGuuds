@@ -20,22 +20,22 @@ type internalClient struct {
 	baseURL  *url.URL
 	username string
 	password string
-	origin string
+	origin   string
 }
 
 const (
-	delete = "DELETE"
-	get    = "GET"
-	patch  = "PATCH"
-	post   = "POST"
-	put    = "PUT"
-	defaultRetryWaitMin = 5 * time.Millisecond
-	defaultRetryWaitMax = 10 * time.Millisecond
-	defaultRetryMax = 5
+	delete                = "DELETE"
+	get                   = "GET"
+	patch                 = "PATCH"
+	post                  = "POST"
+	put                   = "PUT"
+	defaultRetryWaitMin   = 5 * time.Millisecond
+	defaultRetryWaitMax   = 10 * time.Millisecond
+	defaultRetryMax       = 5
 	defaultRequestTimeout = 1 * time.Second
 )
 
-func newInternalClient(base, username, password, origin string) (*internalClient, error) {
+func newInternalClient(base, username, password, origin string, retryConfig *RetryConfig) (*internalClient, error) {
 	// ensure that base ends with a '/', so ResolveReference() will work as desired
 	if base[len(base)-1] != '/' {
 		base = base + "/"
@@ -46,17 +46,17 @@ func newInternalClient(base, username, password, origin string) (*internalClient
 	}
 
 	retryClient := retryablehttp.NewClient()
-	retryClient.RetryMax = defaultRetryMax
-	retryClient.RetryWaitMin = defaultRetryWaitMin
-	retryClient.RetryWaitMax = defaultRetryWaitMax
-	retryClient.HTTPClient.Timeout = defaultRequestTimeout
+	retryClient.RetryMax = retryConfig.MaxRetries
+	retryClient.RetryWaitMin = retryConfig.MinRetryWaitTime
+	retryClient.RetryWaitMax = retryConfig.MaxRetryWaitTime
+	retryClient.HTTPClient.Timeout = retryConfig.RequestTimeout
 
 	return &internalClient{
-		client: retryClient,
+		client:   retryClient,
 		baseURL:  baseURL,
 		username: username,
 		password: password,
-		origin: origin,
+		origin:   origin,
 	}, nil
 }
 
@@ -117,7 +117,7 @@ func (ic *internalClient) Update(id, username string) error {
 
 // Signup signs up a user account and returns the jwt token associated with the record
 // TODO: unit test
-func (ic *internalClient) Signup(username, password string) (string, error){
+func (ic *internalClient) Signup(username, password string) (string, error) {
 	form := url.Values{}
 	form.Add("username", username)
 	form.Add("password", password)
@@ -149,14 +149,14 @@ func (ic *internalClient) Signup(username, password string) (string, error){
 
 // Logout revokes the established session and refresh token by the application with the authentication service
 // TODO: unit test
-func (ic *internalClient) Logout() error{
+func (ic *internalClient) Logout() error {
 	_, err := ic.doWithAuth(delete, "session", nil)
 	return err
 }
 
 // Login logs a user into the backend system
 // TODO: unit test
-func (ic *internalClient) Login(username, password string) (string, error){
+func (ic *internalClient) Login(username, password string) (string, error) {
 	form := url.Values{}
 	form.Add("username", username)
 	form.Add("password", password)

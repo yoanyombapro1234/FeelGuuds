@@ -14,6 +14,7 @@ import (
 )
 
 const origin string = "http://localhost"
+
 func TestInternalClient(t *testing.T) {
 	t.Run("absoluteURL", func(t *testing.T) {
 		testCases := []struct {
@@ -29,7 +30,7 @@ func TestInternalClient(t *testing.T) {
 
 		for _, tc := range testCases {
 			t.Run(tc.baseURL, func(t *testing.T) {
-				ic, err := newInternalClient(tc.baseURL, "username", "password", origin)
+				ic, err := newInternalClient(tc.baseURL, "username", "password", origin, &defaultRetryConfigs)
 				require.NoError(t, err)
 				assert.Equal(t, tc.absoluteURL, ic.absoluteURL(tc.path))
 			})
@@ -132,7 +133,7 @@ func TestICGetAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -223,7 +224,7 @@ func TestICUpdate(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -238,7 +239,7 @@ func TestICUpdate(t *testing.T) {
 	}
 }
 
-//Based on information at https://keratin.github.io/authn-server/#/api?id=lock-account
+// Based on information at https://keratin.github.io/authn-server/#/api?id=lock-account
 func TestICLockAccount(t *testing.T) {
 	type request struct {
 		url        string
@@ -293,7 +294,7 @@ func TestICLockAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -363,7 +364,7 @@ func TestICUnlockAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -433,7 +434,7 @@ func TestICArchiveAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -521,7 +522,7 @@ func TestICImportAccount(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -592,7 +593,7 @@ func TestICExpirePassword(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -638,7 +639,7 @@ func TestICServiceStats(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -680,7 +681,7 @@ func TestICServerStats(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -778,7 +779,7 @@ func TestICErrorResponses(t *testing.T) {
 		httpClient, teardown := testingHTTPClient(h)
 		defer teardown()
 
-		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin)
+		cli, err := newInternalClient(tc.request.url, tc.request.htusername, tc.request.htpassword, origin, &defaultRetryConfigs)
 		if err != nil {
 			t.Fatal(err)
 		}
