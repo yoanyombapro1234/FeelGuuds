@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Blackspace Authors.
+Copyright 2019 The Feelguuds Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ func BenchmarkInfoMLoggerInfo(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			jLogger := NewJSONLogger(nil, nil)
-			jLogger.InfoM("test",
+			jLogger.Info("test",
 				zap.String("test0", "response0"),
 				zap.String("test1", "response1"),
 				zap.String("test2", "response2"),
@@ -143,7 +143,7 @@ func BenchmarkErrorMLoggerInfo(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			jLogger := NewJSONLogger(nil, nil)
-			jLogger.ErrorM(errors.New("test0"), "error occured")
+			jLogger.Error(errors.New("test0"), "error occured")
 		}
 	})
 }
