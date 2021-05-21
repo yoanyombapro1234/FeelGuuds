@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/giantswarm/retry-go"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,21 +24,34 @@ func (s *Server) setCtxRequestTimeout(ctx context.Context) context.Context {
 func (s *Server) performRetryableRpcCall(ctx context.Context, f func() (interface{}, error)) (interface{}, error) {
 	var response = make(chan interface{}, 1)
 
-	err := retry.Do(
-		func(conn chan<- interface{}) func() error {
-			return func() error {
-				opResponse, err := f()
-				if err != nil {
-					return err
+	/*
+		err := retry.Do(
+			func(conn chan<- interface{}) func() error {
+				return func() error {
+					opResponse, err := f()
+					if err != nil {
+						return err
+					}
+					response <- opResponse
+					return nil
 				}
-				response <- opResponse
-				return nil
+			}(response),
+			retry.MaxTries(s.config.RpcRetries),
+			retry.Timeout(time.Millisecond*time.Duration(s.config.RpcDeadline)),
+			retry.Sleep(time.Millisecond*time.Duration(s.config.RpcRetryBackoff)),
+		)
+	*/
+
+	err := func(conn chan<- interface{}) func() error {
+		return func() error {
+			opResponse, err := f()
+			if err != nil {
+				return err
 			}
-		}(response),
-		retry.MaxTries(s.config.RpcRetries),
-		retry.Timeout(time.Millisecond*time.Duration(s.config.RpcDeadline)),
-		retry.Sleep(time.Millisecond*time.Duration(s.config.RpcRetryBackoff)),
-	)
+			response <- opResponse
+			return nil
+		}
+	}(response)()
 
 	if err != nil {
 		return nil, status.Errorf(codes.Unknown, err.Error())
@@ -61,6 +73,7 @@ func (s *Server) PerformRetryableRPCOperation(ctx context.Context, span opentrac
 		)
 
 		retryableOp := func() (interface{}, error) {
+			s.logger.For(ctx).Info("performing retryable http operation", "operation type", opType)
 			return s.performRetryableRpcCall(ctx, op)
 		}
 

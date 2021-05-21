@@ -18,12 +18,12 @@ func TestAuthenticationHandlerServiceClient_AuthenticateAccount(t *testing.T) {
 	password := fmt.Sprintf("test_%s", util.GenerateRandomString(17))
 
 	tests := []struct {
-		name string
-		email   string
-		password string
-		err    error
-		shouldCreateAccount  bool
-		shouldCheckToken bool
+		name                string
+		email               string
+		password            string
+		err                 error
+		shouldCreateAccount bool
+		shouldCheckToken    bool
 	}{
 		{
 			"authenticate non-existent account scenario",
@@ -69,7 +69,7 @@ func TestAuthenticationHandlerServiceClient_AuthenticateAccount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c :=  NewClient(conn, 5*time.Second)
+			c := NewClient(conn, 5*time.Second)
 			if tt.shouldCreateAccount {
 				_, err := createAccountTestHelper(c, ctx, tt.email, tt.password)
 				if err != nil {

@@ -37,7 +37,7 @@ func (s *Server) cacheWriteHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 	_, err = conn.Do("SET", key, string(body))
 	if err != nil {
-		s.logger.InfoM("cache set failed", zap.Error(err))
+		s.logger.Info("cache set failed", zap.Error(err))
 		s.ErrorResponse(w, r, "cache set failed", http.StatusInternalServerError)
 		return
 	}
@@ -94,7 +94,7 @@ func (s *Server) cacheReadHandler(w http.ResponseWriter, r *http.Request) {
 
 	ok, err := redis.Bool(conn.Do("EXISTS", key))
 	if err != nil || !ok {
-		s.logger.InfoM("cache key not found", zap.String("key", key))
+		s.logger.Info("cache key not found", zap.String("key", key))
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}

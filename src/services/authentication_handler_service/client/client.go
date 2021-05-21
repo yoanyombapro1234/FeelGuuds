@@ -9,7 +9,7 @@ import (
 )
 
 type Client struct {
-	conn proto.AuthenticationHandlerServiceApiClient
+	conn    proto.AuthenticationHandlerServiceApiClient
 	timeout time.Duration
 }
 
@@ -20,6 +20,3 @@ func NewClient(conn *grpc.ClientConn, timeout time.Duration) *Client {
 		timeout: timeout,
 	}
 }
-
-
-

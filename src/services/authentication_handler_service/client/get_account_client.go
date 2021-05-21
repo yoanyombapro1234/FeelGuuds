@@ -13,7 +13,7 @@ import (
 // GetAccount obtains an account from the authentication service by account Id
 func (c *Client) GetAccount(ctx context.Context, accountId uint32) (*proto.Account, error) {
 	request := &proto.GetAccountRequest{
-		Id:                  accountId,
+		Id: accountId,
 	}
 
 	ctx, cancel := context.WithDeadline(ctx, time.Now().Add(c.timeout))

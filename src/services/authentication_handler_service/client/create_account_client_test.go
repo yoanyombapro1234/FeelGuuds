@@ -18,10 +18,10 @@ func TestAuthenticationHandlerServiceClient_CreateAccount(t *testing.T) {
 	password := fmt.Sprintf("test_%s", util.GenerateRandomString(17))
 
 	tests := []struct {
-		name string
-		email   string
+		name     string
+		email    string
 		password string
-		err    error
+		err      error
 	}{
 		{
 			"create account scenario",
@@ -59,9 +59,9 @@ func TestAuthenticationHandlerServiceClient_CreateAccount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c :=  NewClient(conn, 5*time.Second)
+			c := NewClient(conn, 5*time.Second)
 			_, err := createAccountTestHelper(c, ctx, tt.email, tt.password)
-			if err != nil &&  errors.Is(err, tt.err) {
+			if err != nil && errors.Is(err, tt.err) {
 				t.Error("error: expected", tt.err, "received", err)
 			}
 		})

@@ -11,10 +11,10 @@ import (
 )
 
 // UpdateAccount updates an account
-func (c *Client) UpdateAccount(ctx context.Context, accountId uint32, email string) (error) {
+func (c *Client) UpdateAccount(ctx context.Context, accountId uint32, email string) error {
 	request := &proto.UpdateAccountRequest{
 		Email: email,
-		Id: accountId,
+		Id:    accountId,
 	}
 
 	ctx, cancel := context.WithDeadline(ctx, time.Now().Add(c.timeout))

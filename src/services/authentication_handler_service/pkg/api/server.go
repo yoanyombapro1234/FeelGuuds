@@ -260,7 +260,7 @@ func (s *Server) startServer() *http.Server {
 	// start the server in the background
 	go func() {
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-			s.logger.FatalM(err, "HTTP server crashed")
+			s.logger.Fatal(err, "HTTP server crashed")
 		}
 	}()
 
@@ -291,7 +291,7 @@ func (s *Server) startSecureServer() *http.Server {
 	// start the server in the background
 	go func() {
 		if err := srv.ListenAndServeTLS(cert, key); err != http.ErrServerClosed {
-			s.logger.FatalM(err, "HTTPS server crashed")
+			s.logger.Fatal(err, "HTTPS server crashed")
 		}
 	}()
 

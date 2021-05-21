@@ -18,11 +18,11 @@ func TestAuthenticationHandlerServiceClient_DeleteAccount(t *testing.T) {
 	password := fmt.Sprintf("test_%s", util.GenerateRandomString(17))
 
 	tests := []struct {
-		name string
-		email   string
-		password string
-		err    error
-		shouldCreateAccount  bool
+		name                          string
+		email                         string
+		password                      string
+		err                           error
+		shouldCreateAccount           bool
 		shouldInputArgBeMisconfigured bool
 	}{
 		{
@@ -62,7 +62,7 @@ func TestAuthenticationHandlerServiceClient_DeleteAccount(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var id uint32 = 1000
-			c :=  NewClient(conn, 5*time.Second)
+			c := NewClient(conn, 5*time.Second)
 			if tt.shouldCreateAccount {
 				id, err = createAccountTestHelper(c, ctx, tt.email, tt.password)
 				if err != nil {

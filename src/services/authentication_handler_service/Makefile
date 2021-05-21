@@ -130,6 +130,10 @@ cover:
 	$(AT) echo open $(TMP_COVERAGE)/coverage.html
 	$(AT) if [ "$(OPEN_COVERAGE_HTML)" == "1" ]; then open $(TMP_COVERAGE)/coverage.html; fi
 
+.PHONY: go-mod
+go-mod:
+	go list -m -u all
+
 .PHONY: test
 test: start-containers
 	echo "sleeping for 60 seconds before running unit tests"

@@ -13,7 +13,7 @@ import (
 // CreateAccount creates an account
 func (c *Client) CreateAccount(ctx context.Context, email, password string) (uint32, error) {
 	request := &proto.CreateAccountRequest{
-		Email: email,
+		Email:    email,
 		Password: password,
 	}
 

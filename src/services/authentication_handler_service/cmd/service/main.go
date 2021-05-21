@@ -83,6 +83,12 @@ func main() {
 	fs.String("SERVICE_AUTHN_PORT", "8000", "authentication service external port")
 	fs.Bool("SERVICE_ENABLE_AUTH_SERVICE_PRIVATE_INTEGRATION", true, "enables communication with authentication service")
 
+	// retry specific configurations
+	fs.Int("HTTP_MAX_RETRIES", 5, "max retries to perform on failed http calls")
+	fs.Duration("HTTP_MIN_RETRY_WAITING_TIME", 5*time.Millisecond, "minimum time to wait between failed calls for retry")
+	fs.Duration("HTTP_MAX_RETRY_WAITING_TIME", 15*time.Millisecond, "maximum time to wait between failed calls for retry")
+	fs.Duration("HTTP_REQUEST_TIMEOUT", 300*time.Millisecond, "time until a request is seen as timing out")
+
 	// logging specific configurations
 	fs.String("SERVICE_NAME", "authentication_handler_service", "service name")
 	// TODO: reconfigure this to leverage datadog instead
@@ -156,7 +162,7 @@ func main() {
 
 	authnServiceClient := NewAuthServiceClientConnection(err, logger)
 	if authnServiceClient != nil {
-		logger.InfoM("successfully initialized authentication service client")
+		logger.Info("successfully initialized authentication service client")
 	}
 
 	// start stress tests if any
@@ -177,7 +183,7 @@ func main() {
 	// validate random delay options
 	if viper.GetInt("random-delay-max") < viper.GetInt("random-delay-min") {
 		err := errors.New("`--random-delay-max` should be greater than `--random-delay-min`")
-		logger.FatalM(err, "please fix configurations")
+		logger.Fatal(err, "please fix configurations")
 	}
 
 	switch delayUnit := viper.GetString("random-delay-unit"); delayUnit {
@@ -187,14 +193,14 @@ func main() {
 		break
 	default:
 		err := errors.New("random-delay-unit` accepted values are: s|ms")
-		logger.FatalM(err, "please fix configurations")
+		logger.Fatal(err, "please fix configurations")
 	}
 
 	// load gRPC server config
 	var grpcCfg grpc.Config
 	if err := viper.Unmarshal(&grpcCfg); err != nil {
 		err := errors.New("config unmarshal failed")
-		logger.FatalM(err, "please fix configurations")
+		logger.Fatal(err, "please fix configurations")
 	}
 
 	// start gRPC server
@@ -209,7 +215,7 @@ func main() {
 	// load HTTP server config
 	var srvCfg api.Config
 	if err := viper.Unmarshal(&srvCfg); err != nil {
-		logger.FatalM(err, "config unmarshal failed")
+		logger.Fatal(err, "config unmarshal failed")
 	}
 
 	// log version and port
@@ -270,6 +276,13 @@ func beginStressTest(cpus int, mem int, logger core_logging.ILog) {
 // initAuthnClient initializes an instance of the authn client primarily useful in
 // communicating with the authentication service securely
 func initAuthnClient(username, password, audience, issuer, url, origin string) (*core_auth_sdk.Client, error) {
+	retryConfig := &core_auth_sdk.RetryConfig{
+		MaxRetries:       viper.GetInt("HTTP_MAX_RETRIES"),
+		MinRetryWaitTime: viper.GetDuration("HTTP_MIN_RETRY_WAITING_TIME"),
+		MaxRetryWaitTime: viper.GetDuration("HTTP_MAX_RETRY_WAITING_TIME"),
+		RequestTimeout:   viper.GetDuration("HTTP_REQUEST_TIMEOUT"),
+	}
+
 	// Authentication.
 	return core_auth_sdk.NewClient(core_auth_sdk.Config{
 		// The AUTHN_URL of your Keratin AuthN server. This will be used to verify tokens created by
@@ -290,7 +303,7 @@ func initAuthnClient(username, password, audience, issuer, url, origin string) (
 		// RECOMMENDED: Send private API calls to AuthN using private network routing. This can be
 		// necessary if your environment has a firewall to limit public endpoints.
 		PrivateBaseURL: url,
-	}, origin)
+	}, origin, retryConfig)
 }
 
 func NewAuthServiceClientConnection(err error, logger core_logging.ILog) core_auth_sdk.AuthService {
@@ -306,7 +319,7 @@ func NewAuthServiceClientConnection(err error, logger core_logging.ILog) core_au
 	authnClient, err := initAuthnClient(authUsername, authPassword, domains, issuer, privateURL, origin)
 	// crash the process if we cannot connect to the authentication service
 	if err != nil {
-		logger.FatalM(err, "failed to initialized authentication service client")
+		logger.Fatal(err, "failed to initialized authentication service client")
 	}
 
 	// TODO: make this a retryable operation
@@ -317,7 +330,7 @@ func NewAuthServiceClientConnection(err error, logger core_logging.ILog) core_au
 		_, err = authnClient.ServerStats()
 		if err != nil {
 			if retries != retryLimit {
-				logger.ErrorM(err, fmt.Sprintf("failed to connect to authentication service. Attempt #%d", retries))
+				logger.Error(err, fmt.Sprintf("failed to connect to authentication service. Attempt #%d", retries))
 			}
 			retries += 1
 		} else {

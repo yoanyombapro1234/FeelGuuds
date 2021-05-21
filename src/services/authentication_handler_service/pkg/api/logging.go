@@ -19,7 +19,7 @@ func NewLoggingMiddleware(logger core_logging.ILog) *LoggingMiddleware {
 
 func (m *LoggingMiddleware) Handler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		m.logger.InfoM(
+		m.logger.Info(
 			"request started",
 			zap.String("proto", r.Proto),
 			zap.String("uri", r.RequestURI),

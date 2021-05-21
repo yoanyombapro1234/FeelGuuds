@@ -49,7 +49,7 @@ func (s *Server) CreateAccount(ctx context.Context, req *proto.CreateAccountRequ
 	if !ok {
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(constants.CREATE_ACCOUNT)
 		err := status.Errorf(codes.Internal, "failed to convert result to uint32 id value")
-		s.logger.For(ctx).ErrorM(err, "casting error")
+		s.logger.For(ctx).Error(err, "casting error")
 		return nil, err
 	}
 

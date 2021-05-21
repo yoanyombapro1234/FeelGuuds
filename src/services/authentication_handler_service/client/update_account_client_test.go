@@ -19,9 +19,9 @@ func TestAuthenticationHandlerServiceClient_UpdateAccount(t *testing.T) {
 	updatedEmail := email + util.GenerateRandomString(11)
 
 	tests := []struct {
-		name string
-		email   string
-		err    error
+		name         string
+		email        string
+		err          error
 		accountExist bool
 	}{
 		{
@@ -52,7 +52,7 @@ func TestAuthenticationHandlerServiceClient_UpdateAccount(t *testing.T) {
 	}
 	defer conn.Close()
 
-	c :=  NewClient(conn, 5*time.Second)
+	c := NewClient(conn, 5*time.Second)
 	id, err := createAccountTestHelper(c, ctx, email, password)
 	if err != nil {
 		t.Error("error: did not expect to receive an error")

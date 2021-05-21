@@ -35,4 +35,3 @@ func createAccountTestHelper(c *Client, ctx context.Context, email, password str
 	id, err := c.CreateAccount(ctx, email, password)
 	return id, err
 }
-

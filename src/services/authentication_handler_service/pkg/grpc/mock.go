@@ -85,7 +85,7 @@ func NewMockServer(authClientMockStub core_auth_sdk.AuthService) *Server {
 	if authClientMockStub == nil {
 		authClientMockStub, err = InitializeAuthnClient(logger)
 		if err != nil {
-			logger.FatalM(err, err.Error())
+			logger.Fatal(err, err.Error())
 		}
 	}
 
@@ -122,7 +122,12 @@ func InitializeAuthnClient(logger core_logging.ILog) (core_auth_sdk.AuthService,
 		// RECOMMENDED: Send private API calls to AuthN using private network routing. This can be
 		// necessary if your environment has a firewall to limit public endpoints.
 		PrivateBaseURL: constants.TEST_BASE_URL,
-	}, constants.TEST_ORIGIN)
+	}, constants.TEST_ORIGIN, &core_auth_sdk.RetryConfig{
+		MaxRetries:       5,
+		MinRetryWaitTime: 5 * time.Millisecond,
+		MaxRetryWaitTime: 10 * time.Millisecond,
+		RequestTimeout:   400 * time.Millisecond,
+	})
 
 	// TODO: make this a retryable operation
 	retries := 1
@@ -131,14 +136,14 @@ func InitializeAuthnClient(logger core_logging.ILog) (core_auth_sdk.AuthService,
 		data, err := client.ServerStats()
 		if err != nil {
 			if retries != 4 {
-				logger.ErrorM(err, "failed to connect to authentication service")
+				logger.Error(err, "failed to connect to authentication service")
 			} else {
-				logger.FatalM(err, "failed to connect to authentication service")
+				logger.Fatal(err, "failed to connect to authentication service")
 			}
 			retries += 1
 		} else {
 			retries = 4
-			logger.InfoM("data", zap.Any("result", data))
+			logger.Info("data", zap.Any("result", data))
 		}
 
 		time.Sleep(1 * time.Second)

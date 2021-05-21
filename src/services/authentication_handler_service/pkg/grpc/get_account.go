@@ -52,7 +52,7 @@ func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(constants.GET_ACCOUNT)
 
 		err := service_errors.ErrFailedToCastAccount
-		s.logger.For(ctx).ErrorM(err, err.Error())
+		s.logger.For(ctx).Error(err, err.Error())
 		return nil, err
 	}
 

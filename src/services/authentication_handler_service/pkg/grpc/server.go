@@ -64,7 +64,7 @@ func (s *Server) ListenAndServe() {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", s.config.Port))
 	if err != nil {
 		var msg = fmt.Sprintf("faled to listen on port %d", s.config.Port)
-		s.logger.FatalM(err, msg)
+		s.logger.Fatal(err, msg)
 	}
 
 	// configure tracing so all future rpc activity will be traced by use of s
@@ -92,6 +92,6 @@ func (s *Server) ListenAndServe() {
 
 	if err := srv.Serve(listener); err != nil {
 		var msg = fmt.Sprintf("faled to serve on port %d", s.config.Port)
-		s.logger.FatalM(err, msg)
+		s.logger.Fatal(err, msg)
 	}
 }

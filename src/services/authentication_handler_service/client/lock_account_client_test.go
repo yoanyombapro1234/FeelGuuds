@@ -18,11 +18,11 @@ func TestAuthenticationHandlerServiceClient_LockAccount(t *testing.T) {
 	password := fmt.Sprintf("test_%s", util.GenerateRandomString(17))
 
 	tests := []struct {
-		name string
-		email   string
-		password string
-		err    error
-		accountExists bool
+		name                           string
+		email                          string
+		password                       string
+		err                            error
+		accountExists                  bool
 		shouldAccountBeLockPrematurely bool
 	}{
 		{
@@ -32,7 +32,6 @@ func TestAuthenticationHandlerServiceClient_LockAccount(t *testing.T) {
 			errors.New("grpc: Unknown, retry limit reached (1/1): received 404 from http://localhost:8000/accounts/1000. Errors in account: NOT_FOUND"),
 			false,
 			false,
-
 		},
 		{
 			"lock account that already exists and isnt locked scenario",
@@ -60,7 +59,7 @@ func TestAuthenticationHandlerServiceClient_LockAccount(t *testing.T) {
 	}
 	defer conn.Close()
 
-	c :=  NewClient(conn, 5*time.Second)
+	c := NewClient(conn, 5*time.Second)
 
 	id, err := createAccountTestHelper(c, ctx, email, password)
 	if err != nil {

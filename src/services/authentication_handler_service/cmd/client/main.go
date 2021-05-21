@@ -18,18 +18,18 @@ func main() {
 		panic(e)
 	}
 	defer conn.Close()
-	client :=  proto.NewAuthenticationHandlerServiceApiClient(conn)
+	client := proto.NewAuthenticationHandlerServiceApiClient(conn)
 
 	for i := range [10]int{} {
 		newAccount := proto.CreateAccountRequest{
-			Email:                fmt.Sprintf("yoan_%s@gmail.com", util.GenerateRandomString(20 + i)),
-			Password:              fmt.Sprintf("%s", util.GenerateRandomString(20 + i)),
+			Email:                fmt.Sprintf("yoan_%s@gmail.com", util.GenerateRandomString(20+i)),
+			Password:             fmt.Sprintf("%s", util.GenerateRandomString(20+i)),
 			XXX_NoUnkeyedLiteral: struct{}{},
 			XXX_unrecognized:     nil,
 			XXX_sizecache:        0,
 		}
 
-		if responseMessage, e := client.CreateAccount (context.Background(), &newAccount); e != nil {
+		if responseMessage, e := client.CreateAccount(context.Background(), &newAccount); e != nil {
 			panic(fmt.Sprintf("Was not able to create Record %v", e))
 		} else {
 			fmt.Println("Record Inserted..")
