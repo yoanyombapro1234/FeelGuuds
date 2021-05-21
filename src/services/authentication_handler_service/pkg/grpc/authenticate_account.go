@@ -50,7 +50,7 @@ func (s *Server) AuthenticateAccount(ctx context.Context, req *proto.Authenticat
 	if token == "" {
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(constants.LOGIN_ACCOUNT)
 		err := status.Errorf(codes.Internal, "issue casting to jwt token")
-		s.logger.For(ctx).ErrorM(err, "casting error")
+		s.logger.For(ctx).Error(err, "casting error")
 		return nil, err
 	}
 
