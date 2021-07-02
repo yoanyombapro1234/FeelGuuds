@@ -40,6 +40,25 @@ func (s *Server) performRetryableRpcCall(ctx context.Context, f func() (interfac
 			retry.Timeout(time.Millisecond*time.Duration(s.config.RpcDeadline)),
 			retry.Sleep(time.Millisecond*time.Duration(s.config.RpcRetryBackoff)),
 		)
+
+		retries := 1
+		for retries < 4 {
+			// perform a test request to the authentication service
+			data, err := client.ServerStats()
+			if err != nil {
+				if retries != 4 {
+					logger.Error(err, "failed to connect to authentication service")
+				} else {
+					logger.Fatal(err, "failed to connect to authentication service")
+				}
+				retries += 1
+			} else {
+				retries = 4
+				logger.Info("data", zap.Any("result", data))
+			}
+
+			time.Sleep(1 * time.Second)
+		}
 	*/
 
 	err := func(conn chan<- interface{}) func() error {

@@ -10,7 +10,7 @@ import (
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 )
 
-// CreateAccount creates an account
+// AuthenticateAccount attempts to authenticate an account via the auto generate grpc client
 func (c *Client) AuthenticateAccount(ctx context.Context, email, password string) (string, error) {
 	request := &proto.AuthenticateAccountRequest{
 		Email:    email,

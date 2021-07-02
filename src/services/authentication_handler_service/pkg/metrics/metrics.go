@@ -12,6 +12,7 @@ type MetricsEngine struct {
 	Engine              *core_metrics.CoreMetricsEngine
 }
 
+// NewMetricsEngine initializes a new instance of the metrics engins
 func NewMetricsEngine(engine *core_metrics.CoreMetricsEngine, serviceName string) *MetricsEngine {
 	return &MetricsEngine{
 		MicroServiceMetrics: NewCoreMetrics(engine, serviceName),
@@ -31,12 +32,17 @@ type CoreMetrics struct {
 	ExtractIdOperationCounter *core_metrics.CounterVec
 	// tracks the number of times there was a failure or success when trying to extract id from the request url
 	RemoteOperationStatusCounter    *core_metrics.CounterVec
+	// tracks the latency of various remote operations
 	RemoteOperationsLatencyCounter  *core_metrics.HistogramVec
+	// tracks the number of invalid requests processed by the service
 	InvalidRequestParametersCounter *core_metrics.CounterVec
+	// tracks the number of failed casting operations captured by the service
 	CastingOperationFailureCounter  *core_metrics.CounterVec
+	// tracks the number of failed request decoding operations for the service
 	DecodeRequestStatusCounter      *core_metrics.CounterVec
 }
 
+// NewCoreMetrics returns a pointer reference to a metrics objects encapsulating all registered counters for this service
 func NewCoreMetrics(engine *core_metrics.CoreMetricsEngine, serviceName string) *CoreMetrics {
 	return &CoreMetrics{
 		ServiceName:                     serviceName,
@@ -51,6 +57,7 @@ func NewCoreMetrics(engine *core_metrics.CoreMetricsEngine, serviceName string) 
 	}
 }
 
+// NewGRPCRequestCounter returns a counter instance capturing the number of grpd requests
 func NewGRPCRequestCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.CounterVec {
 	newCounter := core_metrics.NewCounterVec(&core_metrics.CounterOpts{
 		Namespace: serviceName,
@@ -63,6 +70,7 @@ func NewGRPCRequestCounter(engine *core_metrics.CoreMetricsEngine, serviceName s
 	return newCounter
 }
 
+// NewGRPCRequestLatencyCounter returns a counter instance capturing the request latency of a grpc operation
 func NewGRPCRequestLatencyCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.HistogramVec {
 	newCounter := core_metrics.NewHistogramVec(&core_metrics.HistogramOpts{
 		Namespace:         serviceName,
@@ -78,6 +86,7 @@ func NewGRPCRequestLatencyCounter(engine *core_metrics.CoreMetricsEngine, servic
 	return newCounter
 }
 
+// NewExtractIdOperationCounter returns an instance of the status of the extract id operation counter
 func NewExtractIdOperationCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.CounterVec {
 	// tracks the number of times there was a failure or success when trying to extract id from the request url
 	newCounter := core_metrics.NewCounterVec(&core_metrics.CounterOpts{
@@ -90,6 +99,7 @@ func NewExtractIdOperationCounter(engine *core_metrics.CoreMetricsEngine, servic
 	return newCounter
 }
 
+// NewRemoteOperationStatusCounter returns an instance of a counter capturing the status of an rpc operation
 func NewRemoteOperationStatusCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.CounterVec {
 	newCounter := core_metrics.NewCounterVec(&core_metrics.CounterOpts{
 		Namespace: serviceName,
@@ -101,6 +111,7 @@ func NewRemoteOperationStatusCounter(engine *core_metrics.CoreMetricsEngine, ser
 	return newCounter
 }
 
+// NewRemoteOperationLatencyCounter returns an instance of the rpc operation latency counter
 func NewRemoteOperationLatencyCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.HistogramVec {
 	newCounter := core_metrics.NewHistogramVec(&core_metrics.HistogramOpts{
 		Namespace:         serviceName,
@@ -116,6 +127,7 @@ func NewRemoteOperationLatencyCounter(engine *core_metrics.CoreMetricsEngine, se
 	return newCounter
 }
 
+// NewInvalidRequestParametersCounter returns an instance of the invalid request parameters counter
 func NewInvalidRequestParametersCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.CounterVec {
 	newCounter := core_metrics.NewCounterVec(&core_metrics.CounterOpts{
 		Namespace: serviceName,
@@ -127,6 +139,7 @@ func NewInvalidRequestParametersCounter(engine *core_metrics.CoreMetricsEngine, 
 	return newCounter
 }
 
+// NewCastingOperationFailureCounter returns an instance of the casting operation failure counter
 func NewCastingOperationFailureCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.CounterVec {
 	newCounter := core_metrics.NewCounterVec(&core_metrics.CounterOpts{
 		Namespace: serviceName,
@@ -138,6 +151,7 @@ func NewCastingOperationFailureCounter(engine *core_metrics.CoreMetricsEngine, s
 	return newCounter
 }
 
+// NewDecodeRequestStatusCounter returns an instance of the request status counter
 func NewDecodeRequestStatusCounter(engine *core_metrics.CoreMetricsEngine, serviceName string) *core_metrics.CounterVec {
 	newCounter := core_metrics.NewCounterVec(&core_metrics.CounterOpts{
 		Namespace: serviceName,

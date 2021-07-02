@@ -69,7 +69,7 @@ func TestAuthenticationHandlerServiceClient_AuthenticateAccount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := NewClient(conn, 5*time.Second)
+			c := NewClient(conn, 55*time.Second)
 			if tt.shouldCreateAccount {
 				_, err := createAccountTestHelper(c, ctx, tt.email, tt.password)
 				if err != nil {

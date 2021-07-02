@@ -7,6 +7,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/giantswarm/retry-go"
 	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-lib/metrics/prometheus"
 	"go.uber.org/zap"
@@ -103,6 +104,8 @@ func NewMockServer(authClientMockStub core_auth_sdk.AuthService) *Server {
 
 // InitializeAuthnClient creates a connection to the authn service
 func InitializeAuthnClient(logger core_logging.ILog) (core_auth_sdk.AuthService, error) {
+	// var response = make(chan interface{}, 1)
+
 	client, err := core_auth_sdk.NewClient(core_auth_sdk.Config{
 		// The AUTHN_URL of your Keratin AuthN server. This will be used to verify tokens created by
 		// AuthN, and will also be used for API calls unless PrivateBaseURL is also set.
@@ -128,8 +131,6 @@ func InitializeAuthnClient(logger core_logging.ILog) (core_auth_sdk.AuthService,
 		MaxRetryWaitTime: 10 * time.Millisecond,
 		RequestTimeout:   400 * time.Millisecond,
 	})
-
-	// TODO: make this a retryable operation
 	retries := 1
 	for retries < 4 {
 		// perform a test request to the authentication service
@@ -146,10 +147,34 @@ func InitializeAuthnClient(logger core_logging.ILog) (core_auth_sdk.AuthService,
 			logger.Info("data", zap.Any("result", data))
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(3 * time.Second)
 	}
 
+	// err = ConnectToDownstreamService(logger, client, response)
+
 	return client, err
+}
+
+// ConnectToDownstreamService attempts to connect to a downstream service
+func ConnectToDownstreamService(logger core_logging.ILog, client *core_auth_sdk.Client, response chan interface{}) error {
+	return retry.Do(
+		func(conn chan<- interface{}) func() error {
+			return func() error {
+				data, err := client.ServerStats()
+				if err != nil {
+					logger.Error(err, "failed to connect to authentication service")
+					return err
+				}
+
+				logger.Info("data", zap.Any("result", data))
+
+				response <- data
+				return nil
+			}
+		}(response),
+		retry.MaxTries(5),
+		retry.Timeout(time.Millisecond*time.Duration(10)),
+		retry.Sleep(time.Millisecond*time.Duration(10)))
 }
 
 // InitializeLoggingEngine initializes logging object

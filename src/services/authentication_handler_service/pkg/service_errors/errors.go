@@ -45,6 +45,7 @@ var (
 	ErrUnauthorizedRequest               = status.Errorf(codes.Unauthenticated, "unauthorized request")
 )
 
+// NewError returns a new error type based on some defined error message
 func NewError(msg string) error {
 	return errors.New(msg)
 }

@@ -12,6 +12,7 @@ import (
 	s_grpc "github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/grpc"
 )
 
+// dialer attempts to connect to a grpc service
 func dialer() func(context.Context, string) (net.Conn, error) {
 	listener := bufconn.Listen(1024 * 1024)
 	server := grpc.NewServer()

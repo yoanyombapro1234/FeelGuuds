@@ -1,4 +1,4 @@
-# Makefile for releasing service
+# Makefile for releasing Authentication handler service
 #
 # The release version is controlled from pkg/version
 
@@ -26,32 +26,48 @@ else
 	OPEN_COVERAGE_HTML :=
 endif
 
+# runs an instance of the service locally
+.PHONY: run
 run:
 	go run -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version.REVISION=$(GIT_COMMIT)" cmd/service/* \
 	--level=debug --grpc-port=9999 --backend-url=https://httpbin.org/status/401 --backend-url=https://httpbin.org/status/500 \
 	--ui-logo=https://raw.githubusercontent.com/stefanprodan/service/gh-pages/cuddle_clap.gif $(EXTRA_RUN_ARGS)
 
+# builds the service as an executable
+.PHONY: build
 build:
 	GIT_COMMIT=$$(git rev-list -1 HEAD) && CGO_ENABLED=0 go build  -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version.REVISION=$(GIT_COMMIT)" -a -o ./bin/service ./cmd/service/*
 	GIT_COMMIT=$$(git rev-list -1 HEAD) && CGO_ENABLED=0 go build  -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version.REVISION=$(GIT_COMMIT)" -a -o ./bin/servicecli ./cmd/servicecli/*
 
+# formats the service's codebase
+.PHONY: fmt
 fmt:
 	gofmt -l -s -w ./
 	goimports -l -w ./
 
+# builds various associated helm charts
+.PHONY: build-charts
 build-charts:
 	helm lint charts/*
 	helm package charts/*
 
+# builds a docker container in which the service's executable will run
+.PHONY: build-container
 build-container:
 	docker build -t $(DOCKER_IMAGE_NAME):$(VERSION) .
 
+# buidls the base image of the docker build
+.PHONY: build-base
 build-base:
 	docker build -f Dockerfile.base -t $(DOCKER_REPOSITORY)/$(NAME)-base:latest .
 
+# builds the final part of the docker build
+.PHONY: push-base
 push-base: build-base
 	docker push $(DOCKER_REPOSITORY)/$(NAME)-base:latest
 
+# test the docker container (endpoint test) TODO: expand this -- perform a suite of operations against the container
+.PHONY: test-container
 test-container:
 	@docker rm -f $(NAME) || true
 	@docker run -dp 9898:9898 --name=$(NAME) $(DOCKER_IMAGE_NAME):$(VERSION)
@@ -59,6 +75,8 @@ test-container:
 	@TOKEN=$$(curl -sd 'test' localhost:9898/token | jq -r .token) && \
 	curl -sH "Authorization: Bearer $${TOKEN}" localhost:9898/token/validate | grep test
 
+# push the container to some docker registry
+.PHONY: push-container
 push-container:
 	docker tag $(DOCKER_IMAGE_NAME):$(VERSION) $(DOCKER_IMAGE_NAME):latest
 	docker push $(DOCKER_IMAGE_NAME):$(VERSION)
@@ -68,6 +86,8 @@ push-container:
 	docker push quay.io/$(DOCKER_IMAGE_NAME):$(VERSION)
 	docker push quay.io/$(DOCKER_IMAGE_NAME):latest
 
+# set the version of the service
+.PHONY: version-set
 version-set:
 	@next="$(TAG)" && \
 	current="$(VERSION)" && \
@@ -83,14 +103,20 @@ version-set:
 	sed -i '' "s/service:$$current/service:$$next/g" deploy/bases/backend/deployment.yaml && \
 	echo "Version $$next set in code, deployment, chart and kustomize"
 
+# define a release of the current code base
+.PHONY: release
 release:
 	git tag $(VERSION)
 	git push origin $(VERSION)
 
+# generate swagger docs for the service
+.PHONY: swagger
 swagger:
 	go get github.com/swaggo/swag/cmd/swag
 	cd pkg/api && $$(go env GOPATH)/bin/swag init -g server.go
 
+# generate grpc models based on protocol buffers
+.PHONY: protogen
 protogen:
 	protoc -I. \
 		-I$(GOPATH)/src \
@@ -101,13 +127,19 @@ protogen:
 		-I=$(GOPATH)/src/github.com/protobuf/src/google/protobuf/timestamp.proto \
 		--gogoopsee_out=plugins=grpc+graphql,Mopsee/protobuf/opsee.proto=github.com/opsee/protobuf/opseeproto,Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/protoc-gen-gogo/descriptor:./gen/ --proto_path=$(GOPATH)/src:. ./proto/*.proto
 
+# terminate the current set of docker containers
+.PHONY: kill-containers
 kill-containers:
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml down
 
+# start docker containers in the backgound
+.PHONY: start-containers
 start-containers:
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans --detach
 
+# start docker containers with logs running in the foreground
+.PHONY: start-containers-live
 start-containers-live:
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans
@@ -137,7 +169,7 @@ go-mod:
 .PHONY: test
 test: start-containers
 	echo "sleeping for 60 seconds before running unit tests"
-	sleep 60s
+	sleep 90s
 	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover | tparse -all -top
 
@@ -161,6 +193,7 @@ load-test: start-containers
 	cd ./load_test && ./load.sh
 	cd ../
 
+# profile the serivice
 .PHONY: install-pprof
 install-pprof:
 	go get -u github.com/google/pprof
