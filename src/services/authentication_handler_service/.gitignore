@@ -12,6 +12,10 @@
 
 .DS_Store
 
+# remove any .tmp file generated from load tests
+.tmp/
+.tmp
+
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 .idea/
