@@ -30,7 +30,7 @@ func (s *Server) storeWriteHandler(w http.ResponseWriter, r *http.Request) {
 	hash := hash(string(body))
 	err = ioutil.WriteFile(path.Join(s.config.DataPath, hash), body, 0644)
 	if err != nil {
-		s.logger.Warn("writing file failed", zap.Error(err), zap.String("file", path.Join(s.config.DataPath, hash)))
+		s.logger.Info("writing file failed", zap.Error(err), zap.String("file", path.Join(s.config.DataPath, hash)))
 		s.ErrorResponse(w, r, "writing file failed", http.StatusInternalServerError)
 		return
 	}
@@ -49,7 +49,7 @@ func (s *Server) storeReadHandler(w http.ResponseWriter, r *http.Request) {
 	hash := mux.Vars(r)["hash"]
 	content, err := ioutil.ReadFile(path.Join(s.config.DataPath, hash))
 	if err != nil {
-		s.logger.Warn("reading file failed", zap.Error(err), zap.String("file", path.Join(s.config.DataPath, hash)))
+		s.logger.Info("reading file failed", zap.Error(err), zap.String("file", path.Join(s.config.DataPath, hash)))
 		s.ErrorResponse(w, r, "reading file failed", http.StatusInternalServerError)
 		return
 	}

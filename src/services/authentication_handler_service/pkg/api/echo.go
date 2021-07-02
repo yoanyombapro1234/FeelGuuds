@@ -24,7 +24,7 @@ import (
 func (s *Server) echoHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		s.logger.Error("reading the request body failed", zap.Error(err))
+		s.logger.Error(err, "reading the request body failed", zap.Error(err))
 		s.ErrorResponse(w, r, "invalid request body", http.StatusBadRequest)
 		return
 	}
@@ -38,7 +38,7 @@ func (s *Server) echoHandler(w http.ResponseWriter, r *http.Request) {
 				defer wg.Done()
 				backendReq, err := http.NewRequest("POST", backend, bytes.NewReader(body))
 				if err != nil {
-					s.logger.Error("backend call failed", zap.Error(err), zap.String("url", backend))
+					s.logger.Error(err, "backend call failed", zap.Error(err), zap.String("url", backend))
 					return
 				}
 
@@ -54,7 +54,7 @@ func (s *Server) echoHandler(w http.ResponseWriter, r *http.Request) {
 				// call backend
 				resp, err := http.DefaultClient.Do(backendReq.WithContext(ctx))
 				if err != nil {
-					s.logger.Error("backend call failed", zap.Error(err), zap.String("url", backend))
+					s.logger.Error(err, "backend call failed", zap.Error(err), zap.String("url", backend))
 					result[index] = fmt.Sprintf("backend %v call failed %v", backend, err)
 					return
 				}
@@ -62,7 +62,7 @@ func (s *Server) echoHandler(w http.ResponseWriter, r *http.Request) {
 
 				// copy error status from backend and exit
 				if resp.StatusCode >= 400 {
-					s.logger.Error("backend call failed", zap.Int("status", resp.StatusCode), zap.String("url", backend))
+					s.logger.Error(err, "backend call failed", zap.Int("status", resp.StatusCode), zap.String("url", backend))
 					result[index] = fmt.Sprintf("backend %v response status code %v", backend, resp.StatusCode)
 					return
 				}
@@ -70,7 +70,7 @@ func (s *Server) echoHandler(w http.ResponseWriter, r *http.Request) {
 				// forward the received body
 				rbody, err := ioutil.ReadAll(resp.Body)
 				if err != nil {
-					s.logger.Error(
+					s.logger.Error(err,
 						"reading the backend request body failed",
 						zap.Error(err),
 						zap.String("url", backend))
@@ -78,7 +78,7 @@ func (s *Server) echoHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
-				s.logger.Debug(
+				s.logger.Info(
 					"payload received from backend",
 					zap.String("response", string(rbody)),
 					zap.String("url", backend))

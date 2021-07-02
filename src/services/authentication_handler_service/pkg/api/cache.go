@@ -37,7 +37,7 @@ func (s *Server) cacheWriteHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 	_, err = conn.Do("SET", key, string(body))
 	if err != nil {
-		s.logger.Warn("cache set failed", zap.Error(err))
+		s.logger.Info("cache set failed", zap.Error(err))
 		s.ErrorResponse(w, r, "cache set failed", http.StatusInternalServerError)
 		return
 	}
@@ -65,7 +65,7 @@ func (s *Server) cacheDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 	_, err := conn.Do("DEL", key)
 	if err != nil {
-		s.logger.Warn("cache delete failed", zap.Error(err))
+		s.logger.Info("cache delete failed", zap.Error(err))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -94,14 +94,14 @@ func (s *Server) cacheReadHandler(w http.ResponseWriter, r *http.Request) {
 
 	ok, err := redis.Bool(conn.Do("EXISTS", key))
 	if err != nil || !ok {
-		s.logger.Warn("cache key not found", zap.String("key", key))
+		s.logger.Info("cache key not found", zap.String("key", key))
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	data, err := redis.String(conn.Do("GET", key))
 	if err != nil {
-		s.logger.Warn("cache get failed", zap.Error(err))
+		s.logger.Info("cache get failed", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -130,7 +130,7 @@ func (s *Server) startCachePool(ticker *time.Ticker, stopCh <-chan struct{}) {
 	setVersion := func() {
 		conn := s.pool.Get()
 		if _, err := conn.Do("SET", s.config.Hostname, version.VERSION, "EX", 60); err != nil {
-			s.logger.Warn("cache server is offline", zap.Error(err), zap.String("server", s.config.CacheServer))
+			s.logger.Info("cache server is offline", zap.Error(err), zap.String("server", s.config.CacheServer))
 		}
 		_ = conn.Close()
 	}

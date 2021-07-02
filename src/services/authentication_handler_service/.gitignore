@@ -20,3 +20,8 @@ build/
 gcloud/
 dist/
 bin/
+data/
+.temp/*
+*.temp
+*.result
+*.result/

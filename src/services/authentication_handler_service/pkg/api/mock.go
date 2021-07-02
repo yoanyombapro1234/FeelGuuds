@@ -1,10 +1,20 @@
 package api
 
 import (
+	"context"
+	"io"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-lib/metrics/prometheus"
 	"go.uber.org/zap"
+
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
+	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
+	core_metrics "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics"
+	core_tracing "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/metrics"
 )
 
 func NewMockServer() *Server {
@@ -22,11 +32,118 @@ func NewMockServer() *Server {
 		Hostname:                  "localhost",
 	}
 
-	logger, _ := zap.NewDevelopment()
+	const serviceName string = "test"
 
-	return &Server{
-		router: mux.NewRouter(),
-		logger: logger,
-		config: config,
+	// initiate tracing engine
+	tracerEngine, closer := InitializeTracingEngine(serviceName)
+	defer closer.Close()
+	ctx := context.Background()
+
+	// initiate metrics engine
+	serviceMetrics := InitializeMetricsEngine(serviceName)
+
+	// initiate logging client
+	logger := InitializeLoggingEngine(ctx)
+
+	// authn client
+	authnClient, err := InitializeAuthnClient(logger)
+	if err != nil {
+		logger.For(ctx).Fatal(err, "unable to setup mock server")
 	}
+
+	srv := &Server{
+		router:        mux.NewRouter(),
+		config:        config,
+		tracerEngine:  tracerEngine,
+		metricsEngine: serviceMetrics.Engine,
+		metrics:       serviceMetrics.MicroServiceMetrics,
+		logger:        logger,
+		authnClient:   authnClient,
+	}
+
+	// authMw := middleware.NewAuthnMw(srv.authnClient, srv.logger)
+	// srv.router.Use(authMw.AuthenticationMiddleware)
+
+	return srv
+}
+
+func InitializeAuthnClient(logger core_logging.ILog) (*core_auth_sdk.Client, error) {
+	// TODO Move this to errors folder
+	const username string = "blackspaceinc"
+	const password string = "blackspaceinc"
+	const audience string = "localhost"
+	const issuer string = "http://localhost:8404"
+	const origin string = "http://localhost"
+	const privateBaseUrl string = "http://localhost:8404"
+
+	client, err := core_auth_sdk.NewClient(core_auth_sdk.Config{
+		// The AUTHN_URL of your Keratin AuthN server. This will be used to verify tokens created by
+		// AuthN, and will also be used for API calls unless PrivateBaseURL is also set.
+		Issuer: issuer,
+
+		// The domain of your application (no protocol). This domain should be listed in the APP_DOMAINS
+		// of your Keratin AuthN server.
+		Audience: audience,
+
+		// Credentials for AuthN's private endpoints. These will be used to execute admin actions using
+		// the Client provided by this library.
+		//
+		// TIP: make them extra secure in production!
+		Username: username,
+		Password: password,
+
+		// RECOMMENDED: Send private API calls to AuthN using private network routing. This can be
+		// necessary if your environment has a firewall to limit public endpoints.
+		PrivateBaseURL: privateBaseUrl,
+	}, origin, &core_auth_sdk.RetryConfig{
+		MaxRetries:       5,
+		MinRetryWaitTime: 5 * time.Millisecond,
+		MaxRetryWaitTime: 15 * time.Millisecond,
+		RequestTimeout:   400 * time.Millisecond,
+	})
+
+	// TODO: make this a retryable operation
+	retries := 1
+	for retries < 4 {
+		// perform a test request to the authentication service
+		data, err := client.ServerStats()
+		if err != nil {
+			if retries != 4 {
+				logger.Error(err, "failed to connect to authentication service")
+			} else {
+				logger.Fatal(err, "failed to connect to authentication service")
+			}
+			retries += 1
+		} else {
+			retries = 4
+			logger.Info("data", zap.Any("result", data))
+		}
+
+		time.Sleep(1 * time.Second)
+	}
+
+	return client, err
+}
+
+func InitializeLoggingEngine(ctx context.Context) core_logging.ILog {
+	// initiate authn client
+	rootSpan := opentracing.SpanFromContext(ctx)
+
+	// create logging object
+	logger := core_logging.NewJSONLogger(nil, rootSpan)
+	return logger
+}
+
+func InitializeMetricsEngine(serviceName string) *metrics.MetricsEngine {
+	coreMetrics := core_metrics.NewCoreMetricsEngineInstance(serviceName, nil)
+	serviceMetrics := metrics.NewMetricsEngine(coreMetrics, "mock")
+	return serviceMetrics
+}
+
+func InitializeTracingEngine(serviceName string) (*core_tracing.TracingEngine, io.Closer) {
+	// TODO move this to constant folder
+	const collectorEndpoint string = "http://localhost:14268/api/traces"
+
+	// initiaize a tracing object globally
+	return core_tracing.NewTracer(serviceName, collectorEndpoint, prometheus.New())
 }
