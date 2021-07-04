@@ -1,10 +1,8 @@
 # FeelGuuds Authentication Handler Service - (Recon)
 
-[![e2e](https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/blob/master/.github/workflows/e2e.yml)
-[![test](https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/workflows/test/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/blob/master/.github/workflows/test.yml)
-[![cve-scan](https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/workflows/cve-scan/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/blob/master/.github/workflows/cve-scan.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service)](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service)
-[![Docker Pulls](https://img.shields.io/docker/pulls/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service)](https://hub.docker.com/r/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service)
+[![Continuous Integration Pipeline](https://github.com/stefanprodan/podinfo/workflows/e2e/badge.svg)](https://github.com/yoanyombapro1234/FeelGuuds/blob/main/.github/workflows/authentication_handler_service.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/yoanyombapro1234/FeelGuuds)](https://goreportcard.com/report/github.com/yoanyombapro1234/FeelGuuds)
+
 
 Specifications:
 
@@ -181,3 +179,5 @@ flux -n default delete helmrelease service
 If you wish to manage the lifecycle of your applications in a **GitOps** manner, check out
 this [workflow example](https://github.com/fluxcd/flux2-kustomize-helm-example)
 for multi-env deployments with Flux, Kustomize and Helm.
+
+##  [Authentication Handler Service Documentation](./docs/designdoc.md#introduction)

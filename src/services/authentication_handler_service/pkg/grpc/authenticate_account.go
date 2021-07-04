@@ -1,0 +1,64 @@
+package grpc
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/opentracing/opentracing-go"
+	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/constants"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
+)
+
+// AuthenticateAccount authenticates the current user account against the authentication service ensuring the credentials defined exist
+func (s *Server) AuthenticateAccount(ctx context.Context, req *proto.AuthenticateAccountRequest) (*proto.AuthenticateAccountResponse, error) {
+	ctx = s.setCtxRequestTimeout(ctx)
+	ctx, parentSpan := s.StartRootSpan(ctx, constants.LOGIN_ACCOUNT)
+	defer parentSpan.Finish()
+
+	if req == nil {
+		return nil, service_errors.ErrInvalidInputArguments
+	}
+
+	if req.Email == "" || req.Password == "" {
+		s.metrics.InvalidRequestParametersCounter.WithLabelValues(constants.LOGIN_ACCOUNT).Inc()
+
+		err := service_errors.ErrInvalidInputArguments
+		s.logger.Error(err, "invalid input parameters. please specify a valid email and password")
+
+		return nil, err
+	}
+
+	var (
+		operation = func() (interface{}, error) {
+			return s.authnClient.LoginAccount(req.Email, req.Password)
+		}
+	)
+
+	ctx = opentracing.ContextWithSpan(ctx, parentSpan)
+	result, err := s.PerformRetryableRPCOperation(ctx, parentSpan, operation, constants.LOGIN_ACCOUNT)()
+	if err != nil {
+		s.logger.Error(err, err.Error())
+		return nil, err
+	}
+
+	token := fmt.Sprintf("%v", result)
+	if token == "" {
+		s.metrics.CastingOperationFailureCounter.WithLabelValues(constants.LOGIN_ACCOUNT)
+		err := status.Errorf(codes.Internal, "issue casting to jwt token")
+		s.logger.For(ctx).Error(err, "casting error")
+		return nil, err
+	}
+
+	s.logger.For(ctx).Info("Successfully authenticated user account", zap.String("jwt", token))
+	response := &proto.AuthenticateAccountResponse{
+		Token: token,
+		Error: "",
+	}
+
+	return response, nil
+}

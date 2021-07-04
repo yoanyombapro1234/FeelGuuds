@@ -1,5 +1,5 @@
 /*
-Copyright 2019 The Blackspace Authors.
+Copyright 2019 The Feelguuds Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,10 +33,31 @@ import (
 // Inspired from https://github.com/go-logr/zapr, some functions is copy from the repo.
 type ILog interface {
 	logr.Logger
-	InfoM(msg string, zapKeysAndVals ...zap.Field)
-	ErrorM(err error, msg string)
-	FatalM(err error, msg string)
+
+	// Fatal logs an error message with the given message as additional context.
+	//
+	// The msg argument should be used to add some constant description to
+	// the log line.
+	Fatal(err error, msg string)
+
+	// For wraps the current log handle with various context centric variables (utilized in request tracing)
 	For(ctx context.Context) ILog
+
+	// Warn logs a non-error message with the given key/value pairs as context.
+	//
+	// The msg argument should be used to add some constant description to
+	// the log line.  The key/value pairs can then be used to add additional
+	// variable information.  The key/value pairs should alternate string
+	// keys and arbitrary values.
+	Warn(msg string, keysAndValues ...interface{})
+
+	// Debug logs a non-error message with the given key/value pairs as context.
+	//
+	// The msg argument should be used to add some constant description to
+	// the log line.  The key/value pairs can then be used to add additional
+	// variable information.  The key/value pairs should alternate string
+	// keys and arbitrary values.
+	Debug(msg string, keysAndValues ...interface{})
 }
 
 var (
@@ -48,6 +69,15 @@ var (
 
 	// witholds a handle on a trancing object with which the library can log traces
 	Span opentracing.Span
+
+	logLevelMap = map[zapcore.Level]string {
+		zapcore.DebugLevel: "debug",
+		zapcore.InfoLevel: "info",
+		zapcore.WarnLevel: "warn",
+		zapcore.ErrorLevel: "err",
+		zapcore.FatalLevel: "fatal",
+		zapcore.DPanicLevel: "panic",
+	}
 )
 
 const (
@@ -72,40 +102,86 @@ func (l *zapLogger) Enabled() bool {
 	return true
 }
 
-// InfoM write zap log message to error level log
-func (l *zapLogger) InfoM(msg string, zapKeysAndVals ...zap.Field) {
-	entry := zapcore.Entry{
-		Time:    timeNow(),
-		Message: msg,
-	}
-	checkedEntry := l.l.Core().Check(entry, nil)
-	checkedEntry.Write(zapKeysAndVals...)
-	l.logToSpan("info", msg, zapKeysAndVals...)
+// Error write log message to error level
+func (l *zapLogger) Error(err error, msg string, keysAndValues ...interface{}){
+	var logLevelType = zapcore.ErrorLevel
+	var loglevel = logLevelMap[logLevelType]
+
+	entry := l.configureCoreLoggingLevel(msg, logLevelType)
+	l.logInternal(msg, keysAndValues, entry, loglevel, err)
 }
 
-// Info write message to error level log
+// Info write message to info level log
 func (l *zapLogger) Info(msg string, keysAndVals ...interface{}) {
-	entry := zapcore.Entry{
-		Time:    timeNow(),
-		Message: msg,
-	}
-	checkedEntry := l.l.Core().Check(entry, nil)
-	checkedEntry.Write(l.handleFields(keysAndVals)...)
-	l.logToSpan("info", msg, l.handleFields(keysAndVals)...)
+	var logLevelType = zapcore.InfoLevel
+	var loglevel = logLevelMap[logLevelType]
+
+	entry := l.configureCoreLoggingLevel(msg, logLevelType)
+	l.logInternal(msg, keysAndVals, entry, loglevel, nil)
+}
+
+// Warn write message to warn level log
+func (l *zapLogger) Warn(msg string, keysAndVals ...interface{}) {
+	var logLevelType = zapcore.WarnLevel
+	var loglevel = logLevelMap[logLevelType]
+
+	entry := l.configureCoreLoggingLevel(msg, logLevelType)
+	l.logInternal(msg, keysAndVals, entry, loglevel, nil)
+}
+
+// Debug write message to warn level log
+func (l *zapLogger) Debug(msg string, keysAndVals ...interface{}) {
+	var logLevelType = zapcore.DebugLevel
+	var loglevel = logLevelMap[logLevelType]
+
+	entry := l.configureCoreLoggingLevel(msg, logLevelType)
+	l.logInternal(msg, keysAndVals, entry, loglevel, nil)
+}
+
+// Fatal writes zap  log message to error level and calls os.exit(255)
+func (l *zapLogger) Fatal(err error, msg string) {
+	var logLevelType = zapcore.FatalLevel
+	var loglevel = logLevelMap[logLevelType]
+
+	entry := l.configureCoreLoggingLevel(msg, logLevelType)
+	l.logInternal(msg, nil, entry, loglevel, err)
+	tag.Error.Set(l.span, true)
+
+	os.Exit(255)
 }
 
 // dPanic write message to DPanicLevel level log
 // we need implement this because unit test case need stub time.Now
 // otherwise the ts field always changed
 func (l *zapLogger) dPanic(msg string) {
+	var logLevelType = zapcore.DPanicLevel
+	var loglevel = logLevelMap[logLevelType]
+
+	entry := l.configureCoreLoggingLevel(msg, logLevelType)
+	l.logInternal(msg, nil, entry, loglevel, nil)
+}
+
+func (l *zapLogger) logInternal(msg string, keysAndVals []interface{}, entry zapcore.Entry, loglevel string,  err error) {
+	checkedEntry := l.l.Core().Check(entry, nil)
+
+	if entry.Level == zapcore.DPanicLevel{
+		checkedEntry.Write(zap.Int("v", l.lvl))
+	} else if err == nil {
+		checkedEntry.Write(l.handleFields(keysAndVals)...)
+	} else {
+		checkedEntry.Write(l.handleFields(keysAndVals, handleError(err))...)
+	}
+
+	l.logToSpan(loglevel, msg, l.handleFields(keysAndVals)...)
+}
+
+func (l *zapLogger) configureCoreLoggingLevel(msg string, level zapcore.Level) zapcore.Entry {
 	entry := zapcore.Entry{
-		Level:   zapcore.DPanicLevel,
+		Level:   level,
 		Time:    timeNow(),
 		Message: msg,
 	}
-	checkedEntry := l.l.Core().Check(entry, nil)
-	checkedEntry.Write(zap.Int("v", l.lvl))
-	l.logToSpan("panic", msg)
+	return entry
 }
 
 // handleFields converts a bunch of arbitrary key-value pairs into Zap fields.  It takes
@@ -147,47 +223,6 @@ func (l *zapLogger) handleFields(args []interface{}, additional ...zap.Field) []
 	return append(fields, additional...)
 }
 
-// Error write log message to error level
-func (l *zapLogger) Error(err error, msg string, keysAndVals ...interface{}) {
-	entry := zapcore.Entry{
-		Level:   zapcore.ErrorLevel,
-		Time:    timeNow(),
-		Message: msg,
-	}
-	checkedEntry := l.l.Core().Check(entry, nil)
-	checkedEntry.Write(l.handleFields(keysAndVals, handleError(err))...)
-	l.logToSpan("error", msg, l.handleFields(keysAndVals)...)
-}
-
-// ErrorM writes zap  log message to error level
-func (l *zapLogger) ErrorM(err error, msg string) {
-	entry := zapcore.Entry{
-		Level:   zapcore.ErrorLevel,
-		Time:    timeNow(),
-		Message: msg,
-	}
-
-	checkedEntry := l.l.Core().Check(entry, nil)
-	checkedEntry.Write(handleError(err))
-	l.logToSpan("error", msg)
-}
-
-// FatalM writes zap  log message to error level and calls os.exit(255)
-func (l *zapLogger) FatalM(err error, msg string) {
-	entry := zapcore.Entry{
-		Level:   zapcore.ErrorLevel,
-		Time:    timeNow(),
-		Message: msg,
-	}
-
-	checkedEntry := l.l.Core().Check(entry, nil)
-	checkedEntry.Write(handleError(err))
-	l.logToSpan("fatal", msg)
-	tag.Error.Set(l.span, true)
-
-	os.Exit(255)
-}
-
 // V return info logr.Logger  with specified level
 func (l *zapLogger) V(level int) logr.Logger {
 	opentracing.SetGlobalTracer(opentracing.GlobalTracer())
@@ -221,6 +256,7 @@ func (l *zapLogger) With(fields ...zapcore.Field) ILog {
 	return &zapLogger{l: l.WithSpanFields(fields...), span: l.span, spanFields: l.spanFields}
 }
 
+// For decorates a log handler with various context centric variables
 func (l *zapLogger) For(ctx context.Context) ILog {
 	if span := opentracing.SpanFromContext(ctx); span != nil {
 		l.span = span
@@ -236,6 +272,7 @@ func (l *zapLogger) For(ctx context.Context) ILog {
 	return l
 }
 
+// logToSpan logs fields to span
 func (l *zapLogger) logToSpan(level string, msg string, fields ...zapcore.Field) {
 	// TODO rather than always converting the fields, we could wrap them into a lazy logger
 	fa := fieldAdapter(make([]log.Field, 0, 2+len(fields)))
@@ -278,6 +315,7 @@ func NewJSONLogger(w zapcore.WriteSyncer, span opentracing.Span) ILog {
 	}
 }
 
+// handleError converts an error to a named zap error
 func handleError(err error) zap.Field {
 	return zap.NamedError("err", err)
 }
