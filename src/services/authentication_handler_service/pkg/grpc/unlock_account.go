@@ -21,7 +21,7 @@ func (s *Server) UnLockAccount(ctx context.Context, req *proto.UnLockAccountRequ
 	}
 
 	err, ok := s.IsValidID(req.Id, operationType)
-	if!ok {
+	if !ok {
 		return nil, err
 	}
 

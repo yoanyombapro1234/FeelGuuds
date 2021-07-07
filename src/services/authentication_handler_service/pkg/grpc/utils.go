@@ -17,7 +17,7 @@ func (s *Server) IsPasswordOrEmailInValid(email string, password string, operati
 		return err, true
 	}
 
-	err , ok = s.IsValidPassword(password, operationType)
+	err, ok = s.IsValidPassword(password, operationType)
 	if !ok {
 		return err, true
 	}

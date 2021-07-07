@@ -21,7 +21,7 @@ func (s *Server) UpdateAccount(ctx context.Context, req *proto.UpdateAccountRequ
 	}
 
 	err, ok := s.IsValidID(req.Id, operationType)
-	if!ok {
+	if !ok {
 		return nil, err
 	}
 

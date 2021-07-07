@@ -21,7 +21,7 @@ func (s *Server) LogoutAccount(ctx context.Context, req *proto.LogoutAccountRequ
 	}
 
 	err, ok := s.IsValidID(req.Id, operationType)
-	if!ok {
+	if !ok {
 		return nil, err
 	}
 

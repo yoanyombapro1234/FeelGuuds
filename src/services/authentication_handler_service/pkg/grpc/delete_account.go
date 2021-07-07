@@ -21,7 +21,7 @@ func (s *Server) DeleteAccount(ctx context.Context, req *proto.DeleteAccountRequ
 	}
 
 	err, ok := s.IsValidID(req.Id, operationType)
-	if!ok {
+	if !ok {
 		return nil, err
 	}
 
@@ -38,4 +38,3 @@ func (s *Server) DeleteAccount(ctx context.Context, req *proto.DeleteAccountRequ
 		Error: "",
 	}, nil
 }
-

@@ -21,7 +21,7 @@ func (s *Server) LockAccount(ctx context.Context, req *proto.LockAccountRequest)
 	}
 
 	err, ok := s.IsValidID(req.Id, operationType)
-	if!ok {
+	if !ok {
 		return nil, err
 	}
 

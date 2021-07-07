@@ -11,8 +11,18 @@ type DownStreamOperation func() (interface{}, error)
 // ServiceDependentOperations defines a set of downstream service operations this service relies on
 type ServiceDependentOperations interface {
 	// CallAuthenticationService performs a downstream call to the authentication service
-	CallAuthenticationService(client *core_auth_sdk.AuthService) DownStreamOperation
+	CallAuthenticationService(client core_auth_sdk.AuthService) DownStreamOperation
 }
+
+// ensure we have compile time failures if structs ever fail to adhere to the following interface
+var _ ServiceDependentOperations = (*AuthenticateAccountRequest)(nil)
+var _ ServiceDependentOperations = (*CreateAccountRequest)(nil)
+var _ ServiceDependentOperations = (*DeleteAccountRequest)(nil)
+var _ ServiceDependentOperations = (*GetAccountRequest)(nil)
+var _ ServiceDependentOperations = (*LockAccountRequest)(nil)
+var _ ServiceDependentOperations = (*UnLockAccountRequest)(nil)
+var _ ServiceDependentOperations = (*UpdateAccountRequest)(nil)
+var _ ServiceDependentOperations = (*LogoutAccountRequest)(nil)
 
 func (req *AuthenticateAccountRequest) CallAuthenticationService(client core_auth_sdk.AuthService) DownStreamOperation {
 	return func() (interface{}, error) {
@@ -66,7 +76,6 @@ func (req *UnLockAccountRequest) CallAuthenticationService(client core_auth_sdk.
 		return nil, nil
 	}
 }
-
 
 func (req *LogoutAccountRequest) CallAuthenticationService(client core_auth_sdk.AuthService) DownStreamOperation {
 	return func() (interface{}, error) {

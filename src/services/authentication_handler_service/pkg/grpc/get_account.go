@@ -21,7 +21,7 @@ func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (
 	}
 
 	err, ok := s.IsValidID(req.Id, operationType)
-	if!ok {
+	if !ok {
 		return nil, err
 	}
 

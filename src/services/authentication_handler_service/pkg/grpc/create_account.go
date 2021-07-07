@@ -42,4 +42,3 @@ func (s *Server) CreateAccount(ctx context.Context, req *proto.CreateAccountRequ
 
 	return response, nil
 }
-

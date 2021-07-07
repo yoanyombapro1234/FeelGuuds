@@ -45,4 +45,3 @@ func (s *Server) AuthenticateAccount(ctx context.Context, req *proto.Authenticat
 
 	return response, nil
 }
-
