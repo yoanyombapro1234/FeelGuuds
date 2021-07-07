@@ -1,4 +1,4 @@
-name: Authentication Handler Service (Release)
+name: Auth. Hdlr. Svc - Release
 
 on:
   push:

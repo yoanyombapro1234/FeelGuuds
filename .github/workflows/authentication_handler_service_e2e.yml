@@ -1,4 +1,4 @@
-name: Authentication Handler Service (End To End Test)
+name: Auth. Hdlr. Svc - E2E
 
 on:
   push:
