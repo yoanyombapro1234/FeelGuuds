@@ -17,5 +17,5 @@ const (
 	TEST_AUDIENCE      string = "localhost"
 	TEST_ISSUER        string = "http://localhost:8000"
 	TEST_ORIGIN        string = "http://localhost"
-	TEST_BASE_URL      string = "http://localhost:8000"
+	TEST_BASE_URL      string = "http://authentication_service:3000"
 )
