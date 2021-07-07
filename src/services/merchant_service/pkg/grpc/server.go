@@ -9,6 +9,9 @@ import (
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	otgrpc "github.com/opentracing-contrib/go-grpc"
+	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
+	core_metrics "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics"
+	core_tracing "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -17,8 +20,10 @@ import (
 )
 
 type Server struct {
-	logger *zap.Logger
 	config *Config
+	logger        core_logging.ILog
+	metricsEngine *core_metrics.CoreMetricsEngine
+	tracerEngine  *core_tracing.TracingEngine
 }
 
 type Config struct {
