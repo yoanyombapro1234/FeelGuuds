@@ -44,7 +44,7 @@ function RunLoadTest(){
 
 	# run linear load test
 	ghz --insecure --async --proto "${svcProtoPath}" \
-		--call proto.authentication_handler_serviceApi/"${operation}"  -c 10 -n 10000 --rps 200 \
+		--call proto.authentication_handler_serviceApi/"${operation}"  -c 10 -n 10000 --rps 1000 \
 		-d "${request}" 0.0.0.0:9897 $flags
 
 	open "$outputPath"

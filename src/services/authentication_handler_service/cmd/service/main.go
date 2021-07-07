@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -26,8 +27,6 @@ import (
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/signals"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version"
 
-	_ "net/http/pprof"
-
 	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
 	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
 )
@@ -40,10 +39,10 @@ func main() {
 	fs.Int("port-metrics", 0, "metrics port")
 	fs.Int("grpc-port", 9897, "gRPC port")
 	fs.String("grpc-service-name", "service", "gPRC service name")
-	fs.Int("grpc-rpc-deadline", 5, "gRPC deadline in milliseconds")
-	fs.Int("grpc-rpc-retries", 2, "gRPC max operation retries in the face of errors")
-	fs.Int("grpc-rpc-retry-timeout", 10, "gRPC max timeout of retry operation in milliseconds")
-	fs.Int("grpc-rpc-retry-backoff", 2, "gRPC backoff in between failed retry operations in milliseconds")
+	fs.Int("grpc-rpc-deadline", 500, "gRPC deadline in milliseconds")
+	fs.Int("grpc-rpc-retries", 1, "gRPC max operation retries in the face of errors")
+	fs.Int("grpc-rpc-retry-timeout", 100, "gRPC max timeout of retry operation in milliseconds")
+	fs.Int("grpc-rpc-retry-backoff", 20, "gRPC backoff in between failed retry operations in milliseconds")
 
 	fs.String("level", "info", "log level debug, info, warn, error, flat or panic")
 	fs.StringSlice("backend-url", []string{}, "backend service URL")
@@ -85,10 +84,10 @@ func main() {
 	fs.Bool("SERVICE_ENABLE_AUTH_SERVICE_PRIVATE_INTEGRATION", true, "enables communication with authentication service")
 
 	// retry specific configurations
-	fs.Int("HTTP_MAX_RETRIES", 5, "max retries to perform on failed http calls")
-	fs.Duration("HTTP_MIN_RETRY_WAITING_TIME", 5*time.Millisecond, "minimum time to wait between failed calls for retry")
-	fs.Duration("HTTP_MAX_RETRY_WAITING_TIME", 15*time.Millisecond, "maximum time to wait between failed calls for retry")
-	fs.Duration("HTTP_REQUEST_TIMEOUT", 300*time.Millisecond, "time until a request is seen as timing out")
+	fs.Int("HTTP_MAX_RETRIES", 3, "max retries to perform on failed http calls")
+	fs.Duration("HTTP_MIN_RETRY_WAITING_TIME", 10*time.Millisecond, "minimum time to wait between failed calls for retry")
+	fs.Duration("HTTP_MAX_RETRY_WAITING_TIME", 50*time.Millisecond, "maximum time to wait between failed calls for retry")
+	fs.Duration("HTTP_REQUEST_TIMEOUT", 5*time.Second, "time until a request is seen as timing out")
 
 	// logging specific configurations
 	fs.String("SERVICE_NAME", "authentication_handler_service", "service name")

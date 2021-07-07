@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/giantswarm/retry-go"
 	"github.com/opentracing/opentracing-go"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"google.golang.org/grpc/codes"
@@ -25,53 +26,21 @@ func (s *Server) setCtxRequestTimeout(ctx context.Context) context.Context {
 func (s *Server) performRetryableRpcCall(ctx context.Context, f func() (interface{}, error)) (interface{}, error) {
 	var response = make(chan interface{}, 1)
 
-	/*
-		err := retry.Do(
-			func(conn chan<- interface{}) func() error {
-				return func() error {
-					opResponse, err := f()
-					if err != nil {
-						return err
-					}
-					response <- opResponse
-					return nil
+	err := retry.Do(
+		func(conn chan<- interface{}) func() error {
+			return func() error {
+				opResponse, err := f()
+				if err != nil {
+					return err
 				}
-			}(response),
-			retry.MaxTries(s.config.RpcRetries),
-			retry.Timeout(time.Millisecond*time.Duration(s.config.RpcDeadline)),
-			retry.Sleep(time.Millisecond*time.Duration(s.config.RpcRetryBackoff)),
-		)
-
-		retries := 1
-		for retries < 4 {
-			// perform a test request to the authentication service
-			data, err := client.ServerStats()
-			if err != nil {
-				if retries != 4 {
-					logger.Error(err, "failed to connect to authentication service")
-				} else {
-					logger.Fatal(err, "failed to connect to authentication service")
-				}
-				retries += 1
-			} else {
-				retries = 4
-				logger.Info("data", zap.Any("result", data))
+				response <- opResponse
+				return nil
 			}
-
-			time.Sleep(1 * time.Second)
-		}
-	*/
-
-	err := func(conn chan<- interface{}) func() error {
-		return func() error {
-			opResponse, err := f()
-			if err != nil {
-				return err
-			}
-			response <- opResponse
-			return nil
-		}
-	}(response)()
+		}(response),
+		retry.MaxTries(s.config.RpcRetries),
+		retry.Timeout(time.Millisecond*time.Duration(s.config.RpcDeadline)),
+		retry.Sleep(time.Millisecond*time.Duration(s.config.RpcRetryBackoff)),
+	)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Unknown, err.Error())
