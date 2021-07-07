@@ -8,7 +8,9 @@ import (
 
 type DownStreamOperation func() (interface{}, error)
 
+// ServiceDependentOperations defines a set of downstream service operations this service relies on
 type ServiceDependentOperations interface {
+	// CallAuthenticationService performs a downstream call to the authentication service
 	CallAuthenticationService(client *core_auth_sdk.AuthService) DownStreamOperation
 }
 

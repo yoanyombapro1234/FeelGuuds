@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -131,23 +133,27 @@ func InitializeAuthnClient(logger core_logging.ILog) (core_auth_sdk.AuthService,
 		MaxRetryWaitTime: 10 * time.Millisecond,
 		RequestTimeout:   400 * time.Millisecond,
 	})
+
 	retries := 1
-	for retries < 4 {
+	retryLimit := 8
+	for retries < retryLimit {
 		// perform a test request to the authentication service
-		data, err := client.ServerStats()
+		_, err = client.ServerStats()
 		if err != nil {
-			if retries != 4 {
-				logger.Error(err, "failed to connect to authentication service")
-			} else {
-				logger.Fatal(err, "failed to connect to authentication service")
+			if retries != retryLimit {
+				logger.Error(err, fmt.Sprintf("failed to connect to authentication service. Attempt #%d", retries))
 			}
 			retries += 1
 		} else {
-			retries = 4
-			logger.Info("data", zap.Any("result", data))
+			break
 		}
 
-		time.Sleep(3 * time.Second)
+		time.Sleep(1 * time.Second)
+	}
+
+	if err != nil {
+		logger.Error(errors.New("failed to initiate connection to downstream service"), "failure")
+		return nil, err
 	}
 
 	// err = ConnectToDownstreamService(logger, client, response)
