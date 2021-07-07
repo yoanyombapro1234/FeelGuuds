@@ -2,6 +2,7 @@
 
 replicaCount: 1
 logLevel: info
+host: #0.0.0.0
 backend: #http://backend-service:9898/echo
 backends: []
 
@@ -100,12 +101,16 @@ securityContext: {}
 
 ingress:
     enabled: false
+    className: ""
     annotations:
         {}
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
-    path: /*
-    hosts: []
+    hosts:
+        - host: service.local
+          paths:
+              - path: /
+                pathType: ImplementationSpecific
     #  - service.local
     tls: []
     #  - secretName: chart-example-tls
@@ -120,6 +125,7 @@ linkerd:
 serviceMonitor:
     enabled: false
     interval: 15s
+    additionalLabels: {}
 
 resources:
     limits:
