@@ -24,7 +24,7 @@ type internalClient struct {
 }
 
 const (
-	delete                = "DELETE"
+	remove                = "DELETE"
 	get                   = "GET"
 	patch                 = "PATCH"
 	post                  = "POST"
@@ -150,7 +150,7 @@ func (ic *internalClient) Signup(username, password string) (string, error) {
 // Logout revokes the established session and refresh token by the application with the authentication service
 // TODO: unit test
 func (ic *internalClient) Logout() error {
-	_, err := ic.doWithAuth(delete, "session", nil)
+	_, err := ic.doWithAuth(remove, "session", nil)
 	return err
 }
 
@@ -200,7 +200,7 @@ func (ic *internalClient) UnlockAccount(id string) error {
 
 // ArchiveAccount archives the account with the specified id
 func (ic *internalClient) ArchiveAccount(id string) error {
-	_, err := ic.doWithAuth(delete, "accounts/"+id, nil)
+	_, err := ic.doWithAuth(remove, "accounts/"+id, nil)
 	return err
 }
 
