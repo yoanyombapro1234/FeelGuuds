@@ -2,9 +2,7 @@ package grpc
 
 import (
 	"context"
-	"strconv"
 
-	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
@@ -14,31 +12,27 @@ import (
 
 // UpdateAccount updates the account via the authentication services
 func (s *Server) UpdateAccount(ctx context.Context, req *proto.UpdateAccountRequest) (*proto.UpdateAccountResponse, error) {
-	ctx = s.setCtxRequestTimeout(ctx)
-	ctx, parentSpan := s.StartRootSpan(ctx, constants.UPDATE_ACCOUNT)
-	defer parentSpan.Finish()
+	operationType := constants.UPDATE_ACCOUNT
+	ctx, rootSpan := s.ConfigureAndStartRootSpan(ctx, operationType)
+	defer rootSpan.Finish()
 
 	if req == nil {
 		return nil, service_errors.ErrInvalidInputArguments
 	}
 
-	if req.Email == "" || req.Id == 0 {
-		s.metrics.InvalidRequestParametersCounter.WithLabelValues(constants.UPDATE_ACCOUNT).Inc()
-
-		err := service_errors.ErrInvalidInputArguments
-		s.logger.Error(err, "invalid input parameters. please specify an email or valid id")
-
+	err, ok := s.IsValidID(req.Id, operationType)
+	if!ok {
 		return nil, err
 	}
 
-	var (
-		operation = func() (interface{}, error) {
-			return nil, s.authnClient.Update(strconv.Itoa(int(req.Id)), req.Email)
-		}
-	)
+	err, ok = s.IsValidEmail(req.Email, operationType)
+	if !ok {
+		return nil, err
+	}
 
-	ctx = opentracing.ContextWithSpan(ctx, parentSpan)
-	_, err := s.PerformRetryableRPCOperation(ctx, parentSpan, operation, constants.GET_ACCOUNT)()
+	var callAuthenticationService = req.CallAuthenticationService(s.authnClient)
+
+	_, err = s.PerformRetryableRPCOperation(ctx, rootSpan, callAuthenticationService, constants.GET_ACCOUNT)()
 	if err != nil {
 		s.logger.Error(err, err.Error())
 		return nil, err

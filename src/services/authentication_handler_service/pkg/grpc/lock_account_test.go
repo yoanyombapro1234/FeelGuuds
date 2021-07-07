@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"strings"
 	"testing"
@@ -16,8 +15,6 @@ import (
 
 func Test_lock_account(t *testing.T) {
 	// TODO : ensure proper metrics are being emitted in each unit test
-	expectedErrMsg := "retry limit reached"
-
 	id := "1"
 
 	tests := []struct {
@@ -45,9 +42,9 @@ func Test_lock_account(t *testing.T) {
 			id,
 			&proto.LockAccountResponse{},
 			codes.Unknown,
-			expectedErrMsg,
+			service_errors.ErrAccountAlreadyLocked.Error(),
 			func(id string) error {
-				return errors.New("account already locked")
+				return service_errors.ErrAccountAlreadyLocked
 			},
 		},
 		// scenario: failed to lock account - account does not exist
@@ -56,9 +53,9 @@ func Test_lock_account(t *testing.T) {
 			id,
 			&proto.LockAccountResponse{},
 			codes.Unknown,
-			expectedErrMsg,
+			service_errors.ErrAccountDoesNotExist.Error(),
 			func(id string) error {
-				return errors.New("account does not exist")
+				return service_errors.ErrAccountDoesNotExist
 			},
 		},
 		// scenario: invalid request
