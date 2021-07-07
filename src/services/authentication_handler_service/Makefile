@@ -168,9 +168,10 @@ go-mod:
 
 .PHONY: test
 test: start-containers
-	echo "sleeping for 60 seconds before running unit tests"
+	echo "sleeping for 90 seconds before running unit tests"
 	sleep 90s
 	go get github.com/mfridman/tparse
+	docker ps
 	go test -v -race ./... -json -cover | tparse -all -top
 
 .PHONY: prereq
