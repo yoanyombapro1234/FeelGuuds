@@ -18,8 +18,6 @@ import (
 
 func Test_get_account(t *testing.T) {
 	// TODO : ensure proper metrics are being emitted in each unit test
-	expectedErrMsg := "retry limit reached"
-
 	email := fmt.Sprintf("test_%s@gmail.com", util.GenerateRandomString(17))
 	password := fmt.Sprintf("test_password_%s", util.GenerateRandomString(17))
 	testAccount := &proto.Account{
@@ -50,7 +48,7 @@ func Test_get_account(t *testing.T) {
 				Error:   "",
 			},
 			codes.Unknown,
-			expectedErrMsg,
+			"",
 			func(id string) (*core_auth_sdk.Account, error) {
 				return &core_auth_sdk.Account{
 					ID:       int(testAccount.Id),
