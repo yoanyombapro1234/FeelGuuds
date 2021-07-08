@@ -177,7 +177,7 @@ integration-tests:
 	go test -v -race ./client/...
 
 .PHONY: run-tests
-run-tests: start-containers unit-tests integration-tests
+run-tests: start-containers unit-tests
 
 .PHONY: run-test-suite
 run-test-suite: start-containers
