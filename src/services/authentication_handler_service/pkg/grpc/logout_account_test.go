@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"strings"
 	"testing"
@@ -15,8 +14,6 @@ import (
 )
 
 func Test_logout_account(t *testing.T) {
-	expectedErrMsg := "retry limit reached"
-
 	id := "1"
 
 	tests := []struct {
@@ -44,9 +41,9 @@ func Test_logout_account(t *testing.T) {
 			id,
 			&proto.LogoutAccountResponse{},
 			codes.Unknown,
-			expectedErrMsg,
+			service_errors.ErrCannotLogoutAccount.Error(),
 			func() error {
-				return errors.New("failed to logout account")
+				return service_errors.ErrCannotLogoutAccount
 			},
 		},
 		// scenario: invalid request

@@ -26,9 +26,10 @@ import (
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/signals"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version"
 
+	_ "net/http/pprof"
+
 	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
 	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
-	_ "net/http/pprof"
 )
 
 func main() {

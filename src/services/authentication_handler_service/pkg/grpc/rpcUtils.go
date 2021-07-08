@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/opentracing/opentracing-go"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -84,12 +85,14 @@ func (s *Server) performRetryableRpcCall(ctx context.Context, f func() (interfac
 }
 
 // PerformRetryableRPCOperation performs a retryable operation
-func (s *Server) PerformRetryableRPCOperation(ctx context.Context, span opentracing.Span, op RpcOperationFunc, opType string) RpcOperationFunc {
+func (s *Server) PerformRetryableRPCOperation(ctx context.Context, span opentracing.Span, op proto.DownStreamOperation, opType string) proto.DownStreamOperation {
 	return func() (interface{}, error) {
 		var (
 			begin = time.Now()
 			took  = time.Since(begin)
 		)
+
+		ctx = opentracing.ContextWithSpan(ctx, span)
 
 		retryableOp := func() (interface{}, error) {
 			s.logger.For(ctx).Info("performing retryable http operation", "operation type", opType)
@@ -99,4 +102,11 @@ func (s *Server) PerformRetryableRPCOperation(ctx context.Context, span opentrac
 		ctx = opentracing.ContextWithSpan(ctx, span)
 		return s.performRPCOperationAndInstrument(ctx, retryableOp, opType, &took)
 	}
+}
+
+// ConfigureAndStartRootSpan configures a parent span object and starts it
+func (s *Server) ConfigureAndStartRootSpan(ctx context.Context, operationType string) (context.Context, opentracing.Span) {
+	ctx = s.setCtxRequestTimeout(ctx)
+	ctx, rootSpan := s.StartRootSpan(ctx, operationType)
+	return ctx, rootSpan
 }

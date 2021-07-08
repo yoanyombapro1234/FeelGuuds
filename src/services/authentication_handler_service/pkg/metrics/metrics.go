@@ -31,15 +31,15 @@ type CoreMetrics struct {
 	// tracks the number of times there was a failure or success when trying to extract id from the request url
 	ExtractIdOperationCounter *core_metrics.CounterVec
 	// tracks the number of times there was a failure or success when trying to extract id from the request url
-	RemoteOperationStatusCounter    *core_metrics.CounterVec
+	RemoteOperationStatusCounter *core_metrics.CounterVec
 	// tracks the latency of various remote operations
-	RemoteOperationsLatencyCounter  *core_metrics.HistogramVec
+	RemoteOperationsLatencyCounter *core_metrics.HistogramVec
 	// tracks the number of invalid requests processed by the service
 	InvalidRequestParametersCounter *core_metrics.CounterVec
 	// tracks the number of failed casting operations captured by the service
-	CastingOperationFailureCounter  *core_metrics.CounterVec
+	CastingOperationFailureCounter *core_metrics.CounterVec
 	// tracks the number of failed request decoding operations for the service
-	DecodeRequestStatusCounter      *core_metrics.CounterVec
+	DecodeRequestStatusCounter *core_metrics.CounterVec
 }
 
 // NewCoreMetrics returns a pointer reference to a metrics objects encapsulating all registered counters for this service

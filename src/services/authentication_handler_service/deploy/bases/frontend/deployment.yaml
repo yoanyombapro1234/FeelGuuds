@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/FeelGuuds/service:5.2.0
+        image: feelguuds/authentication_handler_service:latest
         imagePullPolicy: IfNotPresent
         ports:
         - name: http

@@ -4,16 +4,19 @@ kind: ServiceMonitor
 metadata:
   name: {{ template "service.fullname" . }}
   labels:
-    {{- include "service.labels" . | nindent 4 }}
+  {{- include "service.labels" . | nindent 4 }}
+  {{- with .Values.serviceMonitor.additionalLabels }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   endpoints:
-    - path: /metrics
-      port: http
-      interval: {{ .Values.serviceMonitor.interval }}
+	- path: /metrics
+	  port: http
+	  interval: {{ .Values.serviceMonitor.interval }}
   namespaceSelector:
-    matchNames:
-      - {{ .Release.Namespace }}
+	matchNames:
+	  - {{ .Release.Namespace }}
   selector:
-    matchLabels:
-      {{- include "service.selectorLabels" . | nindent 6 }}
-{{- end }}
+	matchLabels:
+  {{- include "service.selectorLabels" . | nindent 6 }}
+  {{- end }}

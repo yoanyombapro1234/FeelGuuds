@@ -1,0 +1,49 @@
+name: Auth. Hdlr. Svc - Tests
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./src/services/authentication_handler_service
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Restore Go cache
+        uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.x
+      - name: Run unit tests
+        working-directory: ${{env.working-directory}}
+        run: make run-tests
+      - name: Check if working tree is dirty
+        run: |
+          if [[ $(git diff --stat) != '' ]]; then
+            echo 'run make test and commit changes'
+            exit 1
+          fi
+      - name: Validate Helm chart
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.19.11
+          helm: 2.17.0
+          helmv3: 3.6.0
+          command: |
+            helmv3 template ${{env.working-directory}}/charts/service | kubeval --strict --kubernetes-version 1.19.11 --schema-location https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master
+      - name: Validate kustomization
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.19.11
+          command: |
+            kustomize build ${{env.working-directory}}/kustomize | kubeval --strict --kubernetes-version 1.19.11 --schema-location https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master
+            kustomize build ${{env.working-directory}}/kustomize | conftest test -p .github/policy -

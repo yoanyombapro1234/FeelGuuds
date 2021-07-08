@@ -2,11 +2,11 @@ package grpc
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -15,8 +15,6 @@ import (
 
 func Test_delete_account(t *testing.T) {
 	// TODO : ensure proper metrics are being emitted in each unit test
-	expectedErrMsg := "retry limit reached"
-
 	id := "1"
 
 	tests := []struct {
@@ -27,15 +25,15 @@ func Test_delete_account(t *testing.T) {
 		errMsg             string
 		ArchiveAccountFunc func(id string) error
 	}{
-		// scenario: duplicate account
+		// scenario: account does not exist
 		{
-			"account already exists",
+			"account does not exist",
 			id,
 			nil,
 			codes.Unknown,
-			expectedErrMsg,
+			"account does not exist",
 			func(id string) error {
-				return errors.New("account not found")
+				return service_errors.ErrAccountDoesNotExist
 			},
 		},
 		// scenario: valid request
@@ -51,7 +49,7 @@ func Test_delete_account(t *testing.T) {
 		},
 		// scenario: invalid request
 		{
-			"valid request",
+			"invalid request",
 			"0",
 			nil,
 			codes.InvalidArgument,

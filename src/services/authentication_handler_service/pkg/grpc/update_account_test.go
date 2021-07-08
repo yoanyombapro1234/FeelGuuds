@@ -2,11 +2,11 @@ package grpc
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -16,8 +16,6 @@ import (
 
 func Test_update_account(t *testing.T) {
 	// TODO : ensure proper metrics are being emitted in each unit test
-	expectedErrMsg := "retry limit reached"
-
 	email := fmt.Sprintf("test_%s@gmail.com", util.GenerateRandomString(17))
 
 	tests := []struct {
@@ -60,9 +58,9 @@ func Test_update_account(t *testing.T) {
 			1,
 			nil,
 			codes.Unknown,
-			expectedErrMsg,
+			"account does not exist",
 			func(id, username string) error {
-				return errors.New("account does not exit")
+				return service_errors.ErrAccountDoesNotExist
 			},
 		},
 	}

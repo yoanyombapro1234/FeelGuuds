@@ -2,12 +2,9 @@ package grpc
 
 import (
 	"context"
-	"strconv"
 
-	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 
-	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/constants"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
@@ -15,44 +12,29 @@ import (
 
 // GetAccount obtains an account as long as the account exists from the context of the authentication service
 func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (*proto.GetAccountResponse, error) {
-	ctx = s.setCtxRequestTimeout(ctx)
-	ctx, parentSpan := s.StartRootSpan(ctx, constants.GET_ACCOUNT)
-	defer parentSpan.Finish()
+	operationType := constants.GET_ACCOUNT
+	ctx, rootSpan := s.ConfigureAndStartRootSpan(ctx, operationType)
+	defer rootSpan.Finish()
 
 	if req == nil {
 		return nil, service_errors.ErrInvalidInputArguments
 	}
 
-	if req.Id == 0 {
-		s.metrics.InvalidRequestParametersCounter.WithLabelValues(constants.GET_ACCOUNT).Inc()
-		err := service_errors.ErrInvalidInputArguments
-		s.logger.Error(err, "invalid input parameters. please specify a valid user id")
+	err, ok := s.IsValidID(req.Id, operationType)
+	if !ok {
 		return nil, err
 	}
 
-	var (
-		operation = func() (interface{}, error) {
-			account, err := s.authnClient.GetAccount(strconv.Itoa(int(req.GetId())))
-			if err != nil {
-				return nil, err
-			}
-			return account, nil
-		}
-	)
+	var callAuthenticationService = req.CallAuthenticationService(s.authnClient)
 
-	ctx = opentracing.ContextWithSpan(ctx, parentSpan)
-	result, err := s.PerformRetryableRPCOperation(ctx, parentSpan, operation, constants.GET_ACCOUNT)()
+	result, err := s.PerformRetryableRPCOperation(ctx, rootSpan, callAuthenticationService, constants.GET_ACCOUNT)()
 	if err != nil {
 		s.logger.Error(err, err.Error())
 		return nil, err
 	}
 
-	account, ok := result.(*core_auth_sdk.Account)
-	if !ok {
-		s.metrics.CastingOperationFailureCounter.WithLabelValues(constants.GET_ACCOUNT)
-
-		err := service_errors.ErrFailedToCastAccount
-		s.logger.For(ctx).Error(err, err.Error())
+	account, err := s.GetAccountFromResponseObject(ctx, ok, result, operationType)
+	if err != nil {
 		return nil, err
 	}
 

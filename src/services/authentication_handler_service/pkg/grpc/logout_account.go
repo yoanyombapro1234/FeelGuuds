@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 
-	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
@@ -13,31 +12,22 @@ import (
 
 // LogoutAccount revokes the user account session from the context of the authentication service
 func (s *Server) LogoutAccount(ctx context.Context, req *proto.LogoutAccountRequest) (*proto.LogoutAccountResponse, error) {
-	ctx = s.setCtxRequestTimeout(ctx)
-	ctx, parentSpan := s.StartRootSpan(ctx, constants.LOGOUT_ACCOUNT)
-	defer parentSpan.Finish()
+	operationType := constants.LOGOUT_ACCOUNT
+	ctx, rootSpan := s.ConfigureAndStartRootSpan(ctx, operationType)
+	defer rootSpan.Finish()
 
 	if req == nil {
 		return nil, service_errors.ErrInvalidInputArguments
 	}
 
-	if req.Id == 0 {
-		s.metrics.InvalidRequestParametersCounter.WithLabelValues(constants.LOGOUT_ACCOUNT).Inc()
-
-		err := service_errors.ErrInvalidInputArguments
-		s.logger.Error(err, "invalid input parameters. please specify a valid user id")
-
+	err, ok := s.IsValidID(req.Id, operationType)
+	if !ok {
 		return nil, err
 	}
 
-	var (
-		operation = func() (interface{}, error) {
-			return nil, s.authnClient.LogOutAccount()
-		}
-	)
+	var callAuthenticationService = req.CallAuthenticationService(s.authnClient)
 
-	ctx = opentracing.ContextWithSpan(ctx, parentSpan)
-	_, err := s.PerformRetryableRPCOperation(ctx, parentSpan, operation, constants.LOGOUT_ACCOUNT)()
+	_, err = s.PerformRetryableRPCOperation(ctx, rootSpan, callAuthenticationService, constants.LOGOUT_ACCOUNT)()
 	if err != nil {
 		s.logger.Error(err, err.Error())
 		return nil, err

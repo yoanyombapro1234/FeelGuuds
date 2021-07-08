@@ -10,3 +10,4 @@ maintainers:
       name: yoanyomba
 sources:
     - https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service
+kubeVersion: ">=1.19.0-0"
