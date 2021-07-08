@@ -7,8 +7,8 @@ backend: #http://backend-service:9898/echo
 backends: []
 
 image:
-    repository: ghcr.io/FeelGuuds/service
-    tag: 5.2.0
+    repository: feelguuds/authentication_handler_service
+    tag: latest
     pullPolicy: IfNotPresent
 
 ui:

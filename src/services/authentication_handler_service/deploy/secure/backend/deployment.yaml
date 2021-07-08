@@ -25,7 +25,7 @@ spec:
       serviceAccountName: secure
       containers:
       - name: backend
-        image: ghcr.io/FeelGuuds/service:5.0.3
+        image: feelguuds/authentication_handler_service:latest
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
