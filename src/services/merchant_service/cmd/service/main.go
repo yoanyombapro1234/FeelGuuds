@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,19 +13,17 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/api"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/grpc"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/signals"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/version"
 
-	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
+	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-lib/metrics/prometheus"
+	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
 	core_metrics "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics"
 	core_tracing "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing"
-	"github.com/opentracing/opentracing-go"
-
 )
 
 func main() {
@@ -123,14 +122,13 @@ func main() {
 	// configure logging
 	logger := core_logging.NewJSONLogger(nil, rootSpan)
 
-
 	// configure logging
 	logger, _ := initZap(viper.GetString("LEVEL"))
 	defer logger.Sync()
 	stdLog := zap.RedirectStdLog(logger)
 	defer stdLog()
 
-	// start stress tests if any 
+	// start stress tests if any
 	beginStressTest(viper.GetInt("STRESS_CPU"), viper.GetInt("STRESS_MEMORY"), logger)
 
 	// validate port

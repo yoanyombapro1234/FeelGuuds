@@ -75,6 +75,10 @@ swagger:
 	go get github.com/swaggo/swag/cmd/swag
 	cd pkg/api && $$(go env GOPATH)/bin/swag init -g server.go
 
+download_proto_dependencies:
+	@echo "downloading protoc-gen tool"
+	go install github.com/danielvladco/go-proto-gql/protoc-gen-gql && go install github.com/danielvladco/go-proto-gql/protoc-gen-gogql && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
 # generate service objects based on proto def
 .PHONY: protogen
 protogen:
@@ -87,7 +91,7 @@ protogen:
 		-I=$(GOPATH)/src/github.com/protobuf/src/google/protobuf/timestamp.proto \
 		--gogoopsee_out=plugins=grpc+graphql,Mopsee/protobuf/opsee.proto=github.com/opsee/protobuf/opseeproto,Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/protoc-gen-gogo/descriptor:./gen/ --proto_path=$(GOPATH)/src:. ./proto/*.proto
 
-generate_grpc_definitions: download_proto_dependencies
+models:
 	@echo "setting up grpc service schema definition via protobuf"
 	protoc -I. \
 			-I$(GOPATH)/src \
@@ -97,8 +101,9 @@ generate_grpc_definitions: download_proto_dependencies
 			-I=$(GOPATH)/src/github.com/infobloxopen/protoc-gen-gorm/options \
 			-I=$(GOPATH)/src/github.com/protobuf/src/google/protobuf/timestamp.proto \
 			--proto_path=${GOPATH}/src/github.com/gogo/protobuf/protobuf \
-			--govalidators_out=./pkg/graphql_api/ \
-			--go_out=./pkg/graphql_api --gorm_out="engine=postgres:./pkg/models/" ./proto/schema.proto
+			--govalidators_out=./pkg/models/ \
+			--go_out=plugins=grpc,Mgoogle/protobuf/descriptor.proto=github.com/golang/protobuf/protoc-gen-go/descriptor:./pkg/models \
+			--gorm_out="engine=postgres:./pkg/models/" ./proto/merchant_service.proto
 
 # brings down any running containers
 .PHONY: kill-containers

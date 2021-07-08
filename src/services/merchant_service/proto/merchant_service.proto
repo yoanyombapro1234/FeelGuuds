@@ -1,8 +1,9 @@
 syntax = "proto3";
 
-package merchant_service.proto.v1;
+package merchant_service_proto_v1;
 
 import "github.com/infobloxopen/protoc-gen-gorm/options/gorm.proto";
+
 option go_package = "github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1";
 
 // MerchantAccount represents a business account in the context of feelguuds
@@ -12,43 +13,47 @@ message MerchantAccount {
 	};
 	uint64 id = 1 [(gorm.field).tag = {type: "serial" primary_key: true, auto_increment: true}];
 	// set of owners who are responsible for this merchant account
-	repeated Owner owners = 2 [(gorm.field).has_many.preload = true];;
+	repeated Owner owners = 2 [(gorm.field).has_many.preload = true];
 	// business name of the merchant account
 	string business_name = 3;
 	// business email of the merchant account
 	string business_email = 4;
 	// employer identification number
-	string employer_id = 5;
+	uint64 employer_id = 5;
 	// estimated annual revenue pre-tax of the merchant account
 	string estimate_annual_revenue = 6;
 	// merchant account address
-	Address address = 7 [(gorm.field).has_one.preload = true];;
+	Address address = 7 [(gorm.field).has_one.preload = true];
 	// types of item this merchant is selling
 	repeated ItemSold items_or_services_sold = 8;
 	// ways in which the merchant aims to fulfill purchases
 	repeated FulfillmentOptions fulfillment_options = 9;
 	// shop settings
-	Settings ShopSettings = 10 [(gorm.field).has_one.preload = true];;
+	Settings ShopSettings = 10 [(gorm.field).has_one.preload = true];
 	// set of supported causes the merchant adheres to
 	repeated Causes supported_causes = 11;
 	// merchant account bio
-	string bio =  12;
+	string bio = 12;
 	// merchant account headline
 	string headline = 13;
 	// merchant account phone number
 	string phone_number = 14;
 	// set of tags associated with a merchant
-	repeated Tags tags = 15 [(gorm.field).has_many.preload = true];;
+	repeated Tags tags = 15 [(gorm.field).has_many.preload = true];
 	// stripe connect account id
 	uint32 stripe_connected_account_id = 16;
 	// id of the associated payment account this merchant account is tied to
 	uint64 payments_account_id = 17;
+	// id of the merchant account from the context of the auth service
+	uint64 authn_account_id = 18;
 	// merchant account onboarding step
-	OnboardingStatus onboarding_state = 18 [(gorm.field).has_one.preload = true];;
+	OnboardingStatus onboarding_state = 19 [(gorm.field).has_one.preload = true];
 	// merchant account state
-	MerchantAccountState account_state = 19 [(gorm.field).has_one.preload = true];;
+	MerchantAccountState account_state = 20 [(gorm.field).has_one.preload = true];
 	// type of merchant account
-	MerchantAccountType account_type = 20 [(gorm.field).has_one.preload = true];;
+	MerchantAccountType account_type = 21 [(gorm.field).has_one.preload = true];
+	// merchant account password
+	string password = 22;
 }
 
 // represents the type of merchant account
@@ -76,10 +81,11 @@ enum FulfillmentOptions {
 
 // represents the stage in the onboarding flow the merchant account is in
 enum OnboardingStatus {
-	FeelGuudOnboarding = 0;
-	StripeOnboarding = 1;
-	CatalogueOnboarding = 2;
-	BCorpOnboarding = 3;
+	OnboardingNotStarted = 0;
+	FeelGuudOnboarding = 1;
+	StripeOnboarding = 2;
+	CatalogueOnboarding = 3;
+	BCorpOnboarding = 4;
 }
 
 // set of causes a merchant may opt to support
@@ -152,16 +158,16 @@ message Settings {
 	}
 
 	// merchant account payment details
-	PaymentDetails payment_details = 2;
+	PaymentDetails payment_details = 2 [(gorm.field).has_one.preload = true];
 
 	// set of policies a merchant account can define on it's shop profile
-	repeated Policy ShopPolicy = 3;
+	repeated Policy ShopPolicy = 3 [(gorm.field).has_many.preload = true];
 	// set of policies a merchant account can define with respect to privacy on it's shop profile
-	repeated Policy PrivacyPolicy = 4;
+	repeated Policy PrivacyPolicy = 4 [(gorm.field).has_many.preload = true];
 	// set of return policies a merchant account can define with respect to issuing refunds on its shop profile
-	ReturnPolicy ReturnPolicy = 5;
+	ReturnPolicy ReturnPolicy = 5 [(gorm.field).has_one.preload = true];
 	// set of shipping policies a merchant account can define on to its shop profile
-	ShippingPolicy ShippingPolicy = 6;
+	ShippingPolicy ShippingPolicy = 6 [(gorm.field).has_one.preload = true];
 }
 
 // Represents the types of items a merchant account sells
@@ -211,46 +217,76 @@ message Address {
 
 // Represents the merchant account owner
 message Owner {
-	string FirstName=1;
-	string LastName=2;
-	string Email=3;
-	string Country=4;
+	option (gorm.opts) = {
+		ormable: true,
+	};
+
+	uint64 id = 1 [(gorm.field).tag = {type: "serial" primary_key: true, auto_increment: true}];
+
+	string FirstName=2;
+	string LastName=3;
+	string Email=4;
+	string Country=5;
 }
 
 // represents a sample tag
 message Tags {
-	string tag_name = 1;
-	string tag_description = 2;
-	repeated string metadata = 3;
+	option (gorm.opts) = {
+		ormable: true,
+	};
+
+	uint64 id = 1 [(gorm.field).tag = {type: "serial" primary_key: true, auto_increment: true}];
+
+	string tag_name = 2;
+	string tag_description = 3;
+	repeated string metadata = 4;
 }
 
 // Represents various policies a merchant account can declare for various use cases
 message Policy {
+	option (gorm.opts) = {
+		ormable: true,
+	};
+
+	uint64 id = 1 [(gorm.field).tag = {type: "serial" primary_key: true, auto_increment: true}];
+
 	enum PolicyType {
 		SHIPPING_POLICY = 0;
 		RETURN_POLICY = 1;
 	}
 
-	string Body = 1;
-	string Handle = 2;
-	string Title = 3;
-	repeated Tags tags = 4;
+	string Body = 2;
+	string Handle = 3;
+	string Title = 4;
+	repeated Tags tags = 5;
 }
 
 // ReturnPolicy represent a sample shop return policy
 message ReturnPolicy {
-	Policy policy_meta = 1;
-	uint32 contact_within_days_of_delivery = 2;
-	uint32 ship_with_days_of_delivery = 3;
-	uint32 request_cancellation_within_days_of_delivery = 4;
-	repeated string items_not_to_be_returned = 5;
-	repeated string conditions_of_return = 6;
-	string details = 7;
+	option (gorm.opts) = {
+		ormable: true,
+	};
+
+	uint64 id = 1 [(gorm.field).tag = {type: "serial" primary_key: true, auto_increment: true}];
+
+	Policy policy_meta = 2 [(gorm.field).has_one.preload = true];
+	uint32 contact_within_days_of_delivery = 3;
+	uint32 ship_with_days_of_delivery = 4;
+	uint32 request_cancellation_within_days_of_delivery = 5;
+	repeated string items_not_to_be_returned = 6;
+	repeated string conditions_of_return = 7;
+	string details = 8;
 }
 
 // ShippingPolicy represents a sample shop shipping policy
 message ShippingPolicy {
-	Policy policy_meta = 1;
+	option (gorm.opts) = {
+		ormable: true,
+	};
+
+	uint64 id = 1 [(gorm.field).tag = {type: "serial" primary_key: true, auto_increment: true}];
+
+	Policy policy_meta = 2 [(gorm.field).has_one.preload = true];
 	enum PostalService {
 		USPS = 0;
 		FEDEX = 1;
@@ -258,9 +294,9 @@ message ShippingPolicy {
 		UPS = 3;
 		BLUE_DART = 4;
 	}
-	PostalService postal_service = 2;
-	uint32 days_order_ships_in = 3;
-	string details = 4;
+	PostalService postal_service = 3;
+	uint32 days_order_ships_in = 4;
+	string details = 5;
 }
 
 // Merchant Service is a service exposed by grpc servers that allows for mutations against merchant accoutns

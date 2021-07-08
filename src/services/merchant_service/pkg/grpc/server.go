@@ -20,7 +20,7 @@ import (
 )
 
 type Server struct {
-	config *Config
+	config        *Config
 	logger        core_logging.ILog
 	metricsEngine *core_metrics.CoreMetricsEngine
 	tracerEngine  *core_tracing.TracingEngine
