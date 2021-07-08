@@ -25,8 +25,6 @@ import (
 )
 
 type Server struct {
-	// inherit the behaviors/adhere to the interface the api server adheres to
-	proto.UnimplementedAuthenticationHandlerServiceApiServer
 	config        *Config
 	authnClient   core_auth_sdk.AuthService
 	logger        core_logging.ILog
@@ -34,6 +32,8 @@ type Server struct {
 	metricsEngine *core_metrics.CoreMetricsEngine
 	tracerEngine  *core_tracing.TracingEngine
 }
+
+var _ proto.AuthenticationHandlerServiceApiServer = (*Server)(nil)
 
 type Config struct {
 	Port            int    `mapstructure:"grpc-port"`
