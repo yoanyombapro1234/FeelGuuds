@@ -20,9 +20,9 @@ type DatabaseOperationType string
 type DbOperations interface {
 	CreateMerchantAccount(ctx context.Context, account *merchant_service_proto_v1.MerchantAccount) (*merchant_service_proto_v1.MerchantAccount, error)
 	UpdateMerchantAccount(ctx context.Context, id uint64, account *merchant_service_proto_v1.MerchantAccount) (*merchant_service_proto_v1.MerchantAccount, error)
-	DeleteMerchantAccount(ctx context.Context, id uint32) (bool, error)
+	DeleteMerchantAccount(ctx context.Context, id uint64) (bool, error)
 	GetMerchantAccountById(ctx context.Context, id uint64) (*merchant_service_proto_v1.MerchantAccount, error)
-	GetMerchantAccountsById(ctx context.Context, ids []uint32) ([]*merchant_service_proto_v1.MerchantAccount, error)
+	GetMerchantAccountsById(ctx context.Context, ids []uint64) ([]*merchant_service_proto_v1.MerchantAccount, error)
 	DoesMerchantAccountExist(ctx context.Context, id uint64) (bool, error)
 }
 
