@@ -166,10 +166,23 @@ cover:
 go-mod:
 	go list -m -u all
 
-.PHONY: test
-test: start-containers
-	echo "sleeping for 60 seconds before running unit tests"
-	sleep 90s
+.PHONY: unit-tests
+unit-tests:
+	echo "running unit tests"
+	go test -v -race ./pkg/... -json -cover
+
+.PHONY: integration-tests
+integration-tests:
+	echo "running integration (e2e) tests"
+	go test -v -race ./client/...
+
+.PHONY: run-tests
+run-tests: start-containers unit-tests integration-tests
+
+.PHONY: run-test-suite
+run-test-suite: start-containers
+	echo "sleeping for 60 seconds before running both unit and e2e tests"
+	sleep 60s
 	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover | tparse -all -top
 
