@@ -3,9 +3,9 @@ entries:
   service:
   - apiVersion: v1
     appVersion: 5.2.0
-    created: "2021-07-08T03:08:09.194581176Z"
+    created: "2021-07-08T03:15:50.381552685Z"
     description: Service Helm chart for Kubernetes
-    digest: fd4c0de85f06ee439d3c6f851063eafe44590d58a91898302b8673d641deef27
+    digest: b2be4edce32d769cbe4ca97c8f1c4b8bdd76ab13fd5a9e820f8ac918155cf9d0
     home: https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service
     kubeVersion: '>=1.19.0-0'
     maintainers:
@@ -17,4 +17,4 @@ entries:
     urls:
     - https://yoanyombapro1234.github.io/FeelGuuds/src/services/authentication_handler_service/charts/service-5.2.0.tgz
     version: 5.2.0
-generated: "2021-07-08T03:08:09.192952891Z"
+generated: "2021-07-08T03:15:50.380258169Z"
