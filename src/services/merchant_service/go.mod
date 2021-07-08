@@ -7,6 +7,7 @@ require (
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
+	github.com/danielvladco/go-proto-gql v0.8.3 // indirect
 	github.com/dgrijalva/jwt-go v3.2.1-0.20200107013213-dc14462fd587+incompatible
 	github.com/fatih/color v1.10.0
 	github.com/fsnotify/fsnotify v1.4.9
@@ -15,6 +16,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645 // indirect
+	github.com/infobloxopen/protoc-gen-gorm v0.20.1 // indirect
 	github.com/opentracing-contrib/go-grpc v0.0.0-20210225150812-73cb765af46e
 	github.com/prometheus/client_golang v1.10.0
 	github.com/spf13/cobra v1.1.3
@@ -28,6 +30,6 @@ require (
 	github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing v0.0.0-20210419120811-ccda648fd4a2 // indirect
 	github.com/yoanyombapro1234/Microservice-Template-Golang v1.8.0
 	go.uber.org/zap v1.16.0
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
+	golang.org/x/net v0.0.0-20210410081132-afb366fc7cd1
 	google.golang.org/grpc v1.37.0
 )

@@ -15,9 +15,6 @@ run:
 	--level=debug --grpc-port=9999 --backend-url=https://httpbin.org/status/401 --backend-url=https://httpbin.org/status/500 \
 	--ui-logo=https://raw.githubusercontent.com/stefanprodan/service/gh-pages/cuddle_clap.gif $(EXTRA_RUN_ARGS)
 
-test:
-	go test ./... -coverprofile cover.out
-
 build:
 	GIT_COMMIT=$$(git rev-list -1 HEAD) && CGO_ENABLED=0 go build  -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/version.REVISION=$(GIT_COMMIT)" -a -o ./bin/service ./cmd/service/*
 	GIT_COMMIT=$$(git rev-list -1 HEAD) && CGO_ENABLED=0 go build  -ldflags "-s -w -X github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/version.REVISION=$(GIT_COMMIT)" -a -o ./bin/servicecli ./cmd/servicecli/*
@@ -89,6 +86,19 @@ protogen:
 		-I=$(GOPATH)/src/github.com/infobloxopen/protoc-gen-gorm/options \
 		-I=$(GOPATH)/src/github.com/protobuf/src/google/protobuf/timestamp.proto \
 		--gogoopsee_out=plugins=grpc+graphql,Mopsee/protobuf/opsee.proto=github.com/opsee/protobuf/opseeproto,Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/protoc-gen-gogo/descriptor:./gen/ --proto_path=$(GOPATH)/src:. ./proto/*.proto
+
+generate_grpc_definitions: download_proto_dependencies
+	@echo "setting up grpc service schema definition via protobuf"
+	protoc -I. \
+			-I$(GOPATH)/src \
+			-I=$(GOPATH)/src/github.com/infobloxopen/protoc-gen-gorm \
+			-I=$(GOPATH)/src/github.com/infobloxopen/atlas-app-toolkit \
+			-I=$(GOPATH)/src/github.com/lyft/protoc-gen-validate/validate/validate.proto \
+			-I=$(GOPATH)/src/github.com/infobloxopen/protoc-gen-gorm/options \
+			-I=$(GOPATH)/src/github.com/protobuf/src/google/protobuf/timestamp.proto \
+			--proto_path=${GOPATH}/src/github.com/gogo/protobuf/protobuf \
+			--govalidators_out=./pkg/graphql_api/ \
+			--go_out=./pkg/graphql_api --gorm_out="engine=postgres:./pkg/models/" ./proto/schema.proto
 
 # brings down any running containers
 .PHONY: kill-containers
