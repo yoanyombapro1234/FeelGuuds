@@ -329,6 +329,8 @@ message CreateAccountRequest {
 
 message CreateAccountResponse {
 	uint64 account_id = 1;
+	string JwtToken = 2;
+	string StripeUrl = 3;
 }
 
 message DeleteAccountRequest {

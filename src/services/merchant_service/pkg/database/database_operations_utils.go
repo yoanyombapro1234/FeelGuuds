@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
@@ -73,9 +74,31 @@ func (db *Db) ValidateAccountIds(ctx context.Context, account *merchant_service_
 
 // FindMerchantAccountByEmail finds a merchant account by email
 func (db *Db) FindMerchantAccountByEmail(ctx context.Context, email string) (bool, error) {
+	const operation = "merchant_account_exists_by_email_db_op"
+	db.Logger.For(ctx).Info(fmt.Sprintf("get business account by email database operation."))
+	ctx, span := db.startRootSpan(ctx, operation)
+	defer span.Finish()
 
+	tx := db.findMerchantAccountByEmailTxFunc(email)
+	result, err := db.Conn.PerformComplexTransaction(ctx, tx)
+	if err != nil {
+		return true, err
+	}
+
+	status, ok := result.(*bool)
+	if !ok {
+		return true, errors.ErrFailedToCastToType
+	}
+
+	return *status, nil
+}
+
+// findMerchantAccountByEmailTxFunc wraps the logic in a db tx and returns it
+func (db *Db) findMerchantAccountByEmailTxFunc(email string) func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
 	tx := func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
-		span := db.TracingEngine.CreateChildSpan(ctx, "merchant_account_exists_by_email_tx")
+		const operation = "merchant_account_exists_by_email_tx"
+		db.Logger.For(ctx).Info(fmt.Sprintf("get business account by email database tx."))
+		ctx, span := db.startRootSpan(ctx, operation)
 		defer span.Finish()
 
 		if email == constants.EMPTY {
@@ -87,9 +110,23 @@ func (db *Db) FindMerchantAccountByEmail(ctx context.Context, email string) (boo
 			return false, errors.ErrAccountDoesNotExist
 		}
 
+		if account.AccountState == merchant_service_proto_v1.MerchantAccountState_Inactive {
+			return false, errors.ErrAccountDoesNotExist
+		}
+
 		return true, nil
 	}
+	return tx
+}
 
+// FindMerchantAccountById finds a merchant account by id
+func (db *Db) FindMerchantAccountById(ctx context.Context, id uint64) (bool, error) {
+	const operation = "merchant_account_exists_by_id_op"
+	db.Logger.For(ctx).Info(fmt.Sprintf("get business account by id database operation."))
+	ctx, span := db.startRootSpan(ctx, operation)
+	defer span.Finish()
+
+	tx := db.findMerchantAccountByIdTxFunc(id)
 	result, err := db.Conn.PerformComplexTransaction(ctx, tx)
 	if err != nil {
 		return true, err
@@ -103,10 +140,12 @@ func (db *Db) FindMerchantAccountByEmail(ctx context.Context, email string) (boo
 	return *status, nil
 }
 
-// FindMerchantAccountById finds a merchant account by id
-func (db *Db) FindMerchantAccountById(ctx context.Context, id uint64) (bool, error) {
+// findMerchantAccountByIdTxFunc finds the merchant account by id and wraps it in a db tx.
+func (db *Db) findMerchantAccountByIdTxFunc(id uint64) func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
 	tx := func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
-		span := db.TracingEngine.CreateChildSpan(ctx, "merchant_account_exists_by_id_tx")
+		const operation = "merchant_account_exists_by_id_tx"
+		db.Logger.For(ctx).Info(fmt.Sprintf("get business account by id database tx."))
+		ctx, span := db.startRootSpan(ctx, operation)
 		defer span.Finish()
 
 		if id == 0 {
@@ -118,22 +157,16 @@ func (db *Db) FindMerchantAccountById(ctx context.Context, id uint64) (bool, err
 			return false, errors.ErrAccountDoesNotExist
 		}
 
+		if account.AccountState == merchant_service_proto_v1.MerchantAccountState_Inactive {
+			return false, errors.ErrAccountDoesNotExist
+		}
+
 		return true, nil
 	}
-
-	result, err := db.Conn.PerformComplexTransaction(ctx, tx)
-	if err != nil {
-		return true, err
-	}
-
-	status, ok := result.(*bool)
-	if !ok {
-		return true, errors.ErrFailedToCastToType
-	}
-
-	return *status, nil
+	return tx
 }
 
+// UpdateAccountOnboardStatus updates the onboarding status of a merchant account
 func (db *Db) UpdateAccountOnboardStatus(ctx context.Context, account *merchant_service_proto_v1.MerchantAccount) error {
 	err := db.ValidateAccountNotNil(ctx, account)
 	if err != nil {

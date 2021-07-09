@@ -39,6 +39,7 @@ var (
 	ErrFailedToCastToType                       = errors.New("failed to cast to tx result to type after tx completion")
 	ErrUnableToObtainBusinessAccounts           = errors.New("unable to obtain business accounts")
 	ErrUnauthorizedRequest                      = errors.New("unauthorized request")
+	ErrFailedToCreateAccountInAuthHdlrSvc       = errors.New("failed to create an account in authentication handler service")
 )
 
 func NewError(msg string) error {
