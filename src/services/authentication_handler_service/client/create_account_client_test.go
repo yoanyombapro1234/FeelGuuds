@@ -3,19 +3,16 @@ package client
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"testing"
 	"time"
 
 	"google.golang.org/grpc"
-
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/util"
 )
 
 func TestAuthenticationHandlerServiceClient_CreateAccount(t *testing.T) {
-	email := fmt.Sprintf("test_%s@gmail.com", util.GenerateRandomString(17))
-	password := fmt.Sprintf("test_%s", util.GenerateRandomString(17))
+	email := "test_yoan@gmail.com" // fmt.Sprintf("test_yoan@gmail.com", util.GenerateRandomString(17))
+	password := "test_yoan" //fmt.Sprintf("test_yoan", util.GenerateRandomString(17))
 
 	tests := []struct {
 		name     string

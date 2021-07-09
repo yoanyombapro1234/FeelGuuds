@@ -72,9 +72,9 @@ func InitializeAuthnClient(logger core_logging.ILog) (*core_auth_sdk.Client, err
 	const username string = "blackspaceinc"
 	const password string = "blackspaceinc"
 	const audience string = "localhost"
-	const issuer string = "http://localhost:8404"
+	const issuer string = "http://localhost:8000"
 	const origin string = "http://localhost"
-	const privateBaseUrl string = "http://localhost:8404"
+	const privateBaseUrl string = "http://localhost:8000"
 
 	client, err := core_auth_sdk.NewClient(core_auth_sdk.Config{
 		// The AUTHN_URL of your Keratin AuthN server. This will be used to verify tokens created by
