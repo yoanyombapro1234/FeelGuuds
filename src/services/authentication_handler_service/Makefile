@@ -169,7 +169,8 @@ go-mod:
 .PHONY: unit-tests
 unit-tests:
 	echo "running unit tests"
-	go test -v -race ./pkg/... -json -cover
+	go test -v -race ./pkg/... -json -cover  -coverprofile cover.out
+	go tool cover -html=cover.out
 
 .PHONY: integration-tests
 integration-tests:
@@ -182,8 +183,8 @@ run-tests: start-containers
 
 .PHONY: run-test-suite
 run-test-suite: start-containers
-	echo "sleeping for 60 seconds before running both unit and e2e tests"
-	sleep 60s
+	echo "sleeping for 30 seconds before running both unit and e2e tests"
+	sleep 30s
 	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover | tparse -all -top
 
