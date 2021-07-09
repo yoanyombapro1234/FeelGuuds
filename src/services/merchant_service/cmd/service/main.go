@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/metrics"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/api"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/grpc"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/signals"

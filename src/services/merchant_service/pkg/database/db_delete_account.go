@@ -32,8 +32,8 @@ func (db *Db) DeleteMerchantAccount(ctx context.Context, id uint64) (bool, error
 		}
 
 		tx = tx.Clauses(clause.OnConflict{
-				UpdateAll: true,
-			}).Model(&merchant_service_proto_v1.MerchantAccount{}).
+			UpdateAll: true,
+		}).Model(&merchant_service_proto_v1.MerchantAccount{}).
 			Where("id = ?", id)
 
 		if err := tx.Update("account_state", merchant_service_proto_v1.MerchantAccountState_Inactive).Error; err != nil {
