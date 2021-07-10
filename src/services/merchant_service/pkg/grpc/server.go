@@ -52,11 +52,15 @@ func NewServer(config *Config, logging core_logging.ILog, tracer *core_tracing.T
 		return nil, errors.ErrInvalidInputArguments
 	}
 
-	client := stripe_client.NewStripeClient(logging, stripe_client.ClientParams{
+	client, err := stripe_client.NewStripeClient(logging, &stripe_client.ClientParams{
 		Key:        config.StripeKey,
 		RefreshUrl: config.RefreshUrl,
 		ReturnUrl:  config.ReturnUrl,
 	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	srv := &Server{
 		logger:       logging,

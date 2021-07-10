@@ -51,7 +51,8 @@ func (db *Db) createAccountTxFunc(account *merchant_service_proto_v1.MerchantAcc
 			return nil, err
 		}
 
-		if err := tx.Create(&account).Error; err != nil {
+		err := db.SaveAccountRecord(tx, account)
+		if err != nil {
 			return nil, err
 		}
 

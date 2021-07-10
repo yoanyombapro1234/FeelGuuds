@@ -41,11 +41,51 @@ func (s *Server) CallAuthHandlerSvcAndCreateAccount(ctx context.Context, merchan
 	return authnAcct, err
 }
 
-func (s *Server) CallAuthHandlerSvcAndDeleteAccount(ctx context.Context, id uint32) error {
-	rpcReq := &proto.DeleteAccountRequest{
+func (s *Server) CallAuthHandlerSvcAndLockAccount(ctx context.Context, id uint32) error {
+	rpcReq := &proto.LockAccountRequest{
 		Id: id,
 	}
-	authnAcct, err := s.AuthenticationHandlerClient.DeleteAccount(ctx, rpcReq)
+	authnAcct, err := s.AuthenticationHandlerClient.LockAccount(ctx, rpcReq)
+	if err != nil {
+		s.logger.For(ctx).Error(err, err.Error())
+		return err
+	}
+
+	if authnAcct.Error != constants.EMPTY {
+		rpcErr := errors.NewError(authnAcct.Error)
+		s.logger.For(ctx).Error(rpcErr, rpcErr.Error())
+		return rpcErr
+	}
+
+	return err
+}
+
+func (s *Server) CallAuthHandlerSvcAndUnlockAccount(ctx context.Context, id uint32) error {
+	rpcReq := &proto.UnLockAccountRequest{
+		Id: id,
+	}
+	authnAcct, err := s.AuthenticationHandlerClient.UnLockAccount(ctx, rpcReq)
+	if err != nil {
+		s.logger.For(ctx).Error(err, err.Error())
+		return err
+	}
+
+	if authnAcct.Error != constants.EMPTY {
+		rpcErr := errors.NewError(authnAcct.Error)
+		s.logger.For(ctx).Error(rpcErr, rpcErr.Error())
+		return rpcErr
+	}
+
+	return err
+}
+
+func (s *Server) CallAuthHandlerSvcAndUpdateAccount(ctx context.Context, authnId uint64, email string) error {
+	rpcReq := &proto.UpdateAccountRequest{
+		Id:    uint32(authnId),
+		Email: email,
+	}
+
+	authnAcct, err := s.AuthenticationHandlerClient.UpdateAccount(ctx, rpcReq)
 	if err != nil {
 		s.logger.For(ctx).Error(err, err.Error())
 		return err

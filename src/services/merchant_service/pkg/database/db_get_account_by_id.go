@@ -48,8 +48,8 @@ func (db *Db) getMerchantAccountByIdTxFunc(id uint64) core_database.CmplxTx {
 			return nil, errors.ErrAccountDoesNotExist
 		}
 
-		if account.GetAccountState() == merchant_service_proto_v1.MerchantAccountState_Inactive {
-			return nil, errors.ErrAccountDoesNotExist
+		if ok := db.AccountActive(&account); !ok {
+			return false, errors.ErrAccountDoesNotExist
 		}
 
 		return &account, nil

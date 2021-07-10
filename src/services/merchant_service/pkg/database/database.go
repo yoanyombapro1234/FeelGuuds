@@ -23,11 +23,12 @@ type OperationType string
 type DbOperations interface {
 	CreateMerchantAccount(ctx context.Context, account *merchant_service_proto_v1.MerchantAccount) (*merchant_service_proto_v1.MerchantAccount, error)
 	UpdateMerchantAccount(ctx context.Context, id uint64, account *merchant_service_proto_v1.MerchantAccount) (*merchant_service_proto_v1.MerchantAccount, error)
-	DeleteMerchantAccount(ctx context.Context, id uint64) (bool, error)
+	DeactivateMerchantAccount(ctx context.Context, id uint64) (bool, error)
 	GetMerchantAccountById(ctx context.Context, id uint64) (*merchant_service_proto_v1.MerchantAccount, error)
 	GetMerchantAccountsById(ctx context.Context, ids []uint64) ([]*merchant_service_proto_v1.MerchantAccount, error)
 	DoesMerchantAccountExist(ctx context.Context, id uint64) (bool, error)
-	// TODO: Add reactivate account logic
+	ActivateAccount(ctx context.Context, id uint64) (bool, error)
+	UpdateAccountOnboardingStatus(ctx context.Context, id uint64, status merchant_service_proto_v1.MerchantAccountState) (*merchant_service_proto_v1.MerchantAccount, error)
 }
 
 // Db witholds connection to a postgres database as well as a logging handler

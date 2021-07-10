@@ -38,7 +38,7 @@ func (db *Db) getMerchantAccountsTxFunc(ids []uint64) core_database.CmplxTx {
 		defer span.Finish()
 
 		var accounts = make([]*merchant_service_proto_v1.MerchantAccount, len(ids)+1)
-		if err := tx.Where(ids).Find(&accounts).Error; err != nil {
+		if err := tx.Where(ids).Where(merchant_service_proto_v1.MerchantAccount{IsActive: true}).Find(&accounts).Error; err != nil {
 			return nil, err
 		}
 

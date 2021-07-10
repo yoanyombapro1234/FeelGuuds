@@ -65,7 +65,7 @@ func (db *Db) ValidateAccountIds(ctx context.Context, account *merchant_service_
 		return err
 	}
 
-	if account.AuthnAccountId == 0 || account.PaymentsAccountId == 0 || account.StripeConnectedAccountId == 0 || account.EmployerId == 0 {
+	if account.AuthnAccountId == 0 || account.PaymentsAccountId == 0 || account.StripeConnectedAccountId == constants.EMPTY || account.EmployerId == 0 {
 		return errors.ErrMisconfiguredIds
 	}
 
@@ -110,7 +110,7 @@ func (db *Db) findMerchantAccountByEmailTxFunc(email string) func(ctx context.Co
 			return false, errors.ErrAccountDoesNotExist
 		}
 
-		if account.AccountState == merchant_service_proto_v1.MerchantAccountState_Inactive {
+		if ok := db.AccountActive(&account); !ok {
 			return false, errors.ErrAccountDoesNotExist
 		}
 
@@ -142,7 +142,7 @@ func (db *Db) FindMerchantAccountById(ctx context.Context, id uint64) (bool, err
 
 // findMerchantAccountByIdTxFunc finds the merchant account by id and wraps it in a db tx.
 func (db *Db) findMerchantAccountByIdTxFunc(id uint64) func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
-	tx := func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
+	return func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
 		const operation = "merchant_account_exists_by_id_tx"
 		db.Logger.For(ctx).Info(fmt.Sprintf("get business account by id database tx."))
 		ctx, span := db.startRootSpan(ctx, operation)
@@ -157,13 +157,20 @@ func (db *Db) findMerchantAccountByIdTxFunc(id uint64) func(ctx context.Context,
 			return false, errors.ErrAccountDoesNotExist
 		}
 
-		if account.AccountState == merchant_service_proto_v1.MerchantAccountState_Inactive {
+		if ok := db.AccountActive(&account); !ok {
 			return false, errors.ErrAccountDoesNotExist
 		}
 
 		return true, nil
 	}
-	return tx
+}
+
+func (db *Db) AccountActive(account *merchant_service_proto_v1.MerchantAccount) bool {
+	if account == nil || !account.IsActive {
+		return false
+	}
+
+	return true
 }
 
 // UpdateAccountOnboardStatus updates the onboarding status of a merchant account
@@ -174,26 +181,26 @@ func (db *Db) UpdateAccountOnboardStatus(ctx context.Context, account *merchant_
 		return err
 	}
 
-	switch account.OnboardingState {
+	switch account.AccountOnboardingDetails {
 	// not started onboarding
 	case merchant_service_proto_v1.OnboardingStatus_OnboardingNotStarted:
-		account.OnboardingState = merchant_service_proto_v1.OnboardingStatus_FeelGuudOnboarding
-		account.AccountState = merchant_service_proto_v1.MerchantAccountState_PendingOnboardingCompletion
+		account.AccountOnboardingDetails = merchant_service_proto_v1.OnboardingStatus_FeelGuudOnboarding
+		account.AccountOnboardingState = merchant_service_proto_v1.MerchantAccountState_PendingOnboardingCompletion
 		// completed onboarding with feelguud
 	case merchant_service_proto_v1.OnboardingStatus_FeelGuudOnboarding:
-		account.OnboardingState = merchant_service_proto_v1.OnboardingStatus_StripeOnboarding
-		account.AccountState = merchant_service_proto_v1.MerchantAccountState_PendingOnboardingCompletion
+		account.AccountOnboardingDetails = merchant_service_proto_v1.OnboardingStatus_StripeOnboarding
+		account.AccountOnboardingState = merchant_service_proto_v1.MerchantAccountState_PendingOnboardingCompletion
 		// completed onboarding with stripe
 	case merchant_service_proto_v1.OnboardingStatus_StripeOnboarding:
-		account.OnboardingState = merchant_service_proto_v1.OnboardingStatus_CatalogueOnboarding
-		account.AccountState = merchant_service_proto_v1.MerchantAccountState_PendingOnboardingCompletion
+		account.AccountOnboardingDetails = merchant_service_proto_v1.OnboardingStatus_CatalogueOnboarding
+		account.AccountOnboardingState = merchant_service_proto_v1.MerchantAccountState_PendingOnboardingCompletion
 		// completed onboarding catalogue
 	case merchant_service_proto_v1.OnboardingStatus_CatalogueOnboarding:
-		account.OnboardingState = merchant_service_proto_v1.OnboardingStatus_BCorpOnboarding
-		account.AccountState = merchant_service_proto_v1.MerchantAccountState_ActiveAndOnboarded
+		account.AccountOnboardingDetails = merchant_service_proto_v1.OnboardingStatus_BCorpOnboarding
+		account.AccountOnboardingState = merchant_service_proto_v1.MerchantAccountState_ActiveAndOnboarded
 	default:
-		account.OnboardingState = merchant_service_proto_v1.OnboardingStatus_OnboardingNotStarted
-		account.AccountState = merchant_service_proto_v1.MerchantAccountState_PendingOnboardingCompletion
+		account.AccountOnboardingDetails = merchant_service_proto_v1.OnboardingStatus_OnboardingNotStarted
+		account.AccountOnboardingState = merchant_service_proto_v1.MerchantAccountState_PendingOnboardingCompletion
 	}
 
 	return nil
@@ -201,6 +208,12 @@ func (db *Db) UpdateAccountOnboardStatus(ctx context.Context, account *merchant_
 
 // SaveAccountRecord saves a record in the database
 func (db *Db) SaveAccountRecord(tx *gorm.DB, account *merchant_service_proto_v1.MerchantAccount) error {
+	pswd, err := db.ValidateAndHashPassword(account.Password)
+	if err != nil {
+		return err
+	}
+
+	account.Password = pswd
 	if err := tx.Session(&gorm.Session{FullSaveAssociations: true}).Save(&account).Error; err != nil {
 		return err
 	}

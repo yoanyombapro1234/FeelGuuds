@@ -41,19 +41,20 @@ message MerchantAccount {
 	// set of tags associated with a merchant
 	repeated Tags tags = 15 [(gorm.field).has_many.preload = true];
 	// stripe connect account id
-	uint32 stripe_connected_account_id = 16;
+	string stripe_connected_account_id = 16;
 	// id of the associated payment account this merchant account is tied to
 	uint64 payments_account_id = 17;
 	// id of the merchant account from the context of the auth service
 	uint64 authn_account_id = 18;
 	// merchant account onboarding step
-	OnboardingStatus onboarding_state = 19 [(gorm.field).has_one.preload = true];
+	OnboardingStatus account_onboarding_details = 19 [(gorm.field).has_one.preload = true];
 	// merchant account state
-	MerchantAccountState account_state = 20 [(gorm.field).has_one.preload = true];
+	MerchantAccountState account_onboarding_state = 20 [(gorm.field).has_one.preload = true];
 	// type of merchant account
 	MerchantAccountType account_type = 21 [(gorm.field).has_one.preload = true];
 	// merchant account password
 	string password = 22;
+	bool isActive = 23;
 }
 
 // represents the type of merchant account
@@ -68,7 +69,6 @@ enum MerchantAccountType {
 enum MerchantAccountState {
 	ActiveAndOnboarded = 0;
 	PendingOnboardingCompletion = 1;
-	Inactive = 2;
 }
 
 // Represents the manner in which merchant accounts will deliver their service offerings to customers

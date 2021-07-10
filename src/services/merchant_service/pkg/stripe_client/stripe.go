@@ -4,13 +4,21 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/account"
 	"github.com/stripe/stripe-go/accountlink"
+	"github.com/stripe/stripe-go/v72"
 	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
 )
+
+type StripeOperations interface {
+	DeleteAccount(ctx context.Context, accountId uint32) error
+	CreateAccount(ctx context.Context, request *merchant_service_proto_v1.CreateAccountRequest) (*Response, error)
+	GetAccount(ctx context.Context, accountId string) (*stripe.Account, error)
+	GetAccountLink(ctx context.Context, accountId string) (*Response, error)
+}
 
 type Client struct {
 	Key        string
@@ -19,9 +27,11 @@ type Client struct {
 	ReturnUrl  string
 }
 
+var _ StripeOperations = (*Client)(nil)
+
 type Response struct {
 	Url      string
-	StripeId uint32
+	StripeId string
 }
 
 type ClientParams struct {
@@ -30,17 +40,22 @@ type ClientParams struct {
 	ReturnUrl  string
 }
 
-func NewStripeClient(logger core_logging.ILog, params ClientParams) *Client {
+func NewStripeClient(logger core_logging.ILog, params *ClientParams) (*Client, error) {
+	if params == nil {
+		return nil, errors.ErrInvalidInputArguments
+	}
+
+	stripe.Key = params.Key
+
 	return &Client{
 		Key:        params.Key,
 		Logger:     logger,
 		RefreshUrl: params.RefreshUrl,
 		ReturnUrl:  params.ReturnUrl,
-	}
+	}, nil
 }
 
 func (s *Client) DeleteAccount(ctx context.Context, acctId uint32) error {
-	stripe.Key = s.Key
 	id := strconv.Itoa(int(acctId))
 	_, err := account.Del(id, nil)
 	if err != nil {
@@ -52,7 +67,6 @@ func (s *Client) DeleteAccount(ctx context.Context, acctId uint32) error {
 }
 
 func (s *Client) CreateAccount(ctx context.Context, request *merchant_service_proto_v1.CreateAccountRequest) (*Response, error) {
-	stripe.Key = s.Key
 	params := &stripe.AccountParams{
 		Type: stripe.String(string(stripe.AccountTypeStandard)),
 		Capabilities: &stripe.AccountCapabilitiesParams{
@@ -67,21 +81,20 @@ func (s *Client) CreateAccount(ctx context.Context, request *merchant_service_pr
 		Email:   stripe.String(request.Account.BusinessEmail),
 	}
 
+	// TODO: implement this as a retryable operation for all 429+ error codes
 	acct, err := account.New(params)
 	if err != nil {
 		s.Logger.For(ctx).Error(err, err.Error())
 		return nil, err
 	}
 
-	stripeAccountId, err := strconv.Atoi(acct.ID)
-	if err != nil {
-		s.Logger.For(ctx).Error(err, err.Error())
-		return nil, err
-	}
+	return s.GetAccountLink(ctx, acct.ID)
+}
 
+func (s *Client) GetAccountLink(ctx context.Context, accountId string) (*Response, error) {
 	// call the account link api
 	acctLinkParams := &stripe.AccountLinkParams{
-		Account:    stripe.String(acct.ID),
+		Account:    stripe.String(accountId),
 		RefreshURL: stripe.String(s.RefreshUrl),
 		ReturnURL:  stripe.String(s.ReturnUrl),
 		Type:       stripe.String(constants.STRIPE_ACCOUNT_ONBOARDING),
@@ -94,6 +107,43 @@ func (s *Client) CreateAccount(ctx context.Context, request *merchant_service_pr
 
 	return &Response{
 		Url:      acc.URL,
-		StripeId: uint32(stripeAccountId),
+		StripeId: accountId,
 	}, nil
+}
+
+func (s *Client) GetAccount(ctx context.Context, accountId string) (*stripe.Account, error) {
+	if accountId == constants.EMPTY {
+		return nil, errors.ErrInvalidInputArguments
+	}
+
+	return account.GetByID(accountId, nil)
+}
+
+func (s *Client) HandleStripeError(err error) (bool, error) {
+	if err != nil {
+		// Try to safely cast a generic error to a stripe.Error so that we can get at
+		// some additional Stripe-specific information about what went wrong.
+		if stripeErr, ok := err.(*stripe.Error); ok {
+			shouldRetry := s.ClientRetry(stripeErr.Type)
+			if stripeErr.HTTPStatusCode >= 429 {
+				s.Logger.Error(stripeErr.Err, stripeErr.Error())
+				return shouldRetry, stripeErr
+			}
+		} else {
+			s.Logger.Error(err, err.Error())
+		}
+	}
+
+	return false, nil
+}
+
+func (s *Client) ClientRetry(errorType stripe.ErrorType) bool {
+	switch errorType {
+	case stripe.ErrorTypeAPI:
+		return true
+	case stripe.ErrorTypeRateLimit:
+		return true
+	default:
+		return false
+	}
 }
