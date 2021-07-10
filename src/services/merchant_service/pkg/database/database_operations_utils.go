@@ -2,12 +2,12 @@ package database
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/opentracing/opentracing-go"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
-	"gorm.io/gorm"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/utils"
 )
 
 // ValidateAccount performs various account level validations
@@ -72,99 +72,6 @@ func (db *Db) ValidateAccountIds(ctx context.Context, account *merchant_service_
 	return nil
 }
 
-// FindMerchantAccountByEmail finds a merchant account by email
-func (db *Db) FindMerchantAccountByEmail(ctx context.Context, email string) (bool, error) {
-	const operation = "merchant_account_exists_by_email_db_op"
-	db.Logger.For(ctx).Info(fmt.Sprintf("get business account by email database operation."))
-	ctx, span := db.startRootSpan(ctx, operation)
-	defer span.Finish()
-
-	tx := db.findMerchantAccountByEmailTxFunc(email)
-	result, err := db.Conn.PerformComplexTransaction(ctx, tx)
-	if err != nil {
-		return true, err
-	}
-
-	status, ok := result.(*bool)
-	if !ok {
-		return true, errors.ErrFailedToCastToType
-	}
-
-	return *status, nil
-}
-
-// findMerchantAccountByEmailTxFunc wraps the logic in a db tx and returns it
-func (db *Db) findMerchantAccountByEmailTxFunc(email string) func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
-	tx := func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
-		const operation = "merchant_account_exists_by_email_tx"
-		db.Logger.For(ctx).Info(fmt.Sprintf("get business account by email database tx."))
-		ctx, span := db.startRootSpan(ctx, operation)
-		defer span.Finish()
-
-		if email == constants.EMPTY {
-			return false, errors.ErrInvalidInputArguments
-		}
-
-		var account merchant_service_proto_v1.MerchantAccount
-		if err := tx.Where(&merchant_service_proto_v1.MerchantAccount{BusinessEmail: email}).First(&account).Error; err != nil {
-			return false, errors.ErrAccountDoesNotExist
-		}
-
-		if ok := db.AccountActive(&account); !ok {
-			return false, errors.ErrAccountDoesNotExist
-		}
-
-		return true, nil
-	}
-	return tx
-}
-
-// FindMerchantAccountById finds a merchant account by id
-func (db *Db) FindMerchantAccountById(ctx context.Context, id uint64) (bool, error) {
-	const operation = "merchant_account_exists_by_id_op"
-	db.Logger.For(ctx).Info(fmt.Sprintf("get business account by id database operation."))
-	ctx, span := db.startRootSpan(ctx, operation)
-	defer span.Finish()
-
-	tx := db.findMerchantAccountByIdTxFunc(id)
-	result, err := db.Conn.PerformComplexTransaction(ctx, tx)
-	if err != nil {
-		return true, err
-	}
-
-	status, ok := result.(*bool)
-	if !ok {
-		return true, errors.ErrFailedToCastToType
-	}
-
-	return *status, nil
-}
-
-// findMerchantAccountByIdTxFunc finds the merchant account by id and wraps it in a db tx.
-func (db *Db) findMerchantAccountByIdTxFunc(id uint64) func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
-	return func(ctx context.Context, tx *gorm.DB) (interface{}, error) {
-		const operation = "merchant_account_exists_by_id_tx"
-		db.Logger.For(ctx).Info(fmt.Sprintf("get business account by id database tx."))
-		ctx, span := db.startRootSpan(ctx, operation)
-		defer span.Finish()
-
-		if id == 0 {
-			return false, errors.ErrInvalidInputArguments
-		}
-
-		var account merchant_service_proto_v1.MerchantAccount
-		if err := tx.Where(&merchant_service_proto_v1.MerchantAccount{Id: id}).First(&account).Error; err != nil {
-			return false, errors.ErrAccountDoesNotExist
-		}
-
-		if ok := db.AccountActive(&account); !ok {
-			return false, errors.ErrAccountDoesNotExist
-		}
-
-		return true, nil
-	}
-}
-
 func (db *Db) AccountActive(account *merchant_service_proto_v1.MerchantAccount) bool {
 	if account == nil || !account.IsActive {
 		return false
@@ -206,16 +113,7 @@ func (db *Db) UpdateAccountOnboardStatus(ctx context.Context, account *merchant_
 	return nil
 }
 
-// SaveAccountRecord saves a record in the database
-func (db *Db) SaveAccountRecord(tx *gorm.DB, account *merchant_service_proto_v1.MerchantAccount) error {
-	pswd, err := db.ValidateAndHashPassword(account.Password)
-	if err != nil {
-		return err
-	}
-
-	account.Password = pswd
-	if err := tx.Session(&gorm.Session{FullSaveAssociations: true}).Save(&account).Error; err != nil {
-		return err
-	}
-	return nil
+// startRootSpan starts a root span object
+func (db *Db) startRootSpan(ctx context.Context, dbOpType OperationType) (context.Context, opentracing.Span) {
+	return utils.StartRootOperationSpan(ctx, string(dbOpType), db.Logger)
 }
