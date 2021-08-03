@@ -6,7 +6,7 @@ import (
 
 	core_database "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-database"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -26,7 +26,7 @@ func (db *Db) GetMerchantAccountById(ctx context.Context, id uint64) (*merchant_
 
 	acc, ok := result.(*merchant_service_proto_v1.MerchantAccount)
 	if !ok {
-		return nil, errors.ErrFailedToCastToType
+		return nil, service_errors.ErrFailedToCastToType
 	}
 
 	return acc, nil
@@ -40,16 +40,16 @@ func (db *Db) getMerchantAccountByIdTxFunc(id uint64) core_database.CmplxTx {
 		defer span.Finish()
 
 		if id == 0 {
-			return nil, errors.ErrInvalidInputArguments
+			return nil, service_errors.ErrInvalidInputArguments
 		}
 
 		var account merchant_service_proto_v1.MerchantAccount
 		if err := tx.Preload(clause.Associations).Where(&merchant_service_proto_v1.MerchantAccount{Id: id}).First(&account).Error; err != nil {
-			return nil, errors.ErrAccountDoesNotExist
+			return nil, service_errors.ErrAccountDoesNotExist
 		}
 
 		if ok := db.AccountActive(&account); !ok {
-			return false, errors.ErrAccountDoesNotExist
+			return false, service_errors.ErrAccountDoesNotExist
 		}
 
 		return &account, nil

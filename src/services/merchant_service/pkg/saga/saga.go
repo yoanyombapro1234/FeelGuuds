@@ -8,7 +8,7 @@ import (
 	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
 	"go.uber.org/zap"
 
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 )
 
 type SagaCoordinator struct {
@@ -29,21 +29,21 @@ func (s *SagaCoordinator) RunSaga(ctx context.Context, operationName string, ste
 	for _, step := range steps {
 		// first operation is to perform a distributed transaction and unlock the account if possible
 		if err := tx.AddStep(step); err != nil {
-			s.Logger.Error(errors.ErrFailedToConfigureSaga, errors.ErrFailedToConfigureSaga.Error())
-			return errors.ErrFailedToConfigureSaga
+			s.Logger.Error(service_errors.ErrFailedToConfigureSaga, service_errors.ErrFailedToConfigureSaga.Error())
+			return service_errors.ErrFailedToConfigureSaga
 		}
 	}
 
 	coordinator := saga.NewCoordinator(ctx, ctx, tx, store)
 	if result := coordinator.Play(); result != nil && (len(result.CompensateErrors) > 0 || result.ExecutionError != nil) {
 		// log the saga operation errors
-		s.Logger.Error(errors.ErrSagaFailedToExecuteSuccessfully, errors.ErrSagaFailedToExecuteSuccessfully.Error(),
+		s.Logger.Error(service_errors.ErrSagaFailedToExecuteSuccessfully, service_errors.ErrSagaFailedToExecuteSuccessfully.Error(),
 			zap.Errors("compensate error", result.CompensateErrors), zap.Error(result.ExecutionError))
 
 		// construct error
 		errMsg := fmt.Sprintf("compensate errors : %s , execution errors %s", zap.Errors("compensate error",
 			result.CompensateErrors).String, zap.Error(result.ExecutionError).String)
-		err := errors.NewError(errMsg)
+		err := service_errors.NewError(errMsg)
 		return err
 	}
 

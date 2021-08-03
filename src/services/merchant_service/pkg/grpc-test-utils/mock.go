@@ -8,31 +8,31 @@ import (
 
 type MockedService struct{}
 
+var _ merchant_service_proto_v1.MerchantServiceServer = (*MockedService)(nil)
+
 func (s *MockedService) UpdateAccount(ctx context.Context, request *merchant_service_proto_v1.UpdateAccountRequest) (*merchant_service_proto_v1.UpdateAccountResponse, error) {
-	panic("implement me")
+	return nil, nil
 }
 
 func (s *MockedService) DeleteAccount(ctx context.Context, request *merchant_service_proto_v1.DeleteAccountRequest) (*merchant_service_proto_v1.DeleteAccountResponse, error) {
-	panic("implement me")
+	return nil, nil
 }
 
 func (s *MockedService) GetAccount(ctx context.Context, request *merchant_service_proto_v1.GetAccountRequest) (*merchant_service_proto_v1.GetAccountResponse, error) {
-	panic("implement me")
+	return nil, nil
 }
 
 func (s *MockedService) GetAccounts(ctx context.Context, request *merchant_service_proto_v1.GetAccountsRequest) (*merchant_service_proto_v1.GetAccountsResponse, error) {
-	panic("implement me")
+	return nil, nil
 }
 
 func (s *MockedService) SetAccountStatus(ctx context.Context, request *merchant_service_proto_v1.SetAccountStatusRequest) (*merchant_service_proto_v1.SetAccountStatusResponse, error) {
-	panic("implement me")
+	return nil, nil
 }
 
 func (s *MockedService) StartAccountOnboarding(ctx context.Context, request *merchant_service_proto_v1.StartAccountOnboardingRequest) (*merchant_service_proto_v1.StartAccountOnboardingRespone, error) {
-	panic("implement me")
+	return nil, nil
 }
-
-var _ merchant_service_proto_v1.MerchantServiceServer = (*MockedService)(nil)
 
 func (s *MockedService) CreateAccount(ctx context.Context, request *merchant_service_proto_v1.CreateAccountRequest) (*merchant_service_proto_v1.CreateAccountResponse, error) {
 	return &merchant_service_proto_v1.CreateAccountResponse{AccountId: uint64(1000)}, nil

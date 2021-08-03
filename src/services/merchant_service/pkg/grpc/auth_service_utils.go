@@ -6,7 +6,7 @@ import (
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 )
 
 func (s *Server) CallAuthHandlerSvcAndAuthenticateAccount(ctx context.Context, merchantAcct *merchant_service_proto_v1.MerchantAccount) (*proto.
@@ -33,7 +33,7 @@ func (s *Server) CallAuthHandlerSvcAndCreateAccount(ctx context.Context, merchan
 	}
 
 	if authnAcct.Error != constants.EMPTY {
-		rpcErr := errors.NewError(authnAcct.Error)
+		rpcErr := service_errors.NewError(authnAcct.Error)
 		s.logger.For(ctx).Error(rpcErr, rpcErr.Error())
 		return nil, rpcErr
 	}
@@ -52,7 +52,7 @@ func (s *Server) CallAuthHandlerSvcAndLockAccount(ctx context.Context, id uint32
 	}
 
 	if authnAcct.Error != constants.EMPTY {
-		rpcErr := errors.NewError(authnAcct.Error)
+		rpcErr := service_errors.NewError(authnAcct.Error)
 		s.logger.For(ctx).Error(rpcErr, rpcErr.Error())
 		return rpcErr
 	}
@@ -71,7 +71,7 @@ func (s *Server) CallAuthHandlerSvcAndUnlockAccount(ctx context.Context, id uint
 	}
 
 	if authnAcct.Error != constants.EMPTY {
-		rpcErr := errors.NewError(authnAcct.Error)
+		rpcErr := service_errors.NewError(authnAcct.Error)
 		s.logger.For(ctx).Error(rpcErr, rpcErr.Error())
 		return rpcErr
 	}
@@ -92,7 +92,7 @@ func (s *Server) CallAuthHandlerSvcAndUpdateAccount(ctx context.Context, authnId
 	}
 
 	if authnAcct.Error != constants.EMPTY {
-		rpcErr := errors.NewError(authnAcct.Error)
+		rpcErr := service_errors.NewError(authnAcct.Error)
 		s.logger.For(ctx).Error(rpcErr, rpcErr.Error())
 		return rpcErr
 	}

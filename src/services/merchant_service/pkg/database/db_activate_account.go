@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	core_database "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-database"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"gorm.io/gorm"
 )
 
@@ -27,7 +27,7 @@ func (db *Db) ActivateAccount(ctx context.Context, id uint64) (bool, error) {
 
 	opStatus, ok := result.(bool)
 	if !ok {
-		return false, errors.ErrFailedToCastToType
+		return false, service_errors.ErrFailedToCastToType
 	}
 
 	return opStatus, nil
@@ -42,12 +42,12 @@ func (db *Db) activateMerchantAccountTxFunc(id uint64) core_database.CmplxTx {
 		defer span.Finish()
 
 		if id == 0 {
-			return nil, errors.ErrInvalidInputArguments
+			return nil, service_errors.ErrInvalidInputArguments
 		}
 
 		account, err := db.GetMerchantAccountById(ctx, id)
 		if err != nil {
-			return nil, errors.ErrAccountDoesNotExist
+			return nil, service_errors.ErrAccountDoesNotExist
 		}
 
 		account.IsActive = true

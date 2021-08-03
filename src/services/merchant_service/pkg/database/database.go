@@ -10,7 +10,7 @@ import (
 	core_tracing "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-tracing"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
-	svcErrors "github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	svcErrors "github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/utils"
 	"gorm.io/gorm"
 

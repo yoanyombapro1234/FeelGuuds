@@ -5,7 +5,7 @@ import (
 
 	"github.com/itimofeev/go-saga"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 )
 
 // sagaGetJwtTokenFromAuthHandlerSvc returns a saga comprised of an action and compensating function used to authenticate an account through the
@@ -66,7 +66,7 @@ func (s *Server) compensateLockAccountViaAuthHandlerSvc(authnAcctId chan uint32)
 
 		id := <-authnAcctId
 		if id == 0 {
-			return errors.ErrInvalidInputArguments
+			return service_errors.ErrInvalidInputArguments
 		}
 
 		return s.CallAuthHandlerSvcAndLockAccount(ctx, id)
@@ -117,7 +117,7 @@ func (s *Server) compensateUnLockAccountViaAuthHandlerSvc(authnAcctId chan uint3
 
 		id := <-authnAcctId
 		if id == 0 {
-			return errors.ErrInvalidInputArguments
+			return service_errors.ErrInvalidInputArguments
 		}
 
 		return s.CallAuthHandlerSvcAndUnlockAccount(ctx, id)

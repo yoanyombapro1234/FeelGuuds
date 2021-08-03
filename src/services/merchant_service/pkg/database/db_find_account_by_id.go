@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"gorm.io/gorm"
 )
 
@@ -24,7 +24,7 @@ func (db *Db) FindMerchantAccountById(ctx context.Context, id uint64) (bool, err
 
 	status, ok := result.(*bool)
 	if !ok {
-		return true, errors.ErrFailedToCastToType
+		return true, service_errors.ErrFailedToCastToType
 	}
 
 	return *status, nil
@@ -39,16 +39,16 @@ func (db *Db) findMerchantAccountByIdTxFunc(id uint64) func(ctx context.Context,
 		defer span.Finish()
 
 		if id == 0 {
-			return false, errors.ErrInvalidInputArguments
+			return false, service_errors.ErrInvalidInputArguments
 		}
 
 		var account merchant_service_proto_v1.MerchantAccount
 		if err := tx.Where(&merchant_service_proto_v1.MerchantAccount{Id: id}).First(&account).Error; err != nil {
-			return false, errors.ErrAccountDoesNotExist
+			return false, service_errors.ErrAccountDoesNotExist
 		}
 
 		if ok := db.AccountActive(&account); !ok {
-			return false, errors.ErrAccountDoesNotExist
+			return false, service_errors.ErrAccountDoesNotExist
 		}
 
 		return true, nil

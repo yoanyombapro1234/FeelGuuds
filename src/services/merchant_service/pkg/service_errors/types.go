@@ -1,7 +1,20 @@
-package errors
+package service_errors
 
 import (
 	"errors"
+)
+
+// List of values that ErrorCode can take.
+const (
+	ErrorCodeAccountAlreadyExists           ErrorCode = "account_already_exists"
+	ErrorCodeMisconfiguredMerchantAccountID ErrorCode = "misconfigured_merchant_account_id"
+	ErrorCodeAccountInvalid                 ErrorCode = "account_invalid"
+	ErrorCodeMisconfiguredAccountParameters ErrorCode = "misconfigured_merchant_account_parameters"
+	ErrorCodeDatabaseConnectionFailure      ErrorCode = "database_connection_failure"
+	ErrorCodeDatabaseMigrationFailure       ErrorCode = "database_migration_failure"
+	ErrorCodeInvalidInput                   ErrorCode = "invalid_input"
+	ErrorCodeInvalidEnvironmentVariables    ErrorCode = "invalid_environment_variables"
+	ErrorCodeAuthenticationRequired         ErrorCode = "authentication_required"
 )
 
 var (

@@ -1,0 +1,52 @@
+version: '3.7'
+
+services:
+  # merchant account database
+  merchant_account_db:
+    container_name: ${POSTGRES_CONTAINER}
+    image: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_NAME:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - ${POSTGRES_EXTERNAL_PORT}:${POSTGRES_INTERNAL_PORT}
+    restart: unless-stopped
+    networks:
+      - monitor-net
+    env_file:
+      - .env.dev
+
+  # merchant account for the feelguuds platform
+  merchant_account_service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: merchant_account_service
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}  # http port
+      - ${HTTPS_PORT}:${HTTPS_PORT}  # https port
+      - ${GRPC_PORT}:${GRPC_PORT} # grpc port
+    restart: unless-stopped
+    networks:
+      - monitor-net
+      - web
+    volumes:
+      - '.:/go/src/github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_account_service'
+    depends_on:
+      - auth_service
+      - jaeger-query
+      - authentication_handler_service
+      - merchant_account_db
+    env_file:
+      - .env.dev
+
+networks:
+  monitor-net:
+    driver: bridge
+
+volumes:
+  postgres:

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	core_database "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-database"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"gorm.io/gorm"
 )
 
@@ -27,7 +27,7 @@ func (db *Db) DeactivateMerchantAccount(ctx context.Context, id uint64) (bool, e
 
 	status, ok := result.(*bool)
 	if !ok {
-		return false, errors.ErrFailedToCastToType
+		return false, service_errors.ErrFailedToCastToType
 	}
 
 	return *status, nil
@@ -42,17 +42,17 @@ func (db *Db) deactivateMerchantAccountTxFunc(id uint64) core_database.CmplxTx {
 		defer span.Finish()
 
 		if id == 0 {
-			return false, errors.ErrInvalidInputArguments
+			return false, service_errors.ErrInvalidInputArguments
 		}
 
 		account, err := db.GetMerchantAccountById(ctx, id)
 		if err != nil {
-			return nil, errors.ErrAccountDoesNotExist
+			return nil, service_errors.ErrAccountDoesNotExist
 		}
 
 		account.IsActive = false
 		if err := db.SaveAccountRecord(tx, account); err != nil {
-			db.Logger.For(ctx).Error(errors.ErrFailedToUpdateAccountActiveStatus, err.Error())
+			db.Logger.For(ctx).Error(service_errors.ErrFailedToUpdateAccountActiveStatus, err.Error())
 			return false, err
 		}
 

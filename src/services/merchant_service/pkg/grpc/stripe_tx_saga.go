@@ -5,7 +5,8 @@ import (
 
 	"github.com/itimofeev/go-saga"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/stripe_client"
 )
 
@@ -30,8 +31,8 @@ func (s *Server) sagaCreateAccountThroughStripe(request *merchant_service_proto_
 func (s *Server) compensateDeleteAccountViaStripe(stripeResponse <-chan *stripe_client.Response) func(ctx context.Context) error {
 	return func(ctx context.Context) error {
 		resp := <-stripeResponse
-		if resp.StripeId == 0 {
-			return errors.ErrInvalidInputArguments
+		if resp.StripeId == constants.EMPTY{
+			return service_errors.ErrInvalidInputArguments
 		}
 
 		err := s.StripeClient.DeleteAccount(ctx, resp.StripeId)

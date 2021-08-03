@@ -23,6 +23,7 @@ func GetDefaultUnaryServerInterceptors(tracer opentracing.Tracer) []grpc.UnarySe
 		grpc_ctxtags.UnaryServerInterceptor(),
 		grpc_server_interceptor.UnaryAuditServiceRequest(),
 		grpc_server_interceptor.UnaryLogRequestCanceled(),
+		grpc_server_interceptor.UnaryAuthentication(),
 		grpc_opentracing.UnaryServerInterceptor(),
 		otgrpc.OpenTracingServerInterceptor(tracer),
 		// Recovery handlers should typically be last in the chain so that other middleware
@@ -37,6 +38,7 @@ func GetDefaultStreamServerInterceptors(tracer opentracing.Tracer) []grpc.Stream
 		grpc_ctxtags.StreamServerInterceptor(),
 		grpc_server_interceptor.StreamAuditServiceRequest(),
 		grpc_server_interceptor.StreamLogRequestCanceled(),
+		grpc_server_interceptor.StreamAuthentication(),
 		otgrpc.OpenTracingStreamServerInterceptor(tracer),
 		grpc_recovery.StreamServerInterceptor(grpc_recovery.WithRecoveryHandler(requestErrorHandler)),
 	}

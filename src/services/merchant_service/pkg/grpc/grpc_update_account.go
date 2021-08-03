@@ -6,7 +6,7 @@ import (
 	"github.com/itimofeev/go-saga"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 )
 
 func (s *Server) UpdateAccount(ctx context.Context, request *merchant_service_proto_v1.UpdateAccountRequest) (*merchant_service_proto_v1.UpdateAccountResponse, error) {
@@ -19,8 +19,8 @@ func (s *Server) UpdateAccount(ctx context.Context, request *merchant_service_pr
 	defer rootSpan.Finish()
 
 	if request == nil || request.Account == nil {
-		s.logger.For(ctx).Error(errors.ErrInvalidInputArguments, errors.ErrInvalidInputArguments.Error())
-		return nil, errors.ErrInvalidInputArguments
+		s.logger.For(ctx).Error(service_errors.ErrInvalidInputArguments, service_errors.ErrInvalidInputArguments.Error())
+		return nil, service_errors.ErrInvalidInputArguments
 	}
 
 	// update scenarios ....

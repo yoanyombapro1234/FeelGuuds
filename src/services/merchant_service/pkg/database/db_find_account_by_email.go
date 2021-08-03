@@ -6,7 +6,7 @@ import (
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +25,7 @@ func (db *Db) FindMerchantAccountByEmail(ctx context.Context, email string) (boo
 
 	status, ok := result.(*bool)
 	if !ok {
-		return true, errors.ErrFailedToCastToType
+		return true, service_errors.ErrFailedToCastToType
 	}
 
 	return *status, nil
@@ -40,16 +40,16 @@ func (db *Db) findMerchantAccountByEmailTxFunc(email string) func(ctx context.Co
 		defer span.Finish()
 
 		if email == constants.EMPTY {
-			return false, errors.ErrInvalidInputArguments
+			return false, service_errors.ErrInvalidInputArguments
 		}
 
 		var account merchant_service_proto_v1.MerchantAccount
 		if err := tx.Where(&merchant_service_proto_v1.MerchantAccount{BusinessEmail: email}).First(&account).Error; err != nil {
-			return false, errors.ErrAccountDoesNotExist
+			return false, service_errors.ErrAccountDoesNotExist
 		}
 
 		if ok := db.AccountActive(&account); !ok {
-			return false, errors.ErrAccountDoesNotExist
+			return false, service_errors.ErrAccountDoesNotExist
 		}
 
 		return true, nil

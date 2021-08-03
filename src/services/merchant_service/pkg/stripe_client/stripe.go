@@ -2,7 +2,6 @@ package stripe_client
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/stripe/stripe-go/account"
 	"github.com/stripe/stripe-go/accountlink"
@@ -10,11 +9,11 @@ import (
 	core_logging "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-logging/json"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 )
 
 type StripeOperations interface {
-	DeleteAccount(ctx context.Context, accountId uint32) error
+	DeleteAccount(ctx context.Context, accountId string) error
 	CreateAccount(ctx context.Context, request *merchant_service_proto_v1.CreateAccountRequest) (*Response, error)
 	GetAccount(ctx context.Context, accountId string) (*stripe.Account, error)
 	GetAccountLink(ctx context.Context, accountId string) (*Response, error)
@@ -42,7 +41,7 @@ type ClientParams struct {
 
 func NewStripeClient(logger core_logging.ILog, params *ClientParams) (*Client, error) {
 	if params == nil {
-		return nil, errors.ErrInvalidInputArguments
+		return nil, service_errors.ErrInvalidInputArguments
 	}
 
 	stripe.Key = params.Key
@@ -55,8 +54,11 @@ func NewStripeClient(logger core_logging.ILog, params *ClientParams) (*Client, e
 	}, nil
 }
 
-func (s *Client) DeleteAccount(ctx context.Context, acctId uint32) error {
-	id := strconv.Itoa(int(acctId))
+func (s *Client) DeleteAccount(ctx context.Context, id string) error {
+	if id == constants.EMPTY {
+		return service_errors.ErrInvalidInputArguments
+	}
+
 	_, err := account.Del(id, nil)
 	if err != nil {
 		s.Logger.For(ctx).Error(err, err.Error())
@@ -113,7 +115,7 @@ func (s *Client) GetAccountLink(ctx context.Context, accountId string) (*Respons
 
 func (s *Client) GetAccount(ctx context.Context, accountId string) (*stripe.Account, error) {
 	if accountId == constants.EMPTY {
-		return nil, errors.ErrInvalidInputArguments
+		return nil, service_errors.ErrInvalidInputArguments
 	}
 
 	return account.GetByID(accountId, nil)

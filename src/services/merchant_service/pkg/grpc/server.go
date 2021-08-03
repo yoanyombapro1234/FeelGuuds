@@ -12,9 +12,10 @@ import (
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/database"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
 	grpc_client "github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/grpc-client"
+	grpc_server "github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/grpc-server"
 	grpc_utils "github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/grpc-utils"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/stripe_client"
 	tlscert "github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/tlsCert"
 	"go.uber.org/zap"
@@ -47,15 +48,26 @@ type Config struct {
 	ReturnUrl                           string `mapstructure:"return-url"`
 }
 
-func NewServer(config *Config, logging core_logging.ILog, tracer *core_tracing.TracingEngine, dbConn *database.Db) (*Server, error) {
-	if config == nil || dbConn == nil || tracer == nil {
-		return nil, errors.ErrInvalidInputArguments
+type ServerInitializationParams struct {
+	Config             *Config
+	Logger             core_logging.ILog
+	TracerEngine       *core_tracing.TracingEngine
+	DatabaseConnection *database.Db
+}
+
+func NewServer(params *ServerInitializationParams) (*Server, error) {
+	if params == nil {
+		return nil, service_errors.ErrInvalidInputArguments
 	}
 
-	client, err := stripe_client.NewStripeClient(logging, &stripe_client.ClientParams{
-		Key:        config.StripeKey,
-		RefreshUrl: config.RefreshUrl,
-		ReturnUrl:  config.ReturnUrl,
+	if params.DatabaseConnection == nil || params.TracerEngine == nil || params.Config == nil {
+		return nil, service_errors.ErrInvalidInputArguments
+	}
+
+	client, err := stripe_client.NewStripeClient(params.Logger, &stripe_client.ClientParams{
+		Key:        params.Config.StripeKey,
+		RefreshUrl: params.Config.RefreshUrl,
+		ReturnUrl:  params.Config.ReturnUrl,
 	})
 
 	if err != nil {
@@ -63,10 +75,10 @@ func NewServer(config *Config, logging core_logging.ILog, tracer *core_tracing.T
 	}
 
 	srv := &Server{
-		logger:       logging,
-		config:       config,
-		tracerEngine: tracer,
-		DbConn:       dbConn,
+		logger:       params.Logger,
+		config:       params.Config,
+		tracerEngine: params.TracerEngine,
+		DbConn:       params.DatabaseConnection,
 		StripeClient: client,
 	}
 
@@ -98,7 +110,7 @@ func (s *Server) ListenAndServe(enableTls bool) {
 	s.StartGrpcServer(err, sb)
 }
 
-func (s *Server) StartGrpcServer(err error, sb GrpcServer) {
+func (s *Server) StartGrpcServer(err error, sb grpc_server.GrpcServer) {
 	err = sb.Start(fmt.Sprintf(":%v", s.config.Port))
 	if err != nil {
 		s.logger.Fatal(err, err.Error())
@@ -109,8 +121,8 @@ func (s *Server) StartGrpcServer(err error, sb GrpcServer) {
 	})
 }
 
-func (s *Server) InitializeServiceBuilder() *GrpcServerBuilder {
-	builder := NewGrpcServerBuilder(s.config.ServiceName, s.logger)
+func (s *Server) InitializeServiceBuilder() *grpc_server.GrpcServerBuilder {
+	builder := grpc_server.NewGrpcServerBuilder(s.config.ServiceName, s.logger)
 	s.addInterceptors(builder)
 	builder.EnableReflection(true)
 	return builder
@@ -120,7 +132,7 @@ func (s *Server) serviceRegister(sv *grpc.Server) {
 	merchant_service_proto_v1.RegisterMerchantServiceServer(sv, s)
 }
 
-func (s *Server) addInterceptors(sb *GrpcServerBuilder) {
+func (s *Server) addInterceptors(sb *grpc_server.GrpcServerBuilder) {
 	sb.SetUnaryInterceptors(grpc_utils.GetDefaultUnaryServerInterceptors(s.tracerEngine.Tracer))
 	sb.SetStreamInterceptors(grpc_utils.GetDefaultStreamServerInterceptors(s.tracerEngine.Tracer))
 }

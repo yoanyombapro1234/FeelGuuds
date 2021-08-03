@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	core_database "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-database"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"gorm.io/gorm"
 )
 
@@ -24,7 +24,7 @@ func (db *Db) DoesMerchantAccountExist(ctx context.Context, id uint64) (bool, er
 
 	status, ok := result.(bool)
 	if !ok {
-		return true, errors.ErrFailedToCastToType
+		return true, service_errors.ErrFailedToCastToType
 	}
 
 	return status, nil
@@ -38,11 +38,11 @@ func (db *Db) doesMerchantAccountExistTxFunc(id uint64) core_database.CmplxTx {
 		defer span.Finish()
 
 		if id == 0 {
-			return false, errors.ErrInvalidInputArguments
+			return false, service_errors.ErrInvalidInputArguments
 		}
 
 		if ok, err := db.FindMerchantAccountById(ctx, id); !ok && err != nil {
-			return false, errors.ErrAccountDoesNotExist
+			return false, service_errors.ErrAccountDoesNotExist
 		}
 
 		return true, nil

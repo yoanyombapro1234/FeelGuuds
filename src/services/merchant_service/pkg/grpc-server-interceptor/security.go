@@ -4,6 +4,7 @@ import (
 	"context"
 
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/constants"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -24,18 +25,20 @@ func securityContextHandle(ctx context.Context) (context.Context, error) {
 	if !ok {
 		return nil, status.Errorf(codes.InvalidArgument, "Retrieving metadata is failed")
 	}
-	user, ok := md["user"]
-	pass, ok := md["pass"]
+
+	jwtToken, ok := md["jwt"]
 	if !ok {
 		return nil, status.Errorf(codes.Unauthenticated, "Authorization token is not supplied")
 	}
 
-	if user[0] != "user" || pass[0] != "123" {
+	if jwtToken[0] != constants.EMPTY {
 		return nil, status.Errorf(codes.Unauthenticated, "Authorization token is not supplied")
 	}
+
 	type authInfo struct {
-		name string
+		JwtToken string
 	}
-	newCtx := context.WithValue(ctx, "authInfo", authInfo{"foo"})
+
+	newCtx := context.WithValue(ctx, "AuthToken", authInfo{jwtToken[0]})
 	return newCtx, nil
 }

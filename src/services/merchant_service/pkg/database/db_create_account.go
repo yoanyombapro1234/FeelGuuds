@@ -6,7 +6,7 @@ import (
 
 	core_database "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-database"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"gorm.io/gorm"
 )
 
@@ -44,7 +44,7 @@ func (db *Db) createAccountTxFunc(account *merchant_service_proto_v1.MerchantAcc
 
 		// check if merchant account already exist
 		if ok, err := db.FindMerchantAccountByEmail(ctx, account.BusinessEmail); ok && err == nil {
-			return nil, errors.ErrAccountAlreadyExist
+			return nil, service_errors.ErrAccountAlreadyExist
 		}
 
 		if err := db.UpdateAccountOnboardStatus(ctx, account); err != nil {

@@ -6,7 +6,7 @@ import (
 
 	core_database "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-database"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/gen/github.com/yoanyombapro1234/FeelGuuds/src/merchant_service/proto/merchant_service_proto_v1"
-	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/errors"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/merchant_service/pkg/service_errors"
 	"gorm.io/gorm"
 )
 
@@ -45,7 +45,7 @@ func (db *Db) updateMerchantAccountTxFunc(account *merchant_service_proto_v1.Mer
 		}
 
 		if ok, err := db.FindMerchantAccountById(ctx, id); !ok && err != nil {
-			return nil, errors.ErrAccountDoesNotExist
+			return nil, service_errors.ErrAccountDoesNotExist
 		}
 
 		err := db.SaveAccountRecord(tx, account)
