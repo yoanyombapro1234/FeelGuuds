@@ -179,7 +179,8 @@ integration-tests:
 
 .PHONY: run-tests
 run-tests: start-containers
-	sleep 180s
+	sleep 60s
+	curl localhost:8000
 	echo "listing docker containers running and their status"
 	docker ps
 	echo "starting unit tests and integration tests"
