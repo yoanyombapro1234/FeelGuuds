@@ -144,7 +144,7 @@ func (s *Server) registerHandlers() {
 	s.router.HandleFunc("/swagger.json", func(w http.ResponseWriter, r *http.Request) {
 		doc, err := swag.ReadDoc()
 		if err != nil {
-			s.logger.Error( "swagger error", zap.Error(err), zap.String("path", "/swagger.json"))
+			s.logger.Error("swagger error", zap.Error(err), zap.String("path", "/swagger.json"))
 		}
 		w.Write([]byte(doc))
 	})
@@ -184,7 +184,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		var err error
 		watcher, err = fscache.NewWatch(s.config.ConfigPath)
 		if err != nil {
-			s.logger.Error( "config watch error", zap.Error(err), zap.String("path", s.config.ConfigPath))
+			s.logger.Error("config watch error", zap.Error(err), zap.String("path", s.config.ConfigPath))
 		} else {
 			watcher.Watch()
 		}
@@ -233,14 +233,14 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	// determine if the http server was started
 	if srv != nil {
 		if err := srv.Shutdown(ctx); err != nil {
-			s.logger.Error( "HTTP server graceful shutdown failed", zap.Error(err))
+			s.logger.Error("HTTP server graceful shutdown failed", zap.Error(err))
 		}
 	}
 
 	// determine if the secure server was started
 	if secureSrv != nil {
 		if err := secureSrv.Shutdown(ctx); err != nil {
-			s.logger.Error( "HTTPS server graceful shutdown failed", zap.Error(err))
+			s.logger.Error("HTTPS server graceful shutdown failed", zap.Error(err))
 		}
 	}
 }
@@ -265,7 +265,7 @@ func (s *Server) startServer() *http.Server {
 	// start the server in the background
 	go func() {
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-			s.logger.Fatal( "HTTP server crashed", zap.Error(err))
+			s.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
 
@@ -290,13 +290,14 @@ func (s *Server) startSecureServer() *http.Server {
 		Handler:      s.handler,
 	}
 
-	cert := path.Join(s.config.CertPath, "tls.crt")
-	key := path.Join(s.config.CertPath, "tls.key")
+
+	cert := path.Join(s.config.CertPath, "/cert.pem")
+	key := path.Join(s.config.CertPath, "/key.unencrypted.pem")
 
 	// start the server in the background
 	go func() {
 		if err := srv.ListenAndServeTLS(cert, key); err != http.ErrServerClosed {
-			s.logger.Fatal( "HTTPS server crashed", zap.Error(err))
+			s.logger.Fatal("HTTPS server crashed", zap.Error(err))
 		}
 	}()
 

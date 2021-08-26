@@ -24,8 +24,10 @@ build/
 gcloud/
 dist/
 bin/
-data/
+certificate/
 .temp/*
 *.temp
 *.result
 *.result/
+data/*
+/data

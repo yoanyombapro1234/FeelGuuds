@@ -3,14 +3,21 @@ package grpc
 import (
 	"crypto/tls"
 	"fmt"
+	"net"
 
-	core_grpc "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-grpc"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	otgrpc "github.com/opentracing-contrib/go-grpc"
 	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-auth-sdk"
 	core_metrics "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-metrics"
-	core_middleware "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-middleware/server"
 	core_tracing "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-tracing/jaeger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/metrics"
@@ -66,6 +73,44 @@ func NewGRPCServer(config *Config, client *core_auth_sdk.Client, logging *zap.Lo
 
 // ListenAndServe starts the grpc service
 func (s *Server) ListenAndServe() {
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%v", s.config.Port))
+	if err != nil {
+		var msg = fmt.Sprintf("faled to listen on port %d", s.config.Port)
+		s.logger.Fatal(err.Error(), zap.String("msg", msg))
+	}
+
+	// configure tracing so all future rpc activity will be traced by use of s
+	srv := grpc.NewServer(
+		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
+			grpc_ctxtags.StreamServerInterceptor(),
+			grpc_opentracing.StreamServerInterceptor(),
+			grpc_recovery.StreamServerInterceptor(),
+			otgrpc.OpenTracingStreamServerInterceptor(s.tracerEngine.Tracer),
+		)),
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+			grpc_ctxtags.UnaryServerInterceptor(),
+			grpc_opentracing.UnaryServerInterceptor(),
+			grpc_recovery.UnaryServerInterceptor(),
+			otgrpc.OpenTracingServerInterceptor(s.tracerEngine.Tracer)),
+		))
+
+	server := health.NewServer()
+	reflection.Register(srv)
+
+	// use the auto generate code to register server
+	proto.RegisterAuthenticationHandlerServiceApiServer(srv, s)
+	grpc_health_v1.RegisterHealthServer(srv, server)
+	server.SetServingStatus(s.config.ServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
+
+	if err := srv.Serve(listener); err != nil {
+		var msg = fmt.Sprintf("faled to serve on port %d", s.config.Port)
+		s.logger.Fatal(err.Error(), zap.String("msg", msg))
+	}
+}
+
+/*
+// ListenAndServe starts the grpc service
+func (s *Server) ListenAndServe() {
 	params := core_grpc.GrpcServerConfigurations{
 		Logger:                   s.logger,
 		GrpcServerConnectionAddr: fmt.Sprintf(":%v", s.config.Port),
@@ -85,9 +130,26 @@ func (s *Server) ListenAndServe() {
 		},
 	}
 
+		builder := grpc_inst.GrpcServerBuilder{}
+		core_grpc.AddInterceptors(&builder, params.ServiceConfigs)
+		builder.EnableReflection(true)
+		builder.SetTlsCert(&tlscert.Cert)
+		sv := builder.Build()
+		sv.RegisterService(s.ServiceRegistration)
+		err := sv.Start(params.GrpcServerConnectionAddr)
+		if err != nil {
+			s.logger.Fatal( err.Error())
+		}
+		sv.AwaitTermination(func() {
+			s.logger.Info("Shutting down the server")
+		})
+
+
+	grpc_inst.ServerInitialization()
 	grpcServer := core_grpc.NewGrpcService(&params)
 	grpcServer.StartGrpcServer(s.ServiceRegistration)
 }
+*/
 
 func (s *Server) ServiceRegistration(sv *grpc.Server) {
 	proto.RegisterAuthenticationHandlerServiceApiServer(sv, s)

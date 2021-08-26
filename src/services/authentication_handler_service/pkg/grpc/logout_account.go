@@ -29,11 +29,11 @@ func (s *Server) LogoutAccount(ctx context.Context, req *proto.LogoutAccountRequ
 
 	_, err = s.PerformRetryableRPCOperation(ctx, rootSpan, callAuthenticationService, constants.LOGOUT_ACCOUNT)()
 	if err != nil {
-		s.logger.Error(err, err.Error())
+		s.logger.Error(err.Error())
 		return nil, err
 	}
 
-	s.logger.For(ctx).Info("Successfully logged out user account", zap.Int("id", int(req.GetId())))
+	s.logger.Info("Successfully logged out user account", zap.Int("id", int(req.GetId())))
 	response := &proto.LogoutAccountResponse{
 		Error: "",
 	}

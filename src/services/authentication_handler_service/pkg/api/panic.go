@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 )
 
@@ -11,5 +10,5 @@ import (
 // @Tags HTTP API
 // @Router /panic [get]
 func (s *Server) panicHandler(w http.ResponseWriter, r *http.Request) {
-	s.logger.Fatal(errors.New("panic command received"), "Panic command received")
+	s.logger.Fatal("Panic command received")
 }

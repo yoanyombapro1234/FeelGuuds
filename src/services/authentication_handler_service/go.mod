@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/apssouza22/grpc-production-go v1.3.0
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/dgrijalva/jwt-go v3.2.1-0.20200107013213-dc14462fd587+incompatible
 	github.com/fatih/color v1.12.0
@@ -13,7 +14,11 @@ require (
 	github.com/gomodule/redigo v1.8.5
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.4.2
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/juju/errgo v0.0.0-20140925100237-08cceb5d0b53 // indirect
+	github.com/labstack/gommon v0.3.0 // indirect
+	github.com/mfridman/tparse v0.8.3 // indirect
+	github.com/opentracing-contrib/go-grpc v0.0.0-20210225150812-73cb765af46e // indirect
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/prometheus/client_golang v1.11.0
 	github.com/spf13/cobra v1.2.1
@@ -26,6 +31,7 @@ require (
 	github.com/yoanyombapro1234/FeelGuuds_Core/core/core-logging v0.0.0-20210825234059-68dcdef2198a
 	github.com/yoanyombapro1234/FeelGuuds_Core/core/core-metrics v0.0.0-20210825234059-68dcdef2198a
 	github.com/yoanyombapro1234/FeelGuuds_Core/core/core-middleware/server v0.0.0-20210825234059-68dcdef2198a
+	github.com/yoanyombapro1234/FeelGuuds_Core/core/core-tlsCert v0.0.0-20210820094025-9de7c9eac9df
 	github.com/yoanyombapro1234/FeelGuuds_Core/core/core-tracing/jaeger v0.0.0-20210825234059-68dcdef2198a
 	go.uber.org/zap v1.19.0
 	golang.org/x/net v0.0.0-20210825183410-e898025ed96a
