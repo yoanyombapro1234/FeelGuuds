@@ -181,3 +181,44 @@ this [workflow example](https://github.com/fluxcd/flux2-kustomize-helm-example)
 for multi-env deployments with Flux, Kustomize and Helm.
 
 ##  [Authentication Handler Service Documentation](./docs/designdoc.md#introduction)
+
+## Start local cluster
+```bash
+brew install minikube
+
+# start cluster
+minikube start
+
+# use kubectl to access cluster if already installed
+kubectl get po -A
+
+# or download the appropriate version of kubectl
+minikube kubectl -- get po -A
+
+# see the running services in the dashboard
+minikube dashboard
+```
+
+### Cluster Management
+```bash
+#Pause Kubernetes without impacting deployed applications:
+minikube pause
+
+#Unpause a paused instance:
+minikube unpause
+
+#Halt the cluster:
+minikube stop
+
+#Increase the default memory limit (requires a restart):
+minikube config set memory 16384
+
+#Browse the catalog of easily installed Kubernetes services:
+minikube addons list
+
+#Create a second cluster running an older Kubernetes release:
+minikube start -p aged --kubernetes-version=v1.16.1
+
+#Delete all of the minikube clusters:
+minikube delete --all
+```
