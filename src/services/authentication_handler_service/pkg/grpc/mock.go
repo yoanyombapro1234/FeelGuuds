@@ -58,7 +58,7 @@ func MockGRPCService(ctx context.Context, authClientMock core_auth_sdk.AuthServi
 }
 
 // NewMockServer creates a new mock server instance
-func NewMockServer(authServiceMockStub core_auth_sdk.AuthService) *Server {
+func NewMockServer(authnClient core_auth_sdk.AuthService) *Server {
 	var err error
 
 	config := &Config{
@@ -80,21 +80,20 @@ func NewMockServer(authServiceMockStub core_auth_sdk.AuthService) *Server {
 	// initiate logging client
 	logger := InitializeLoggingEngine()
 
-	if authServiceMockStub == nil {
-		authServiceMockStub, err = InitializeAuthnClient(logger)
+	if authnClient == nil {
+		authnClient, err = InitializeAuthnClient(logger)
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
 	}
 
 	srv := &Server{
-		config:               config,
-		tracerEngine:         tracerEngine,
-		metricsEngine:        metricsEngine,
-		metrics:              serviceMetrics,
-		logger:               logger,
-		authnClient:          nil,
-		authnServiceMockStub: authServiceMockStub,
+		config:        config,
+		tracerEngine:  tracerEngine,
+		metricsEngine: metricsEngine,
+		metrics:       serviceMetrics,
+		logger:        logger,
+		authnClient:   authnClient,
 	}
 
 	return srv

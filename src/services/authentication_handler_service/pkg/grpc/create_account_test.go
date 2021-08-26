@@ -101,7 +101,6 @@ func Test_create_account(t *testing.T) {
 			}
 
 			response, err := client.CreateAccount(ctx, request)
-
 			if response != nil {
 				if response.GetError() != tt.res.GetError() {
 					t.Error("response: expected", tt.res.GetError(), "received", response.GetError())

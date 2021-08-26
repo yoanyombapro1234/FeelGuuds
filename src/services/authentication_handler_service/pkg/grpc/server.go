@@ -24,15 +24,14 @@ import (
 )
 
 type Server struct {
-	config               *Config
-	authnClient          *core_auth_sdk.Client
-	logger               *zap.Logger
-	metrics              *metrics.CoreMetrics
-	metricsEngine        *core_metrics.CoreMetricsEngine
-	tracerEngine         *core_tracing.TracingEngine
-	enableTls            bool
-	cert                 *tls.Certificate
-	authnServiceMockStub core_auth_sdk.AuthService
+	config        *Config
+	authnClient   core_auth_sdk.AuthService
+	logger        *zap.Logger
+	metrics       *metrics.CoreMetrics
+	metricsEngine *core_metrics.CoreMetricsEngine
+	tracerEngine  *core_tracing.TracingEngine
+	enableTls     bool
+	cert          *tls.Certificate
 }
 
 var _ proto.AuthenticationHandlerServiceApiServer = (*Server)(nil)
@@ -56,16 +55,15 @@ type Config struct {
 }
 
 // NewGRPCServer defines a new instance of the grpc service
-func NewGRPCServer(config *Config, client *core_auth_sdk.Client, logging *zap.Logger, serviceMetrics *metrics.CoreMetrics,
+func NewGRPCServer(config *Config, client core_auth_sdk.AuthService, logging *zap.Logger, serviceMetrics *metrics.CoreMetrics,
 	metricsEngineConf *core_metrics.CoreMetricsEngine, tracer *core_tracing.TracingEngine) (*Server, error) {
 	srv := &Server{
-		logger:               logging,
-		metrics:              serviceMetrics,
-		authnClient:          client,
-		metricsEngine:        metricsEngineConf,
-		tracerEngine:         tracer,
-		config:               config,
-		authnServiceMockStub: nil,
+		logger:        logging,
+		metrics:       serviceMetrics,
+		authnClient:   client,
+		metricsEngine: metricsEngineConf,
+		tracerEngine:  tracer,
+		config:        config,
 	}
 
 	return srv, nil

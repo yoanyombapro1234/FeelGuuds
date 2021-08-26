@@ -290,7 +290,6 @@ func (s *Server) startSecureServer() *http.Server {
 		Handler:      s.handler,
 	}
 
-
 	cert := path.Join(s.config.CertPath, "/cert.pem")
 	key := path.Join(s.config.CertPath, "/key.unencrypted.pem")
 

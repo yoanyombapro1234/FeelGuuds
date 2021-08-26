@@ -6,6 +6,7 @@ import (
 
 	"github.com/giantswarm/retry-go"
 	"github.com/gorilla/mux"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/constants"
 	"go.uber.org/zap"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/metrics"
@@ -72,23 +73,23 @@ func InitializeAuthnClient(logger *zap.Logger) (*core_auth_sdk.Client, error) {
 	client, err := core_auth_sdk.NewClient(core_auth_sdk.Config{
 		// The AUTHN_URL of your Keratin AuthN server. This will be used to verify tokens created by
 		// AuthN, and will also be used for API calls unless PrivateBaseURL is also set.
-		Issuer: issuer,
+		Issuer: constants.TEST_ISSUER,
 
 		// The domain of your application (no protocol). This domain should be listed in the APP_DOMAINS
 		// of your Keratin AuthN server.
-		Audience: audience,
+		Audience: constants.TEST_AUDIENCE,
 
 		// Credentials for AuthN's private endpoints. These will be used to execute admin actions using
 		// the Client provided by this library.
 		//
 		// TIP: make them extra secure in production!
-		Username: username,
-		Password: password,
+		Username: constants.TEST_USERNAME,
+		Password: constants.TEST_PASSWORD,
 
 		// RECOMMENDED: Send private API calls to AuthN using private network routing. This can be
 		// necessary if your environment has a firewall to limit public endpoints.
-		PrivateBaseURL: privateBaseUrl,
-	}, origin, &core_auth_sdk.RetryConfig{
+		PrivateBaseURL: constants.TEST_BASE_URL,
+	}, constants.TEST_ORIGIN, &core_auth_sdk.RetryConfig{
 		MaxRetries:       5,
 		MinRetryWaitTime: 5 * time.Millisecond,
 		MaxRetryWaitTime: 15 * time.Millisecond,

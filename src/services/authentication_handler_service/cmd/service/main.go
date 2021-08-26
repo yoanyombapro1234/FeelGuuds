@@ -372,6 +372,8 @@ func NewAuthServiceClientConnection(log *zap.Logger) *core_auth_sdk.Client {
 		log.Fatal("failed to initiate connection to downstream service", zap.Error(err))
 	}
 
+	log.Info("successfully connected to authentication service")
+
 	return authnClient
 }
 

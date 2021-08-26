@@ -183,8 +183,8 @@ run-tests: start-containers
 
 .PHONY: run-test-suite
 run-test-suite: start-containers
-	echo "sleeping for 30 seconds before running both unit and e2e tests"
-	sleep 30s
+	echo "sleeping for 15 seconds before running both unit and e2e tests"
+	sleep 15s
 	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover | tparse -all -top
 
