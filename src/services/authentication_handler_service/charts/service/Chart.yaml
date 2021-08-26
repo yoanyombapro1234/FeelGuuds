@@ -3,7 +3,7 @@ version: 5.2.0
 appVersion: 5.2.0
 name: service
 engine: gotpl
-description: Service Helm chart for Kubernetes
+description: Authentication Handler Service Helm chart for Kubernetes
 home: https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service
 maintainers:
     - email: yoanyombapro@gmail.com

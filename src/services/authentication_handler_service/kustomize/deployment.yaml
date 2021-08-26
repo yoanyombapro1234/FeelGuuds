@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: service
+  name: authentication_handler_service
 spec:
-  minReadySeconds: 3
+  minReadySeconds: 5
   revisionHistoryLimit: 5
   progressDeadlineSeconds: 60
   strategy:
@@ -12,38 +12,38 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: service
+      app: authentication_handler_service
   template:
     metadata:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9797"
       labels:
-        app: service
+        app: authentication_handler_service
     spec:
       containers:
-      - name: service
-        image: ghcr.io/FeelGuuds/service:5.2.0
+      - name: authentication_handler_service
+        image: feelguuds/authentication_handler_service-base:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - name: http
-          containerPort: 9898
+        - name: HTTP_PORT
+          containerPort: 9897
           protocol: TCP
-        - name: http-metrics
-          containerPort: 9797
+        - name: METRICS_PORT
+          containerPort: 9899
           protocol: TCP
-        - name: grpc
-          containerPort: 9999
+        - name: GRPC_PORT
+          containerPort: 9896
           protocol: TCP
         command:
         - ./service
-        - --port=9898
-        - --port-metrics=9797
-        - --grpc-port=9999
-        - --grpc-service-name=service
-        - --level=info
-        - --random-delay=false
-        - --random-error=false
+        - --HTTP_PORT=9897
+        - --METRICS_PORT=9899
+        - --GRPC_PORT=9896
+        - --GRPC_SERVICE_NAME=authentication_handler_service
+        - --LOG_LEVEL=info
+        - --ENABLE_RANDOM_DELAY=false
+        - --ENABLE_RANDOM_ERROR=false
         env:
         - name: SERVICE_UI_COLOR
           value: "#34577c"
@@ -53,7 +53,7 @@ spec:
             - servicecli
             - check
             - http
-            - localhost:9898/healthz
+            - localhost:9897/healthz
           initialDelaySeconds: 5
           timeoutSeconds: 5
         readinessProbe:
@@ -62,7 +62,7 @@ spec:
             - servicecli
             - check
             - http
-            - localhost:9898/readyz
+            - localhost:9897/readyz
           initialDelaySeconds: 5
           timeoutSeconds: 5
         resources:
