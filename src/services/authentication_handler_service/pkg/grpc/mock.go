@@ -12,13 +12,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 
-	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_core/core/core-auth-sdk"
-	core_logging "github.com/yoanyombapro1234/FeelGuuds_core/core/core-logging"
-	core_metrics "github.com/yoanyombapro1234/FeelGuuds_core/core/core-metrics"
-	core_tracing "github.com/yoanyombapro1234/FeelGuuds_core/core/core-tracing/jaeger"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/constants"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/metrics"
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-auth-sdk"
+	core_logging "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-logging"
+	core_metrics "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-metrics"
+	core_tracing "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-tracing/jaeger"
 )
 
 type MockAuthGRPCServer struct {
@@ -28,7 +28,7 @@ type MockAuthGRPCServer struct {
 type MockDialOption func(context.Context, string) (net.Conn, error)
 
 // dialer creates an in memory full duplex connection
-func dialer(authClientMock *core_auth_sdk.Client) func() MockDialOption {
+func dialer(authClientMock core_auth_sdk.AuthService) func() MockDialOption {
 	return func() MockDialOption {
 		listener := bufconn.Listen(1024 * 1024)
 
@@ -49,7 +49,7 @@ func dialer(authClientMock *core_auth_sdk.Client) func() MockDialOption {
 }
 
 // MockGRPCService creates and returns a mock grpc service connection
-func MockGRPCService(ctx context.Context, authClientMock *core_auth_sdk.AuthService) *grpc.ClientConn {
+func MockGRPCService(ctx context.Context, authClientMock core_auth_sdk.AuthService) *grpc.ClientConn {
 	conn, err := grpc.DialContext(ctx, "", grpc.WithInsecure(), grpc.WithContextDialer(dialer(authClientMock)()))
 	if err != nil {
 		log.Fatal(err)
@@ -58,7 +58,7 @@ func MockGRPCService(ctx context.Context, authClientMock *core_auth_sdk.AuthServ
 }
 
 // NewMockServer creates a new mock server instance
-func NewMockServer(authClientMockStub *core_auth_sdk.Client) *Server {
+func NewMockServer(authServiceMockStub core_auth_sdk.AuthService) *Server {
 	var err error
 
 	config := &Config{
@@ -80,27 +80,28 @@ func NewMockServer(authClientMockStub *core_auth_sdk.Client) *Server {
 	// initiate logging client
 	logger := InitializeLoggingEngine()
 
-	if authClientMockStub == nil {
-		authClientMockStub, err = InitializeAuthnClient(logger)
+	if authServiceMockStub == nil {
+		authServiceMockStub, err = InitializeAuthnClient(logger)
 		if err != nil {
 			logger.Fatal(err.Error())
 		}
 	}
 
 	srv := &Server{
-		config:        config,
-		tracerEngine:  tracerEngine,
-		metricsEngine: metricsEngine,
-		metrics:       serviceMetrics,
-		logger:        logger,
-		authnClient:   authClientMockStub,
+		config:               config,
+		tracerEngine:         tracerEngine,
+		metricsEngine:        metricsEngine,
+		metrics:              serviceMetrics,
+		logger:               logger,
+		authnClient:          nil,
+		authnServiceMockStub: authServiceMockStub,
 	}
 
 	return srv
 }
 
 // InitializeAuthnClient creates a connection to the authn service
-func InitializeAuthnClient(logger *zap.Logger) (*core_auth_sdk.Client, error) {
+func InitializeAuthnClient(logger *zap.Logger) (core_auth_sdk.AuthService, error) {
 	// var response = make(chan interface{}, 1)
 
 	client, err := core_auth_sdk.NewClient(core_auth_sdk.Config{
@@ -141,7 +142,7 @@ func ConnectToDownstreamService(logger *zap.Logger, client *core_auth_sdk.Client
 			return func() error {
 				data, err := client.ServerStats()
 				if err != nil {
-					logger.Error( "failed to connect to authentication service", zap.Error(err))
+					logger.Error("failed to connect to authentication service", zap.Error(err))
 					return err
 				}
 
@@ -168,7 +169,7 @@ func InitializeMetricsEngine(serviceName string) (*core_metrics.CoreMetricsEngin
 	return coreMetrics, serviceMetrics.MicroServiceMetrics
 }
 
-// InitializeTracingEngine initiaize a tracing object globally
+// InitializeTracingEngine initialize a tracing object globally
 func InitializeTracingEngine(serviceName string) (*core_tracing.TracingEngine, io.Closer) {
 	return core_tracing.New(serviceName, constants.COLLECTOR_ENDPOINT)
 }

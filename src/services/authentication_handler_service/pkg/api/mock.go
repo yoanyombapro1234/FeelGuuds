@@ -9,10 +9,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/metrics"
-	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_core/core/core-auth-sdk"
-	core_logging "github.com/yoanyombapro1234/FeelGuuds_core/core/core-logging"
-	core_metrics "github.com/yoanyombapro1234/FeelGuuds_core/core/core-metrics"
-	core_tracing "github.com/yoanyombapro1234/FeelGuuds_core/core/core-tracing/jaeger"
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-auth-sdk"
+	core_logging "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-logging"
+	core_metrics "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-metrics"
+	core_tracing "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-tracing/jaeger"
 )
 
 const collectorEndpoint string = "http://localhost:14268/api/traces"

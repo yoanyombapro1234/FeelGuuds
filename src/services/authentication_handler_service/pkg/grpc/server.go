@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	core_grpc "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-grpc"
-	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_core/core/core-auth-sdk"
-	core_metrics "github.com/yoanyombapro1234/FeelGuuds_core/core/core-metrics"
-	core_middleware "github.com/yoanyombapro1234/FeelGuuds_core/core/core-middleware/server"
-	core_tracing "github.com/yoanyombapro1234/FeelGuuds_core/core/core-tracing/jaeger"
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-auth-sdk"
+	core_metrics "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-metrics"
+	core_middleware "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-middleware/server"
+	core_tracing "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-tracing/jaeger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
@@ -17,14 +17,15 @@ import (
 )
 
 type Server struct {
-	config        *Config
-	authnClient   *core_auth_sdk.Client
-	logger        *zap.Logger
-	metrics       *metrics.CoreMetrics
-	metricsEngine *core_metrics.CoreMetricsEngine
-	tracerEngine  *core_tracing.TracingEngine
-	enableTls     bool
-	cert          *tls.Certificate
+	config               *Config
+	authnClient          *core_auth_sdk.Client
+	logger               *zap.Logger
+	metrics              *metrics.CoreMetrics
+	metricsEngine        *core_metrics.CoreMetricsEngine
+	tracerEngine         *core_tracing.TracingEngine
+	enableTls            bool
+	cert                 *tls.Certificate
+	authnServiceMockStub core_auth_sdk.AuthService
 }
 
 var _ proto.AuthenticationHandlerServiceApiServer = (*Server)(nil)
@@ -51,12 +52,13 @@ type Config struct {
 func NewGRPCServer(config *Config, client *core_auth_sdk.Client, logging *zap.Logger, serviceMetrics *metrics.CoreMetrics,
 	metricsEngineConf *core_metrics.CoreMetricsEngine, tracer *core_tracing.TracingEngine) (*Server, error) {
 	srv := &Server{
-		logger:        logging,
-		metrics:       serviceMetrics,
-		authnClient:   client,
-		metricsEngine: metricsEngineConf,
-		tracerEngine:  tracer,
-		config:        config,
+		logger:               logging,
+		metrics:              serviceMetrics,
+		authnClient:          client,
+		metricsEngine:        metricsEngineConf,
+		tracerEngine:         tracer,
+		config:               config,
+		authnServiceMockStub: nil,
 	}
 
 	return srv, nil

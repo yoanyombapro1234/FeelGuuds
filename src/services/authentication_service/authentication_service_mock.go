@@ -1,7 +1,7 @@
 package authentication_service
 
 import (
-	core_auth_sdk2 "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
+	core_auth_sdk2 "github.com/yoanyombapro1234/FeelGuuds_core/core/core-auth-sdk"
 )
 
 // AuthenticationServiceMock provides a mock interface to which clients can use to perform dependency injection while writing tests
