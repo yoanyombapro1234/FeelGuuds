@@ -147,7 +147,7 @@ start-containers-live:
 # Cover runs go_test on GO_PKGS and produces code coverage in multiple formats.
 # A coverage.html file for human viewing will be at $(TMP_COVERAGE)/coverage.html
 # This target will echo "open $(TMP_COVERAGE)/coverage.html" with TMP_COVERAGE
-# expanded so that you can easily copy "open $(TMP_COVERAGE)/coverage.html" into
+# expanded  so that you can easily copy "open $(TMP_COVERAGE)/coverage.html" into
 # your terminal as a command to run, and then see the code coverage output locally.
 .PHONY: cover
 cover:
@@ -179,6 +179,10 @@ integration-tests:
 
 .PHONY: run-tests
 run-tests: start-containers
+	sleep 60s
+	echo "listing docker containers running"
+	docker-compose ps
+	echo "starting unit tests and integration tests"
 	go test -v -race ./...
 
 .PHONY: run-test-suite
