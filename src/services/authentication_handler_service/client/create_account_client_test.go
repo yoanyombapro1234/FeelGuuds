@@ -12,7 +12,7 @@ import (
 
 func TestAuthenticationHandlerServiceClient_CreateAccount(t *testing.T) {
 	email := "test_yoan@gmail.com" // fmt.Sprintf("test_yoan@gmail.com", util.GenerateRandomString(17))
-	password := "test_yoan" //fmt.Sprintf("test_yoan", util.GenerateRandomString(17))
+	password := "test_yoan"        //fmt.Sprintf("test_yoan", util.GenerateRandomString(17))
 
 	tests := []struct {
 		name     string

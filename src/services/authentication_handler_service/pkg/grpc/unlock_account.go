@@ -29,11 +29,11 @@ func (s *Server) UnLockAccount(ctx context.Context, req *proto.UnLockAccountRequ
 
 	_, err = s.PerformRetryableRPCOperation(ctx, rootSpan, callAuthenticationService, constants.UNLOCK_ACCOUNT)()
 	if err != nil {
-		s.logger.Error(err, err.Error())
+		s.logger.Error(err.Error())
 		return nil, err
 	}
 
-	s.logger.For(ctx).Info("Successfully unlocked user account", zap.Int("Id", int(req.GetId())))
+	s.logger.Info("Successfully unlocked user account", zap.Int("Id", int(req.GetId())))
 	return &proto.UnLockAccountResponse{
 		Error: "",
 	}, nil

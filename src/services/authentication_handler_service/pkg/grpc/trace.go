@@ -36,7 +36,7 @@ func (s *Server) performRPCOperationAndInstrument(
 
 // StartRootSpan starts the rootspan of the current operation at hand
 func (s *Server) StartRootSpan(ctx context.Context, operationType string) (context.Context, opentracing.Span) {
-	s.logger.For(ctx).Info("GRPC request received", zap.String("method", operationType))
+	s.logger.Info("GRPC request received", zap.String("method", operationType))
 
 	spanCtx, _ := s.tracerEngine.Tracer.Extract(opentracing.HTTPHeaders, nil)
 	parentSpan := s.tracerEngine.Tracer.StartSpan(operationType, ext.RPCServerOption(spanCtx))

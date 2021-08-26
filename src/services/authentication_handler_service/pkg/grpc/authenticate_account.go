@@ -28,7 +28,7 @@ func (s *Server) AuthenticateAccount(ctx context.Context, req *proto.Authenticat
 
 	result, err := s.PerformRetryableRPCOperation(ctx, rootSpan, callAuthenticationService, operationType)()
 	if err != nil {
-		s.logger.Error(err, err.Error())
+		s.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -37,7 +37,7 @@ func (s *Server) AuthenticateAccount(ctx context.Context, req *proto.Authenticat
 		return nil, err
 	}
 
-	s.logger.For(ctx).Info("Successfully authenticated user account", zap.String("jwt", token))
+	s.logger.Info("Successfully authenticated user account", zap.String("jwt", token))
 	response := &proto.AuthenticateAccountResponse{
 		Token: token,
 		Error: "",

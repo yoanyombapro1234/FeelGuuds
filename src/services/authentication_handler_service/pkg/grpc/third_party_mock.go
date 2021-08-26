@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_core/core/core-auth-sdk"
 )
 
 type AuthenticationServiceMock struct {

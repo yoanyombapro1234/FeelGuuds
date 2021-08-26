@@ -3,7 +3,7 @@ package proto
 import (
 	"strconv"
 
-	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_core/core/core-auth-sdk"
 )
 
 type DownStreamOperation func() (interface{}, error)

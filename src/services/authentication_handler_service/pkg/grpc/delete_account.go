@@ -29,11 +29,11 @@ func (s *Server) DeleteAccount(ctx context.Context, req *proto.DeleteAccountRequ
 
 	_, err = s.PerformRetryableRPCOperation(ctx, rootSpan, callAuthenticationService, operationType)()
 	if err != nil {
-		s.logger.Error(err, err.Error())
+		s.logger.Error(err.Error())
 		return nil, err
 	}
 
-	s.logger.For(ctx).Info("Successfully archived user account", zap.Int("Id", int(req.GetId())))
+	s.logger.Info("Successfully archived user account", zap.Int("Id", int(req.GetId())))
 	return &proto.DeleteAccountResponse{
 		Error: "",
 	}, nil

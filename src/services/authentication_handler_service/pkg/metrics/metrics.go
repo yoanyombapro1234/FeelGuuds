@@ -4,17 +4,17 @@ import (
 	"fmt"
 
 	"github.com/prometheus/client_golang/prometheus"
-	core_metrics "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-metrics"
+	core_metrics "github.com/yoanyombapro1234/FeelGuuds_core/core/core-metrics"
 )
 
-type MetricsEngine struct {
+type Telemetry struct {
 	MicroServiceMetrics *CoreMetrics
 	Engine              *core_metrics.CoreMetricsEngine
 }
 
-// NewMetricsEngine initializes a new instance of the metrics engins
-func NewMetricsEngine(engine *core_metrics.CoreMetricsEngine, serviceName string) *MetricsEngine {
-	return &MetricsEngine{
+// New initializes a new instance of the telemetry object
+func New(engine *core_metrics.CoreMetricsEngine, serviceName string) *Telemetry {
+	return &Telemetry{
 		MicroServiceMetrics: NewCoreMetrics(engine, serviceName),
 		Engine:              engine,
 	}

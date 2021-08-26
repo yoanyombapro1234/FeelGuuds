@@ -37,7 +37,7 @@ func (s *Server) CreateAccount(ctx context.Context, req *proto.CreateAccountRequ
 		return nil, err
 	}
 
-	s.logger.For(ctx).Info("Successfully created user account", zap.Int("Id", int(id)))
+	s.logger.Info("Successfully created user account", zap.Int("Id", int(id)))
 	response := &proto.CreateAccountResponse{Id: uint32(id), Error: ""}
 
 	return response, nil

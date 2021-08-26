@@ -29,7 +29,7 @@ func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (
 
 	result, err := s.PerformRetryableRPCOperation(ctx, rootSpan, callAuthenticationService, constants.GET_ACCOUNT)()
 	if err != nil {
-		s.logger.Error(err, err.Error())
+		s.logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -38,7 +38,7 @@ func (s *Server) GetAccount(ctx context.Context, req *proto.GetAccountRequest) (
 		return nil, err
 	}
 
-	s.logger.For(ctx).Info("Successfully obtained user account", zap.Int("Id", int(req.GetId())))
+	s.logger.Info("Successfully obtained user account", zap.Int("Id", int(req.GetId())))
 	return &proto.GetAccountResponse{
 		Account: &proto.Account{
 			Id:            uint32(account.ID),

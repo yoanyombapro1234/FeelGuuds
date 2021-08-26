@@ -6,6 +6,7 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/gen/proto"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -24,43 +25,6 @@ func (s *Server) setCtxRequestTimeout(ctx context.Context) context.Context {
 // performRetryableRpcCall performs an rpc call using retries in the face of errors
 func (s *Server) performRetryableRpcCall(ctx context.Context, f func() (interface{}, error)) (interface{}, error) {
 	var response = make(chan interface{}, 1)
-
-	/*
-		err := retry.Do(
-			func(conn chan<- interface{}) func() error {
-				return func() error {
-					opResponse, err := f()
-					if err != nil {
-						return err
-					}
-					response <- opResponse
-					return nil
-				}
-			}(response),
-			retry.MaxTries(s.config.RpcRetries),
-			retry.Timeout(time.Millisecond*time.Duration(s.config.RpcDeadline)),
-			retry.Sleep(time.Millisecond*time.Duration(s.config.RpcRetryBackoff)),
-		)
-
-		retries := 1
-		for retries < 4 {
-			// perform a test request to the authentication service
-			data, err := client.ServerStats()
-			if err != nil {
-				if retries != 4 {
-					logger.Error(err, "failed to connect to authentication service")
-				} else {
-					logger.Fatal(err, "failed to connect to authentication service")
-				}
-				retries += 1
-			} else {
-				retries = 4
-				logger.Info("data", zap.Any("result", data))
-			}
-
-			time.Sleep(1 * time.Second)
-		}
-	*/
 
 	err := func(conn chan<- interface{}) func() error {
 		return func() error {
@@ -95,7 +59,7 @@ func (s *Server) PerformRetryableRPCOperation(ctx context.Context, span opentrac
 		ctx = opentracing.ContextWithSpan(ctx, span)
 
 		retryableOp := func() (interface{}, error) {
-			s.logger.For(ctx).Info("performing retryable http operation", "operation type", opType)
+			s.logger.Info("performing retryable http operation", zap.Any("operation type", opType))
 			return s.performRetryableRpcCall(ctx, op)
 		}
 

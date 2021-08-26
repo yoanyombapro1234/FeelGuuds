@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds/src/libraries/core/core-auth-sdk"
 	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/service_errors"
+	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_core/core/core-auth-sdk"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -30,7 +31,7 @@ func (s *Server) IsValidEmail(email string, operationType string) (error, bool) 
 	if email == "" {
 		s.metrics.InvalidRequestParametersCounter.WithLabelValues(operationType).Inc()
 		err := service_errors.ErrInvalidInputArguments
-		s.logger.Error(err, "invalid input parameters. please specify a valid email")
+		s.logger.Error("invalid input parameters. please specify a valid email", zap.Error(err))
 		return err, false
 	}
 
@@ -42,7 +43,7 @@ func (s *Server) IsValidPassword(password string, operationType string) (error, 
 	if password == "" {
 		s.metrics.InvalidRequestParametersCounter.WithLabelValues(operationType).Inc()
 		err := service_errors.ErrInvalidInputArguments
-		s.logger.Error(err, "invalid input parameters. please specify a valid password")
+		s.logger.Error( "invalid input parameters. please specify a valid password", zap.Error(err))
 		return err, false
 	}
 
@@ -55,7 +56,7 @@ func (s *Server) CheckJwtTokenForInValidity(ctx context.Context, result interfac
 	if token == "" {
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(operation)
 		err := status.Errorf(codes.Internal, "issue casting to jwt token")
-		s.logger.For(ctx).Error(err, "casting error")
+		s.logger.Error( "casting error", zap.Error(err))
 		return err, true, ""
 	}
 
@@ -69,7 +70,7 @@ func (s *Server) GetIdFromResponseObject(ctx context.Context, response interface
 	if !ok {
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(operationType)
 		err := status.Errorf(codes.Internal, "failed to convert result to uint32 id value")
-		s.logger.For(ctx).Error(err, "casting error")
+		s.logger.Error( "casting error", zap.Error(err))
 		return 0, err
 	}
 	return id, nil
@@ -80,7 +81,7 @@ func (s *Server) IsValidID(Id uint32, operation string) (error, bool) {
 	if Id == 0 {
 		s.metrics.InvalidRequestParametersCounter.WithLabelValues(operation).Inc()
 		err := service_errors.ErrInvalidInputArguments
-		s.logger.Error(err, "invalid input parameters. please specify a valid user id")
+		s.logger.Error( "invalid input parameters. please specify a valid user id", zap.Error(err))
 		return err, false
 	}
 
@@ -94,7 +95,7 @@ func (s *Server) GetAccountFromResponseObject(ctx context.Context, ok bool, resu
 		s.metrics.CastingOperationFailureCounter.WithLabelValues(operation)
 
 		err := service_errors.ErrFailedToCastAccount
-		s.logger.For(ctx).Error(err, err.Error())
+		s.logger.Error(err.Error())
 		return nil, err
 	}
 	return account, nil

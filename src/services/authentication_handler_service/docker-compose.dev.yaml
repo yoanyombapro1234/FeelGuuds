@@ -51,7 +51,7 @@ services:
       PASSWORD_RESET_TOKEN_TTL: ${PASSWORD_RESET_TOKEN_TTL}
       APP_PASSWORD_CHANGED_URL: ${APP_PASSWORD_CHANGED_URL}
     env_file:
-      - .env
+      - .authentication_service_env
     depends_on:
       - redis
       - postgres

@@ -34,11 +34,11 @@ func (s *Server) UpdateAccount(ctx context.Context, req *proto.UpdateAccountRequ
 
 	_, err = s.PerformRetryableRPCOperation(ctx, rootSpan, callAuthenticationService, constants.GET_ACCOUNT)()
 	if err != nil {
-		s.logger.Error(err, err.Error())
+		s.logger.Error(err.Error())
 		return nil, err
 	}
 
-	s.logger.For(ctx).Info("Successfully updated user account", zap.Int("Id", int(req.Id)))
+	s.logger.Info("Successfully updated user account", zap.Int("Id", int(req.Id)))
 	response := &proto.UpdateAccountResponse{Error: ""}
 	return response, nil
 }
