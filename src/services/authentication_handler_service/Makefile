@@ -179,9 +179,9 @@ integration-tests:
 
 .PHONY: run-tests
 run-tests: start-containers
-	sleep 60s
-	echo "listing docker containers running"
-	docker-compose ps
+	sleep 90s
+	echo "listing docker containers running and their status"
+	docker ps
 	echo "starting unit tests and integration tests"
 	go test -v -race ./...
 
