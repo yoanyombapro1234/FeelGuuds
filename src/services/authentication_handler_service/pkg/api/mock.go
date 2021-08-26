@@ -115,6 +115,8 @@ func InitializeAuthnClient(logger *zap.Logger) (*core_auth_sdk.Client, error) {
 	)
 
 	if err != nil {
+		logger.Error("failed to connect to authentication service when using host address LOCALHOST.... " +
+			"attempting using host address authentication_service")
 		// try with the service name as the connection uri
 		client, err = core_auth_sdk.NewClient(core_auth_sdk.Config{
 			// The AUTHN_URL of your Keratin AuthN server. This will be used to verify tokens created by
@@ -162,6 +164,8 @@ func InitializeAuthnClient(logger *zap.Logger) (*core_auth_sdk.Client, error) {
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+
+		logger.Info("successfully connected to authentication service")
 	}
 
 	return client, err
