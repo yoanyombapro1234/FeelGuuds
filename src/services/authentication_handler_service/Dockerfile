@@ -18,7 +18,7 @@ RUN CGO_ENABLED=0 go build -ldflags "-s -w \
 	-X github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version.REVISION=${REVISION}" \
 	-a -o bin/servicecli cmd/servicecli/*
 
-FROM alpine:3.13
+FROM alpine:3.14
 
 ARG BUILD_DATE
 ARG VERSION
