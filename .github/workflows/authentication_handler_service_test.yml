@@ -26,13 +26,11 @@ jobs:
       - name: Start docker containers
         working-directory: ${{env.working-directory}}
         run:
-          docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml config
           docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans --detach
       - name: Run unit, integration, and end to end tests
         working-directory: ${{env.working-directory}}
         run:
-          go get github.com/mfridman/tparse
-          go test -v -race ./... -json -cover  -coverprofile cover.out | tparse -all -top
+          go get github.com/mfridman/tparse && go test -v -race ./... -json -cover -coverprofile cover.out | tparse -all -top
       - name: Stop docker containers
         working-directory: ${{env.working-directory}}
         if: always()
