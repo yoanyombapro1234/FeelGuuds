@@ -166,32 +166,15 @@ cover:
 go-mod:
 	go list -m -u all
 
-.PHONY: unit-tests
-unit-tests:
-	echo "running unit tests"
-	go test -v -race ./pkg/... -json -cover  -coverprofile cover.out
-	go tool cover -html=cover.out
-
-.PHONY: integration-tests
-integration-tests:
-	echo "running integration (e2e) tests"
-	go test -v -race ./client/...
-
 .PHONY: run-tests
 run-tests: start-containers
-	sleep 60s
-	curl localhost:8000
+	sleep 30s
 	echo "listing docker containers running and their status"
 	docker ps
 	echo "starting unit tests and integration tests"
-	go test -v -race ./...
-
-.PHONY: run-test-suite
-run-test-suite: start-containers
-	echo "sleeping for 15 seconds before running both unit and e2e tests"
-	sleep 15s
 	go get github.com/mfridman/tparse
-	go test -v -race ./... -json -cover | tparse -all -top
+	go test -v -race ./... -json -cover  -coverprofile cover.out | tparse -all -top
+	go tool cover -html=cover.out
 
 .PHONY: prereq
 prereq: start-containers
