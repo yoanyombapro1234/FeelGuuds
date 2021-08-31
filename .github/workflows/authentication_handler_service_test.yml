@@ -116,11 +116,11 @@ jobs:
       - name: Run unit, integration, and end to end tests
         working-directory: ${{env.working-directory}}
         run:
-          docker ps && go get github.com/mfridman/tparse && go test -v -race ./... -json -cover -coverprofile cover.out | tparse -all -top
+          docker ps -a && go get github.com/mfridman/tparse && go test -v -race ./... -json -cover -coverprofile cover.out | tparse -all -top
       - name: Stop docker containers
         working-directory: ${{env.working-directory}}
         if: always()
-        run: docker ps && docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml down
+        run: docker ps -a && docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml down
       - name: Check if working tree is dirty
         run: |
           if [[ $(git diff --stat) != '' ]]; then
