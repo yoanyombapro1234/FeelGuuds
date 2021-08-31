@@ -7,92 +7,6 @@ on:
 
 jobs:
   test:
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_DB: authentication_service
-          POSTGRES_USER: authentication_service
-          POSTGRES_PASSWORD: authentication_service
-          PGDATA: /data/postgres
-        ports:
-          - 5432/tcp
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
-
-      authentication_service:
-        image: keratin/authn-server:latest
-        ports:
-          - 8000:3000
-        env:
-          DATABASE_URL: postgres://authentication_service:authentication_service@postgres:5432/authentication_service?sslmode=disable
-          AUTHN_URL: http://localhost:8000
-          APP_DOMAINS: localhost
-          SECRET_KEY_BASE: secret
-          REDIS_URL: redis://redis:6379/11
-          HTTP_AUTH_USERNAME: feelguuds
-          HTTP_AUTH_PASSWORD: feelguuds
-          ENABLE_SIGNUP: false
-          ACCESS_TOKEN_TTL: 86400
-          REFRESH_TOKEN_TTL: 2592000
-          SESSION_KEY_SALT: feelguuds
-          DB_ENCRYPTION_KEY_SALT: feelguuds
-          USERNAME_IS_EMAIL: true
-          PASSWORD_POLICY_SCORE: 2
-          PASSWORD_CHANGE_LOGOUT: true
-          PASSWORD_RESET_TOKEN_TTL: 1800
-
-      elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
-        ports:
-          - "9200:9200"
-          - "9300:9300"
-        env:
-          cluster.name: jaeger-cluster
-          discovery.type: single-node
-          http.host: 0.0.0.0
-          transport.host: 127.0.0.1
-          ES_JAVA_OPTS: -Xms512m -Xmx512m
-          xpack.security.enabled: false
-
-      jaeger-collector:
-        image: jaegertracing/jaeger-collector:latest
-        ports:
-          - "14269:14269"
-          - "14268:14268"
-          - "14267:14267"
-          - "9411:9411"
-          - "14250:14250"
-        env:
-          SPAN_STORAGE_TYPE: elasticsearch
-          ES_SERVER_URLS: http://elasticsearch:9200
-
-      jaeger-agent:
-        image: jaegertracing/jaeger-agent:latest
-        ports:
-          - "5775:5775/udp"
-          - "6831:6831/udp"
-          - "6832:6832/udp"
-          - "5778:5778"
-        env:
-          SPAN_STORAGE_TYPE: elasticsearch
-          ES_SERVER_URLS: http://elasticsearch:9200
-
-      jaeger-query:
-        image: jaegertracing/jaeger-query:latest
-        env:
-          SPAN_STORAGE_TYPE: elasticsearch
-          ES_SERVER_URLS: http://elasticsearch:9200
-          no_proxy: localhost
-          JAEGER_ENDPOINT: http://jaeger-collector:14268/api/traces
-        ports:
-          - "16686:16686" # http://localhost:16686/search
-          - "16687:16687"
-
     runs-on: ubuntu-latest
     env:
       working-directory: ./src/services/authentication_handler_service
@@ -112,7 +26,7 @@ jobs:
       - name: Start docker containers
         working-directory: ${{env.working-directory}}
         run:
-          docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans --detach
+          docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans --detach && docker ps && sleep 15
       - name: Run unit, integration, and end to end tests
         working-directory: ${{env.working-directory}}
         run:
