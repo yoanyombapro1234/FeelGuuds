@@ -1,7 +1,7 @@
 apiVersion: v1
 version: 5.2.0
 appVersion: 5.2.0
-name: service
+name: authentication-handler-service
 engine: gotpl
 description: Authentication Handler Service Helm chart for Kubernetes
 home: https://github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service

@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/viper"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/swaggo/swag"
+	"github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service/pkg/version"
 	core_auth_sdk "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-auth-sdk"
 	core_metrics "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-metrics"
 	core_tracing "github.com/yoanyombapro1234/FeelGuuds_Core/core/core-tracing/jaeger"
@@ -110,31 +111,10 @@ func (s *Server) registerHandlers() {
 	s.router.Handle("/metrics", promhttp.Handler())
 	s.router.PathPrefix("/debug/pprof/").Handler(http.DefaultServeMux)
 	s.router.HandleFunc("/", s.indexHandler).HeadersRegexp("User-Agent", "^Mozilla.*").Methods("GET")
-	s.router.HandleFunc("/", s.infoHandler).Methods("GET")
-	s.router.HandleFunc("/version", s.versionHandler).Methods("GET")
-	s.router.HandleFunc("/echo", s.echoHandler).Methods("POST")
-	s.router.HandleFunc("/env", s.envHandler).Methods("GET", "POST")
-	s.router.HandleFunc("/headers", s.echoHeadersHandler).Methods("GET", "POST")
-	s.router.HandleFunc("/delay/{wait:[0-9]+}", s.delayHandler).Methods("GET").Name("delay")
 	s.router.HandleFunc("/healthz", s.healthzHandler).Methods("GET")
 	s.router.HandleFunc("/readyz", s.readyzHandler).Methods("GET")
 	s.router.HandleFunc("/readyz/enable", s.enableReadyHandler).Methods("POST")
 	s.router.HandleFunc("/readyz/disable", s.disableReadyHandler).Methods("POST")
-	s.router.HandleFunc("/panic", s.panicHandler).Methods("GET")
-	s.router.HandleFunc("/status/{code:[0-9]+}", s.statusHandler).Methods("GET", "POST", "PUT").Name("status")
-	s.router.HandleFunc("/store", s.storeWriteHandler).Methods("POST", "PUT")
-	s.router.HandleFunc("/store/{hash}", s.storeReadHandler).Methods("GET").Name("store")
-	s.router.HandleFunc("/cache/{key}", s.cacheWriteHandler).Methods("POST", "PUT")
-	s.router.HandleFunc("/cache/{key}", s.cacheDeleteHandler).Methods("DELETE")
-	s.router.HandleFunc("/cache/{key}", s.cacheReadHandler).Methods("GET").Name("cache")
-	s.router.HandleFunc("/configs", s.configReadHandler).Methods("GET")
-	s.router.HandleFunc("/token", s.tokenGenerateHandler).Methods("POST")
-	s.router.HandleFunc("/token/validate", s.tokenValidateHandler).Methods("GET")
-	s.router.HandleFunc("/api/info", s.infoHandler).Methods("GET")
-	s.router.HandleFunc("/api/echo", s.echoHandler).Methods("POST")
-	s.router.HandleFunc("/ws/echo", s.echoWsHandler)
-	s.router.HandleFunc("/chunked", s.chunkedHandler)
-	s.router.HandleFunc("/chunked/{wait:[0-9]+}", s.chunkedHandler)
 	s.router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"),
 	))
@@ -151,15 +131,7 @@ func (s *Server) registerHandlers() {
 }
 
 func (s *Server) registerMiddlewares() {
-	prom := NewPrometheusMiddleware()
-	s.router.Use(prom.Handler)
-	httpLogger := NewLoggingMiddleware(s.logger)
-	s.router.Use(httpLogger.Handler)
 	s.router.Use(versionMiddleware)
-	if s.config.RandomDelay {
-		randomDelayer := NewRandomDelayMiddleware(s.config.RandomDelayMin, s.config.RandomDelayMax, s.config.RandomDelayUnit)
-		s.router.Use(randomDelayer.Handler)
-	}
 	if s.config.RandomError {
 		s.router.Use(randomErrorMiddleware)
 	}
@@ -347,6 +319,45 @@ func (s *Server) printRoutes() {
 		fmt.Println()
 		return nil
 	})
+}
+
+func (s *Server) startCachePool(ticker *time.Ticker, stopCh <-chan struct{}) {
+	if s.config.CacheServer == "" {
+		return
+	}
+	s.pool = &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial("tcp", s.config.CacheServer)
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			return err
+		},
+	}
+
+	// set <hostname>=<version> with an expiry time of one minute
+	setVersion := func() {
+		conn := s.pool.Get()
+		if _, err := conn.Do("SET", s.config.Hostname, version.VERSION, "EX", 60); err != nil {
+			s.logger.Warn("cache server is offline", zap.Error(err), zap.String("server", s.config.CacheServer))
+		}
+		_ = conn.Close()
+	}
+
+	// set version on a schedule
+	go func() {
+		setVersion()
+		for {
+			select {
+			case <-stopCh:
+				return
+			case <-ticker.C:
+				setVersion()
+			}
+		}
+	}()
 }
 
 type ArrayResponse []string

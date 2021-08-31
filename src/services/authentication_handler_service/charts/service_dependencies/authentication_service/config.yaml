@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentication-service-config
+  labels:
+    app: authentication-service-config
+data:
+  DATABASE_URL: postgres://authentication_service:authentication_service@postgres:5432/authentication_service?sslmode=disable
+  AUTHN_URL: http://localhost:8000
+  APP_DOMAINS: localhost
+  SECRET_KEY_BASE: secret
+  REDIS_URL: redis://redis:6379/11
+  HTTP_AUTH_USERNAME: feelguuds
+  HTTP_AUTH_PASSWORD: feelguuds
+  ENABLE_SIGNUP: false
+  ACCESS_TOKEN_TTL: 86400
+  REFRESH_TOKEN_TTL: 2592000
+  SESSION_KEY_SALT: feelguuds
+  DB_ENCRYPTION_KEY_SALT: feelguuds
+  USERNAME_IS_EMAIL: true
+  PASSWORD_POLICY_SCORE: 2
+  PASSWORD_CHANGE_LOGOUT: true
+  PASSWORD_RESET_TOKEN_TTL: 1800

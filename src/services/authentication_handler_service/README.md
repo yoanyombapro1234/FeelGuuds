@@ -182,43 +182,24 @@ for multi-env deployments with Flux, Kustomize and Helm.
 
 ##  [Authentication Handler Service Documentation](./docs/designdoc.md#introduction)
 
-## Start local cluster
-```bash
-brew install minikube
-
-# start cluster
-minikube start
-
-# use kubectl to access cluster if already installed
-kubectl get po -A
-
-# or download the appropriate version of kubectl
-minikube kubectl -- get po -A
-
-# see the running services in the dashboard
-minikube dashboard
-```
-
-### Cluster Management
-```bash
-#Pause Kubernetes without impacting deployed applications:
-minikube pause
-
-#Unpause a paused instance:
-minikube unpause
-
-#Halt the cluster:
-minikube stop
-
-#Increase the default memory limit (requires a restart):
-minikube config set memory 16384
-
-#Browse the catalog of easily installed Kubernetes services:
-minikube addons list
-
-#Create a second cluster running an older Kubernetes release:
-minikube start -p aged --kubernetes-version=v1.16.1
-
-#Delete all of the minikube clusters:
-minikube delete --all
-```
+## Todo
+Attempt to complete all these by sunday
+- [ ] Harden CLI
+  - [X] Fix Local Test Suite
+  - [ ] Deploy dependent services in a kind cluster (auth_svc, postgresql, mysql, redis)
+    - [ ] Ensure service can communicate with dependencies
+    - [x] Ensure services can be deployed at ease in local cluster
+  - [ ] Fix load test issues & script
+    - [ ] implement load test as part of CI flow (docker & kubernetes sandboxed env.)
+  - [ ] Fix CI test suite (fix tests, cve, and helm steps)
+  - [ ] Implement E2E tests for grpc endpoints
+  - [ ] Provision helm chart for authentication_service with deployment testing in its own CI
+- [ ] Education
+  - [ ] Read up on kubernetes, flagger, flux, and helm
+  - [ ] Read up on guides in readme.md
+- [ ] Features
+  - [ ] Architect and implement facebook + google oauth (only for merchants) (Not As High Priority)
+  - [ ] Change password feature
+  - [ ] Reset password feature
+  - [ ] Telemetry
+  - [ ] Setup NewRelic Monitoring Agent + Prometheus + Logs + Tracing (docker & kubernetes)

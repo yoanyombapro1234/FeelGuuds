@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  # authentication_handler_service for the feelguuds platform
+  authentication_handler_service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: authentication_handler_service
+    ports:
+      - "9898:9898" # http port
+      - "9897:9897" # grpc port
+    restart: unless-stopped
+    environment:
+      - AUTHN_INTERNAL_PORT=3000
+      - AUTHN_PORT=8000
+    volumes:
+      - '.:/go/src/github.com/yoanyombapro1234/FeelGuuds/src/services/authentication_handler_service'
+    env_file:
+      - .env

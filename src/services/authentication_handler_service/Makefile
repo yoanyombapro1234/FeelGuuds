@@ -166,11 +166,9 @@ cover:
 go-mod:
 	go list -m -u all
 
-.PHONY: run-tests
-run-tests: start-containers
-	sleep 30s
-	echo "listing docker containers running and their status"
-	docker ps
+.PHONY: test
+test: start-containers
+	sleep 10s
 	echo "starting unit tests and integration tests"
 	go get github.com/mfridman/tparse
 	go test -v -race ./... -json -cover  -coverprofile cover.out | tparse -all -top

@@ -2,7 +2,6 @@ package api
 
 import (
 	"io"
-	"log"
 	"time"
 
 	"github.com/giantswarm/retry-go"
@@ -18,12 +17,6 @@ import (
 )
 
 const collectorEndpoint string = "http://localhost:14268/api/traces"
-const username string = "feelguuds"
-const password string = "feelguuds"
-const audience string = "localhost"
-const issuer string = "http://localhost:8000"
-const origin string = "http://localhost"
-const privateBaseUrl string = "http://authentication_service:8000"
 
 func NewMockServer() *Server {
 	config := &Config{
@@ -115,59 +108,8 @@ func InitializeAuthnClient(logger *zap.Logger) (*core_auth_sdk.Client, error) {
 	)
 
 	if err != nil {
-		logger.Error("failed to connect to authentication service when using host address LOCALHOST.... " +
-			"attempting using host address authentication_service")
-		// try with the service name as the connection uri
-		client, err = core_auth_sdk.NewClient(core_auth_sdk.Config{
-			// The AUTHN_URL of your Keratin AuthN server. This will be used to verify tokens created by
-			// AuthN, and will also be used for API calls unless PrivateBaseURL is also set.
-			Issuer: issuer,
-
-			// The domain of your application (no protocol). This domain should be listed in the APP_DOMAINS
-			// of your Keratin AuthN server.
-			Audience: audience,
-
-			// Credentials for AuthN's private endpoints. These will be used to execute admin actions using
-			// the Client provided by this library.
-			//
-			// TIP: make them extra secure in production!
-			Username: username,
-			Password: password,
-
-			// RECOMMENDED: Send private API calls to AuthN using private network routing. This can be
-			// necessary if your environment has a firewall to limit public endpoints.
-			PrivateBaseURL: privateBaseUrl,
-		}, constants.TEST_ORIGIN, &core_auth_sdk.RetryConfig{
-			MaxRetries:       5,
-			MinRetryWaitTime: 5 * time.Millisecond,
-			MaxRetryWaitTime: 15 * time.Millisecond,
-			RequestTimeout:   400 * time.Millisecond,
-		})
-
-		var response = make(chan interface{}, 1)
-		err = retry.Do(
-			func(conn chan<- interface{}) func() error {
-				return func() error {
-					opResponse, err := client.ServerStats()
-					if err != nil {
-						return err
-					}
-					response <- opResponse
-					return nil
-				}
-			}(response),
-			retry.MaxTries(5),
-			retry.Timeout(time.Millisecond*time.Duration(500)),
-			retry.Sleep(time.Millisecond*time.Duration(50)),
-		)
-
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-
-		logger.Info("successfully connected to authentication service")
+		logger.Error(err.Error())
 	}
-
 	return client, err
 }
 

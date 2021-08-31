@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication-service
+spec:
+  selector:
+    matchLabels:
+      app: authentication-service
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: authentication-service
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: authentication-service
+          image: keratin/authn-server:latest
+          imagePullPolicy: IfNotPresent
+          #command: ["/bin/sh"]
+          #args: ["-c", "./authn migrate && ./authn server"]
+          # Config from ConfigMap
+          # envFrom:
+          #  - configMapRef:
+          #      name: authentication-service-config
+          env:
+            - name: DATABASE_URL
+              value: postgres://authentication_service:authentication_service@postgres:5432/authentication_service?sslmode=disable
+            - name: AUTHN_URL
+              value: http://localhost:8000
+            - name: APP_DOMAINS
+              value: localhost
+            - name: SECRET_KEY_BASE
+              value: secret
+            - name: REDIS_URL
+              value: redis://redis:6379/11
+            - name: HTTP_AUTH_USERNAME
+              value: feelguuds
+            - name: HTTP_AUTH_PASSWORD
+              value: feelguuds
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - CMD
+                - curl
+                - -f
+                - http://localhost:8000
+            initialDelaySeconds: 15
+            timeoutSeconds: 30
+          readinessProbe:
+            exec:
+              command:
+                - CMD
+                - curl
+                - -f
+                - http://localhost:8000
+            initialDelaySeconds: 15
+            timeoutSeconds: 30

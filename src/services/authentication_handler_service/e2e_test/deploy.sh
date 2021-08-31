@@ -1,5 +1,9 @@
 #! /usr/bin/env sh
 
+set -e
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+
 # add jetstack repository
 helm repo add jetstack https://charts.jetstack.io || true
 
@@ -23,9 +27,12 @@ spec:
   selfSigned: {}
 EOF
 
+# deploy service dependencies
+$SCRIPT_DIR/start_dep.sh
+
 # install service with tls enabled
-helm upgrade --install service ./charts/service \
-    --set image.repository=test/service \
+helm upgrade --install service ./charts/authentication_handler_service \
+    --set image.repository=feelguuds/authentication_handler_service \
     --set image.tag=latest \
     --set tls.enabled=true \
     --set certificate.create=true \
