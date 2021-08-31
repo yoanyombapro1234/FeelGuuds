@@ -74,13 +74,13 @@ func main() {
 	// authentication service specific flags
 	fs.String("AUTHN_USERNAME", "feelguuds", "username of authentication client")
 	fs.String("AUTHN_PASSWORD", "feelguuds", "password of authentication client")
-	fs.String("AUTHN_ISSUER_BASE_URL", "http://localhost", "authentication service issuer")
+	fs.String("AUTHN_ISSUER_BASE_URL", "http://authentication_service", "authentication service issuer")
 	fs.String("AUTHN_ORIGIN", "http://localhost", "origin of auth requests")
-	fs.String("AUTHN_DOMAINS", "localhost", "authentication service domains")
+	fs.String("AUTHN_DOMAINS", "authentication_service", "authentication service domains")
 	fs.String("PRIVATE_BASE_URL", "http://authentication_service",
 		"authentication service private url. should be local host if these are not running on docker containers. "+
 			"However if running in docker container with a configured docker network, the url should be equal to the service name")
-	fs.String("AUTHN_PUBLIC_BASE_URL", "http://localhost", "authentication service public endpoint")
+	fs.String("AUTHN_PUBLIC_BASE_URL", "http://authentication_service", "authentication service public endpoint")
 	fs.String("AUTHN_INTERNAL_PORT", "3000", "authentication service port")
 	fs.String("AUTHN_EXTERNAL_PORT", "8000", "authentication service external port")
 	fs.Bool("ENABLE_AUTHN_PRIVATE_INTEGRATION", true, "enables communication with authentication service")
