@@ -1,4 +1,4 @@
-name: authentication_handler_svc_tests
+name: Auth. Hdlr. Svc - Tests
 
 on:
   push:
@@ -109,10 +109,18 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.16.x
+      - name: Start docker containers
+        working-directory: ${{env.working-directory}}
+        run:
+          docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans --detach
       - name: Run unit, integration, and end to end tests
         working-directory: ${{env.working-directory}}
         run:
-          docker ps -a && go get github.com/mfridman/tparse && go test -v -race ./... -json -cover -coverprofile cover.out | tparse -all -top
+          docker ps && go get github.com/mfridman/tparse && go test -v -race ./... -json -cover -coverprofile cover.out | tparse -all -top
+      - name: Stop docker containers
+        working-directory: ${{env.working-directory}}
+        if: always()
+        run: docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml down
       - name: Check if working tree is dirty
         run: |
           if [[ $(git diff --stat) != '' ]]; then
