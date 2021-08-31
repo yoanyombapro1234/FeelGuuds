@@ -109,10 +109,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.16.x
-      - name: Start docker container
-        working-directory: ${{env.working-directory}}
-        run:
-          docker-compose -f docker-compose.yaml up --remove-orphans --detach
       - name: Run unit, integration, and end to end tests
         working-directory: ${{env.working-directory}}
         run:
