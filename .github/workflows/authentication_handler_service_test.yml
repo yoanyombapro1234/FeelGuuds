@@ -27,6 +27,10 @@ jobs:
         working-directory: ${{env.working-directory}}
         run:
           docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml up --remove-orphans --detach && sleep 15
+      - name: See running docker containers
+        working-directory: ${{env.working-directory}}
+        run:
+          docker ps -a
       - name: Run unit, integration, and end to end tests
         working-directory: ${{env.working-directory}}
         run:
