@@ -45,7 +45,7 @@ jobs:
           PASSWORD_POLICY_SCORE: 2
           PASSWORD_CHANGE_LOGOUT: true
           PASSWORD_RESET_TOKEN_TTL: 1800
-        options: --health-cmd curl http://localhost:8000/health
+        options: --health-cmd curl http://localhost:8000/health --health-interval 10s --health-timeout 5s --health-retries 5
 
       elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
