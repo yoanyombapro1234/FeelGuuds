@@ -32,8 +32,7 @@ services:
     ports:
       - ${AUTHN_EXTERNAL_PORT:-8000}:${AUTHN_INTERNAL_PORT:-3000}
     environment:
-      DATABASE_URL: postgres://${AUTHN_POSTGRES_USER:-authentication_service}:${AUTHN_POSTGRES_PASSWORD:-authentication_service}@postgres:$
-      {AUTHN_POSTGRES_EXTERNAL_PORT:-5432}/${AUTHN_POSTGRES_DB_NAME:-authentication_service}?sslmode=disable
+      DATABASE_URL: postgres://${AUTHN_POSTGRES_USER:-authentication_service}:${AUTHN_POSTGRES_PASSWORD:-authentication_service}@postgres:${AUTHN_POSTGRES_EXTERNAL_PORT:-5432}/${AUTHN_POSTGRES_DB_NAME:-authentication_service}?sslmode=disable
       AUTHN_URL: ${AUTHN_PRIVATE_BASE_URL:-http://localhost}:${AUTHN_EXTERNAL_PORT:-8000}
       APP_DOMAINS: ${AUTHN_DOMAINS:-localhost}
       SECRET_KEY_BASE: ${AUTHN_SECRET:-secret}
