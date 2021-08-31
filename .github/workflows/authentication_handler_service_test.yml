@@ -120,7 +120,7 @@ jobs:
       - name: Stop docker containers
         working-directory: ${{env.working-directory}}
         if: always()
-        run: docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml down
+        run: docker ps && docker-compose -f docker-compose.dev.yaml -f docker-compose.jaeger.yaml down
       - name: Check if working tree is dirty
         run: |
           if [[ $(git diff --stat) != '' ]]; then
