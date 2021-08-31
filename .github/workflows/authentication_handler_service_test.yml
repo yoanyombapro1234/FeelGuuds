@@ -116,7 +116,7 @@ jobs:
       - name: Run unit, integration, and end to end tests
         working-directory: ${{env.working-directory}}
         run:
-          go get github.com/mfridman/tparse && go test -v -race ./... -json -cover -coverprofile cover.out | tparse -all -top
+          docker ps && go get github.com/mfridman/tparse && go test -v -race ./... -json -cover -coverprofile cover.out | tparse -all -top
       - name: Stop docker containers
         working-directory: ${{env.working-directory}}
         if: always()
